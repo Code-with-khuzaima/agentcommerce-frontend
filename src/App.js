@@ -128,6 +128,7 @@ function Field({ label, id, helper, error, children }) {
   );
 }
 
+// eslint-disable-next-line no-unused-vars
 function Input({ id, type = "text", placeholder, value, onChange, error, icon, ...rest }) {
   return (
     <div className="relative">
