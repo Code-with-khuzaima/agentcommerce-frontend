@@ -817,7 +817,7 @@ function LandingHero({ onStart }) {
         </div>
         <div className="flex items-center gap-4">
           <a href="#features" className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Features</a>
-          <a href="#pricing" className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Pricing</a>
+          <a href="#pricing" onClick={(e)=>{e.preventDefault();document.getElementById('pricing-modal').style.display='flex'}} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block cursor-pointer">Pricing</a>
           <Btn onClick={onStart} className="text-sm px-4 py-2">Get Started</Btn>
         </div>
       </nav>
@@ -946,6 +946,33 @@ export default function App() {
   <div style={{position:'relative',width:'95vw',maxWidth:'1100px',height:'85vh',borderRadius:'12px',overflow:'hidden'}}>
     <button onClick={()=>document.getElementById('demo-modal').style.display='none'} style={{position:'absolute',top:'12px',right:'12px',zIndex:10,background:'#000',color:'#fff',border:'none',borderRadius:'50%',width:'36px',height:'36px',fontSize:'18px',cursor:'pointer'}}>✕</button>
     <iframe src="/demo.html" style={{width:'100%',height:'100%',border:'none'}} title="Demo"/>
+  </div>
+</div>
+<div id="pricing-modal" style={{display:'none',position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.92)',alignItems:'center',justifyContent:'center',padding:'20px'}}>
+  <div style={{position:'relative',width:'100%',maxWidth:'480px',background:'#0f0f18',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'24px',padding:'48px 40px',textAlign:'center'}}>
+    <button onClick={()=>document.getElementById('pricing-modal').style.display='none'} style={{position:'absolute',top:'16px',right:'16px',background:'rgba(255,255,255,0.1)',color:'#fff',border:'none',borderRadius:'50%',width:'32px',height:'32px',fontSize:'16px',cursor:'pointer'}}>✕</button>
+    <div style={{display:'inline-flex',alignItems:'center',gap:'8px',background:'rgba(139,92,246,0.15)',border:'1px solid rgba(139,92,246,0.3)',borderRadius:'100px',padding:'6px 16px',fontSize:'12px',color:'#a78bfa',fontWeight:'600',marginBottom:'24px'}}>⚡ Most Popular</div>
+    <h2 style={{fontSize:'42px',fontWeight:'800',color:'#fff',margin:'0 0 4px'}}>$19<span style={{fontSize:'16px',fontWeight:'400',color:'#64748b'}}>/month</span></h2>
+    <p style={{color:'#64748b',fontSize:'14px',marginBottom:'32px'}}>Everything you need to automate your store</p>
+    <div style={{textAlign:'left',marginBottom:'32px',display:'flex',flexDirection:'column',gap:'12px'}}>
+      {[
+        '🤖 AI Chat Agent for your store',
+        '🕐 24/7 Automated customer support',
+        '❓ FAQ automation & instant answers',
+        '🧠 Store memory — last 10 messages',
+        '🛍️ Works with Shopify & WooCommerce',
+        '⚡ 1–2 day setup by our team',
+        '🔒 Secure API integration',
+      ].map(f => (
+        <div key={f} style={{display:'flex',alignItems:'center',gap:'12px',color:'#e2e8f0',fontSize:'14px'}}>
+          <span>{f}</span>
+        </div>
+      ))}
+    </div>
+    <button onClick={()=>{document.getElementById('pricing-modal').style.display='none';window.scrollTo({top:0,behavior:'smooth'});setShowFlow(true);}} style={{width:'100%',padding:'16px',background:'linear-gradient(135deg,#7c3aed,#a855f7)',color:'#fff',border:'none',borderRadius:'12px',fontSize:'16px',fontWeight:'700',cursor:'pointer',marginBottom:'12px'}}>
+      Get Started — $19/month
+    </button>
+    <p style={{color:'#475569',fontSize:'12px'}}>No contracts · Cancel anytime · Setup in 1–2 days</p>
   </div>
 </div>
     </div>
