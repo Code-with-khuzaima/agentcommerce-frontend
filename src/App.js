@@ -841,7 +841,7 @@ function LandingHero({ onStart }) {
           <Btn onClick={onStart} className="text-base px-8 py-4">
             <Icon path={icons.zap} size={18}/> Connect Your Store
           </Btn>
-          <a href="#how" className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
+            <a href="#how" onClick={(e)=>{e.preventDefault();document.getElementById('demo-modal').style.display='flex'}} className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer">
             See how it works <Icon path={icons.arrow} size={14}/>
           </a>
         </div>
@@ -942,6 +942,12 @@ export default function App() {
           </div>
         </div>
       )}
+    <div id="demo-modal" style={{display:'none',position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.85)',alignItems:'center',justifyContent:'center'}}>
+  <div style={{position:'relative',width:'95vw',maxWidth:'1100px',height:'85vh',borderRadius:'12px',overflow:'hidden'}}>
+    <button onClick={()=>document.getElementById('demo-modal').style.display='none'} style={{position:'absolute',top:'12px',right:'12px',zIndex:10,background:'#000',color:'#fff',border:'none',borderRadius:'50%',width:'36px',height:'36px',fontSize:'18px',cursor:'pointer'}}>✕</button>
+    <iframe src="/demo.html" style={{width:'100%',height:'100%',border:'none'}} title="Demo"/>
+  </div>
+</div>
     </div>
   );
 }
