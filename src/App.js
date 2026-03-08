@@ -558,7 +558,7 @@ function LandingPage({ onStart }) {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
+      <section id="howit-section" className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 font-medium mb-4">How It Works</div>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Up and Running in 4 Simple Steps</h2>
@@ -671,7 +671,7 @@ function LandingPage({ onStart }) {
       </section>
 
       {/* ── CTA BANNER ── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
+      <section id="howit-section" className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
         <Card className="p-10 sm:p-16 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-600/20 to-fuchsia-600/10 pointer-events-none" />
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-4 relative">Ready to Automate<br />Your Store?</h2>
