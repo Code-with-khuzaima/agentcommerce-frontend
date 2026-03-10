@@ -558,7 +558,7 @@ function LandingPage({ onStart }) {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
+      <section id="howit-section" className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 font-medium mb-4">How It Works</div>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Up and Running in 4 Simple Steps</h2>
@@ -702,7 +702,12 @@ function LandingPage({ onStart }) {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Product</p>
             <div className="space-y-2">
               {["Features", "Pricing", "How It Works", "Demo"].map(l => (
-                <button key={l} onClick={() => l === "Pricing" ? setPricingOpen(true) : l === "Demo" ? setDemoOpen(true) : null} className="block text-sm text-slate-500 hover:text-white transition-colors">{l}</button>
+                <button key={l} onClick={() => {
+                  if (l === "Pricing") setPricingOpen(true);
+                  else if (l === "Demo") setDemoOpen(true);
+                  else if (l === "Features") document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' });
+                  else if (l === "How It Works") document.getElementById('howit-section').scrollIntoView({ behavior: 'smooth' });
+                }} className="block text-sm text-slate-500 hover:text-white transition-colors">{l}</button>
               ))}
             </div>
           </div>
