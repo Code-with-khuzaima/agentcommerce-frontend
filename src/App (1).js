@@ -558,7 +558,7 @@ function LandingPage({ onStart }) {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="howit-section" className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
+      <section className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 font-medium mb-4">How It Works</div>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Up and Running in 4 Simple Steps</h2>
@@ -671,7 +671,7 @@ function LandingPage({ onStart }) {
       </section>
 
       {/* ── CTA BANNER ── */}
-      <section id="howit-section" className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
+      <section className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
         <Card className="p-10 sm:p-16 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-600/20 to-fuchsia-600/10 pointer-events-none" />
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-4 relative">Ready to Automate<br />Your Store?</h2>
@@ -753,43 +753,49 @@ function LandingPage({ onStart }) {
         </div>
       )}
 
- {/* ── CONTACT MODAL ── */}
+      {/* ── CONTACT MODAL ── */}
       {contactOpen && (
-        <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgbacenter p-4 bg-black/80 backdrop-blur-sm" onMouseDown={() => setContactOpen(false)}>
-          <Card className="w-full max-w-md p-8 relative" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
-            <button onClick={() => setContactOpen(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-slate-400 hover:text-white">✕</button>
+        <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.85)',display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}}>
+          <div style={{background:'#0f0f18',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'20px',padding:'40px',width:'100%',maxWidth:'460px',position:'relative'}}>
+            <button style={{position:'absolute',top:'16px',right:'16px',background:'rgba(255,255,255,0.1)',border:'none',borderRadius:'50%',width:'32px',height:'32px',color:'white',fontSize:'16px',cursor:'pointer'}} onClick={() => setContactOpen(false)}>✕</button>
             {contactSent ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4"><Icon path={icons.check} size={28} className="text-emerald-400" /></div>
-                <h3 className="text-xl font-bold text-white mb-2">Message Sent!</h3>
-                <p className="text-slate-400 text-sm">We'll get back to you within 24 hours.</p>
+              <div style={{textAlign:'center',padding:'32px 0'}}>
+                <div style={{width:'64px',height:'64px',borderRadius:'50%',background:'rgba(16,185,129,0.2)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
+                </div>
+                <h3 style={{color:'white',fontSize:'20px',fontWeight:'bold',marginBottom:'8px'}}>Message Sent!</h3>
+                <p style={{color:'#64748b',fontSize:'14px'}}>We will get back to you within 24 hours.</p>
               </div>
             ) : (
-              <>
-                <h3 className="text-xl font-bold text-white mb-2">Contact Us</h3>
-                <p className="text-slate-400 text-sm mb-6">We typically respond within a few hours.</p>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-widest block mb-1.5">Your Name</label>
-                    <input type="text" placeholder="John Smith" value={contactForm.name} onChange={e => setContactForm(f => ({ ...f, name: e.target.value }))}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none focus:ring-2 focus:ring-violet-500/60" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-widest block mb-1.5">Email</label>
-                    <input type="email" placeholder="you@example.com" value={contactForm.email} onChange={e => setContactForm(f => ({ ...f, email: e.target.value }))}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none focus:ring-2 focus:ring-violet-500/60" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-widest block mb-1.5">Message</label>
-                    <textarea rows={4} placeholder="Tell us about your store and what you need..." value={contactForm.message} onChange={e => setContactForm(f => ({ ...f, message: e.target.value }))}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none focus:ring-2 focus:ring-violet-500/60 resize-none" />
-                  </div>
-                  <Btn onClick={handleContactSubmit} className="w-full justify-center"><Icon path={icons.mail} size={16} /> Send Message</Btn>
-                  <p className="text-xs text-slate-500 text-center">Or email us directly: <a href="mailto:codewithkhuzaima@gmail.com" className="text-violet-400">codewithkhuzaima@gmail.com</a></p>
+              <div>
+                <h3 style={{color:'white',fontSize:'20px',fontWeight:'bold',marginBottom:'6px'}}>Contact Us</h3>
+                <p style={{color:'#64748b',fontSize:'14px',marginBottom:'24px'}}>We typically respond within a few hours.</p>
+                <div style={{marginBottom:'16px'}}>
+                  <label style={{display:'block',color:'#94a3b8',fontSize:'11px',fontWeight:'600',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'6px'}}>Your Name</label>
+                  <input type="text" placeholder="John Smith" value={contactForm.name}
+                    onChange={e => setContactForm(f => ({...f, name: e.target.value}))}
+                    style={{width:'100%',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'12px',padding:'12px 16px',color:'white',fontSize:'14px',outline:'none',boxSizing:'border-box'}} />
                 </div>
-              </>
+                <div style={{marginBottom:'16px'}}>
+                  <label style={{display:'block',color:'#94a3b8',fontSize:'11px',fontWeight:'600',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'6px'}}>Email</label>
+                  <input type="email" placeholder="you@example.com" value={contactForm.email}
+                    onChange={e => setContactForm(f => ({...f, email: e.target.value}))}
+                    style={{width:'100%',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'12px',padding:'12px 16px',color:'white',fontSize:'14px',outline:'none',boxSizing:'border-box'}} />
+                </div>
+                <div style={{marginBottom:'24px'}}>
+                  <label style={{display:'block',color:'#94a3b8',fontSize:'11px',fontWeight:'600',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'6px'}}>Message</label>
+                  <textarea rows={4} placeholder="Tell us about your store..." value={contactForm.message}
+                    onChange={e => setContactForm(f => ({...f, message: e.target.value}))}
+                    style={{width:'100%',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'12px',padding:'12px 16px',color:'white',fontSize:'14px',outline:'none',resize:'none',boxSizing:'border-box'}} />
+                </div>
+                <button onClick={handleContactSubmit}
+                  style={{width:'100%',background:'linear-gradient(135deg,#7c3aed,#a855f7)',border:'none',borderRadius:'12px',padding:'14px',color:'white',fontSize:'15px',fontWeight:'700',cursor:'pointer',marginBottom:'12px'}}>
+                  Send Message
+                </button>
+                <p style={{color:'#475569',fontSize:'12px',textAlign:'center'}}>Or email: <a href="mailto:codewithkhuzaima@gmail.com" style={{color:'#a78bfa'}}>codewithkhuzaima@gmail.com</a></p>
+              </div>
             )}
-          </Card>
+          </div>
         </div>
       )}
     </div>
