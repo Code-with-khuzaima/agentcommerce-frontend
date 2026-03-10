@@ -753,9 +753,9 @@ function LandingPage({ onStart }) {
         </div>
       )}
 
-      {/* ── CONTACT MODAL ── */}
+ {/* ── CONTACT MODAL ── */}
       {contactOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onMouseDown={() => setContactOpen(false)}>
+        <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgbacenter p-4 bg-black/80 backdrop-blur-sm" onMouseDown={() => setContactOpen(false)}>
           <Card className="w-full max-w-md p-8 relative" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
             <button onClick={() => setContactOpen(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-slate-400 hover:text-white">✕</button>
             {contactSent ? (
