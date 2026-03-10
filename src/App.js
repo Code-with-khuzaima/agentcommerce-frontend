@@ -697,7 +697,7 @@ function LandingPage({ onStart }) {
             <p className="text-sm text-slate-500 leading-relaxed max-w-xs">AI-powered sales agents for Shopify and WooCommerce stores. Automate support, boost sales, grow faster.</p>
             <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
               <Icon path={icons.mail} size={12} />
-              <a href="mailto:codewithkhuzaima@gmail.com" className="hover:text-violet-400 transition-colors">codewithkhuzaima@gmail.com</a>
+              <a href="mailto:agentcomerce@gmail.com" className="hover:text-violet-400 transition-colors">agentcomerce@gmail.com</a>
             </div>
           </div>
           <div>
@@ -804,7 +804,7 @@ function LandingPage({ onStart }) {
                   style={{width:'100%',background:'linear-gradient(135deg,#7c3aed,#a855f7)',border:'none',borderRadius:'12px',padding:'14px',color:'white',fontSize:'15px',fontWeight:'700',cursor:'pointer',marginBottom:'12px'}}>
                   Send Message
                 </button>
-                <p style={{color:'#475569',fontSize:'12px',textAlign:'center'}}>Or email: <a href="mailto:codewithkhuzaima@gmail.com" style={{color:'#a78bfa'}}>codewithkhuzaima@gmail.com</a></p>
+                <p style={{color:'#475569',fontSize:'12px',textAlign:'center'}}>Or email: <a href="mailto:agentcomerce@gmail.com" style={{color:'#a78bfa'}}>agentcomerce@gmail.com</a></p>
               </div>
             )}
           </div>
@@ -822,10 +822,10 @@ function LandingPage({ onStart }) {
               ["Information We Collect", "We collect information you provide when connecting your store, including your store URL, platform type, API credentials, store name, contact email, product categories, FAQs, and return policies. API credentials are encrypted using AES-256 encryption before storage."],
               ["How We Use Your Information", "We use your information solely to configure and deploy your AI agent. Your store data is used to train the AI to answer customer questions accurately. We never sell, rent, or share your data with third parties for marketing purposes."],
               ["Data Security", "All API credentials are encrypted with AES-256 encryption. All data transmission uses HTTPS/TLS encryption. We follow industry best practices for data security and access control."],
-              ["Data Retention", "We retain your data for as long as your subscription is active. Upon cancellation, your data is deleted within 30 days upon written request to codewithkhuzaima@gmail.com."],
+              ["Data Retention", "We retain your data for as long as your subscription is active. Upon cancellation, your data is deleted within 30 days upon written request to agentcomerce@gmail.com."],
               ["Third Party Services", "We use third-party services including Shopify API, WooCommerce API, and cloud hosting providers. These services have their own privacy policies which we encourage you to review."],
-              ["Your Rights", "You have the right to access, update, or delete your personal data at any time. Contact us at codewithkhuzaima@gmail.com to exercise these rights."],
-              ["Contact", "For privacy-related questions, email us at codewithkhuzaima@gmail.com. We respond within 24 hours."],
+              ["Your Rights", "You have the right to access, update, or delete your personal data at any time. Contact us at agentcomerce@gmail.com to exercise these rights."],
+              ["Contact", "For privacy-related questions, email us at agentcomerce@gmail.com. We respond within 24 hours."],
             ].map(([title, text]) => (
               <div key={title} style={{marginBottom:'20px'}}>
                 <h4 style={{color:'#a78bfa',fontSize:'14px',fontWeight:'700',marginBottom:'6px'}}>{title}</h4>
@@ -851,9 +851,9 @@ function LandingPage({ onStart }) {
               ["Your Responsibilities", "You are responsible for providing accurate store information and valid API credentials. You must ensure your store complies with Shopify or WooCommerce terms of service. You are responsible for the content your AI agent is trained on."],
               ["API Credentials", "You grant AgentComerce permission to access your store via provided API credentials solely for the purpose of configuring your AI agent. We will never use your credentials for any other purpose."],
               ["Service Availability", "We strive for 99% uptime but cannot guarantee uninterrupted service. We are not liable for any losses resulting from service downtime or AI agent errors."],
-              ["Termination", "You may cancel your subscription at any time by emailing codewithkhuzaima@gmail.com. We may terminate accounts that violate these terms. Upon termination, your AI agent will be deactivated within 48 hours."],
+              ["Termination", "You may cancel your subscription at any time by emailing agentcomerce@gmail.com. We may terminate accounts that violate these terms. Upon termination, your AI agent will be deactivated within 48 hours."],
               ["Limitation of Liability", "AgentComerce is not liable for any indirect, incidental, or consequential damages. Our total liability is limited to the amount paid in the last 30 days."],
-              ["Contact", "For questions about these terms, contact us at codewithkhuzaima@gmail.com."],
+              ["Contact", "For questions about these terms, contact us at agentcomerce@gmail.com."],
             ].map(([title, text]) => (
               <div key={title} style={{marginBottom:'20px'}}>
                 <h4 style={{color:'#a78bfa',fontSize:'14px',fontWeight:'700',marginBottom:'6px'}}>{title}</h4>
