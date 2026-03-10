@@ -445,6 +445,8 @@ function LandingPage({ onStart }) {
   const [contactOpen, setContactOpen] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [contactSent, setContactSent] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
 
   const stats = [
     { value: "500+", label: "Stores Connected", icon: icons.store },
@@ -715,7 +717,12 @@ function LandingPage({ onStart }) {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Support</p>
             <div className="space-y-2">
               {["Contact Us", "FAQ", "Privacy Policy", "Terms of Service"].map(l => (
-                <button key={l} onClick={() => l === "Contact Us" ? setContactOpen(true) : l === "FAQ" ? document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' }) : null} className="block text-sm text-slate-500 hover:text-white transition-colors">{l}</button>
+                <button key={l} onClick={() => {
+                  if (l === "Contact Us") setContactOpen(true);
+                  else if (l === "FAQ") document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' });
+                  else if (l === "Privacy Policy") setPrivacyOpen(true);
+                  else if (l === "Terms of Service") setTermsOpen(true);
+                }} className="block text-sm text-slate-500 hover:text-white transition-colors">{l}</button>
               ))}
             </div>
           </div>
@@ -800,6 +807,60 @@ function LandingPage({ onStart }) {
                 <p style={{color:'#475569',fontSize:'12px',textAlign:'center'}}>Or email: <a href="mailto:codewithkhuzaima@gmail.com" style={{color:'#a78bfa'}}>codewithkhuzaima@gmail.com</a></p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ── PRIVACY POLICY MODAL ── */}
+      {privacyOpen && (
+        <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.85)',display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}}>
+          <div style={{background:'#0f0f18',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'20px',padding:'40px',width:'100%',maxWidth:'560px',position:'relative',maxHeight:'85vh',overflowY:'auto'}}>
+            <button style={{position:'absolute',top:'16px',right:'16px',background:'rgba(255,255,255,0.1)',border:'none',borderRadius:'50%',width:'32px',height:'32px',color:'white',fontSize:'16px',cursor:'pointer'}} onClick={() => setPrivacyOpen(false)}>✕</button>
+            <h3 style={{color:'white',fontSize:'22px',fontWeight:'bold',marginBottom:'4px'}}>Privacy Policy</h3>
+            <p style={{color:'#64748b',fontSize:'12px',marginBottom:'24px'}}>Last updated: January 2026</p>
+            {[
+              ["Information We Collect", "We collect information you provide when connecting your store, including your store URL, platform type, API credentials, store name, contact email, product categories, FAQs, and return policies. API credentials are encrypted using AES-256 encryption before storage."],
+              ["How We Use Your Information", "We use your information solely to configure and deploy your AI agent. Your store data is used to train the AI to answer customer questions accurately. We never sell, rent, or share your data with third parties for marketing purposes."],
+              ["Data Security", "All API credentials are encrypted with AES-256 encryption. All data transmission uses HTTPS/TLS encryption. We follow industry best practices for data security and access control."],
+              ["Data Retention", "We retain your data for as long as your subscription is active. Upon cancellation, your data is deleted within 30 days upon written request to codewithkhuzaima@gmail.com."],
+              ["Third Party Services", "We use third-party services including Shopify API, WooCommerce API, and cloud hosting providers. These services have their own privacy policies which we encourage you to review."],
+              ["Your Rights", "You have the right to access, update, or delete your personal data at any time. Contact us at codewithkhuzaima@gmail.com to exercise these rights."],
+              ["Contact", "For privacy-related questions, email us at codewithkhuzaima@gmail.com. We respond within 24 hours."],
+            ].map(([title, text]) => (
+              <div key={title} style={{marginBottom:'20px'}}>
+                <h4 style={{color:'#a78bfa',fontSize:'14px',fontWeight:'700',marginBottom:'6px'}}>{title}</h4>
+                <p style={{color:'#94a3b8',fontSize:'13px',lineHeight:'1.7'}}>{text}</p>
+              </div>
+            ))}
+            <button onClick={() => setPrivacyOpen(false)} style={{width:'100%',background:'linear-gradient(135deg,#7c3aed,#a855f7)',border:'none',borderRadius:'12px',padding:'12px',color:'white',fontSize:'14px',fontWeight:'700',cursor:'pointer',marginTop:'8px'}}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── TERMS OF SERVICE MODAL ── */}
+      {termsOpen && (
+        <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.85)',display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}}>
+          <div style={{background:'#0f0f18',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'20px',padding:'40px',width:'100%',maxWidth:'560px',position:'relative',maxHeight:'85vh',overflowY:'auto'}}>
+            <button style={{position:'absolute',top:'16px',right:'16px',background:'rgba(255,255,255,0.1)',border:'none',borderRadius:'50%',width:'32px',height:'32px',color:'white',fontSize:'16px',cursor:'pointer'}} onClick={() => setTermsOpen(false)}>✕</button>
+            <h3 style={{color:'white',fontSize:'22px',fontWeight:'bold',marginBottom:'4px'}}>Terms of Service</h3>
+            <p style={{color:'#64748b',fontSize:'12px',marginBottom:'24px'}}>Last updated: January 2026</p>
+            {[
+              ["Acceptance of Terms", "By using AgentComerce, you agree to these Terms of Service. If you do not agree, please do not use our service. These terms apply to all users of the platform."],
+              ["Service Description", "AgentComerce provides AI-powered chat agent integration for Shopify and WooCommerce stores. We configure and deploy an AI agent to your store within 1-2 business days of receiving your credentials and store information."],
+              ["Subscription & Payment", "Our service is billed at $19/month. Billing begins on the date your AI agent goes live. You may cancel at any time with no penalty. We offer a 14-day money-back guarantee if you are unsatisfied with the service."],
+              ["Your Responsibilities", "You are responsible for providing accurate store information and valid API credentials. You must ensure your store complies with Shopify or WooCommerce terms of service. You are responsible for the content your AI agent is trained on."],
+              ["API Credentials", "You grant AgentComerce permission to access your store via provided API credentials solely for the purpose of configuring your AI agent. We will never use your credentials for any other purpose."],
+              ["Service Availability", "We strive for 99% uptime but cannot guarantee uninterrupted service. We are not liable for any losses resulting from service downtime or AI agent errors."],
+              ["Termination", "You may cancel your subscription at any time by emailing codewithkhuzaima@gmail.com. We may terminate accounts that violate these terms. Upon termination, your AI agent will be deactivated within 48 hours."],
+              ["Limitation of Liability", "AgentComerce is not liable for any indirect, incidental, or consequential damages. Our total liability is limited to the amount paid in the last 30 days."],
+              ["Contact", "For questions about these terms, contact us at codewithkhuzaima@gmail.com."],
+            ].map(([title, text]) => (
+              <div key={title} style={{marginBottom:'20px'}}>
+                <h4 style={{color:'#a78bfa',fontSize:'14px',fontWeight:'700',marginBottom:'6px'}}>{title}</h4>
+                <p style={{color:'#94a3b8',fontSize:'13px',lineHeight:'1.7'}}>{text}</p>
+              </div>
+            ))}
+            <button onClick={() => setTermsOpen(false)} style={{width:'100%',background:'linear-gradient(135deg,#7c3aed,#a855f7)',border:'none',borderRadius:'12px',padding:'12px',color:'white',fontSize:'14px',fontWeight:'700',cursor:'pointer',marginTop:'8px'}}>Close</button>
           </div>
         </div>
       )}
