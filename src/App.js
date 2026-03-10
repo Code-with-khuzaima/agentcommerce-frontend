@@ -492,8 +492,17 @@ function LandingPage({ onStart }) {
 
   const handleContactSubmit = () => {
     if (!contactForm.name || !contactForm.email || !contactForm.message) return;
-    setContactSent(true);
-    setTimeout(() => { setContactOpen(false); setContactSent(false); setContactForm({ name: "", email: "", message: "" }); }, 3000);
+    window.emailjs.send(
+      "service_26d0u9m",
+      "template_wovwhva",
+      { from_name: contactForm.name, from_email: contactForm.email, message: contactForm.message },
+      "Nvak4g2MT8AuvKpb6"
+    ).then(() => {
+      setContactSent(true);
+      setTimeout(() => { setContactOpen(false); setContactSent(false); setContactForm({ name: "", email: "", message: "" }); }, 3000);
+    }).catch(() => {
+      alert("Failed to send message. Please email us directly at agentcomrce@gmail.com");
+    });
   };
 
   return (
