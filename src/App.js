@@ -411,7 +411,10 @@ function Step2({ data, setData, onNext, onBack }) {
       </div>
       <div className="flex items-center justify-between pt-2">
         <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <Btn onClick={handleValidate} loading={validating}><Icon path={icons.zap} size={16} /> Test Connection</Btn>
+        <div className="flex gap-3">
+          <Btn variant="ghost" onClick={handleValidate} loading={validating}><Icon path={icons.zap} size={16} /> Test Connection</Btn>
+          <Btn onClick={() => validate() && onNext()}>Continue <Icon path={icons.arrow} size={16} /></Btn>
+        </div>
       </div>
     </div>
   );
