@@ -422,6 +422,16 @@ function Step2({ data, setData, onNext, onBack }) {
 
 function Step3({ data, setData, onNext, onBack }) {
   const [errors, setErrors] = useState({});
+
+  const STORE_QUESTIONS = [
+    { id: "freeShipping", q: "Do you offer free shipping?" },
+    { id: "internationalShipping", q: "Do you ship internationally?" },
+    { id: "acceptReturns", q: "Do you accept returns?" },
+    { id: "cashOnDelivery", q: "Do you offer cash on delivery?" },
+    { id: "physicalStore", q: "Do you have a physical store?" },
+    { id: "promoDiscounts", q: "Do you offer discounts or promo codes?" },
+  ];
+
   const validate = () => {
     const e = {};
     if (!data.storeName?.trim()) e.storeName = "Store name is required";
@@ -431,6 +441,9 @@ function Step3({ data, setData, onNext, onBack }) {
     if (!data.deliveryMethods?.length) e.deliveryMethods = "Please select at least one delivery method";
     if (!data.returnPolicy?.trim()) e.returnPolicy = "Return/refund policy is required";
     if (!data.faqs?.trim()) e.faqs = "Please add at least one FAQ";
+    STORE_QUESTIONS.forEach(({ id }) => {
+      if (!data.storeAnswers?.[id]) e[id] = "Please answer this question";
+    });
     setErrors(e); return Object.keys(e).length === 0;
   };
   return (
@@ -467,6 +480,37 @@ function Step3({ data, setData, onNext, onBack }) {
         <Textarea id="faqs" rows={5} placeholder={"Do you ship internationally?\nHow long does delivery take?\nWhat payment methods do you accept?"} value={data.faqs || ""} onChange={e => setData(d => ({ ...d, faqs: e.target.value }))} />
         {errors.faqs && <p className="text-xs text-red-400 mt-1">{errors.faqs}</p>}
       </Field>
+      <div>
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Store Questions <span className="text-red-400">*</span></p>
+        <p className="text-xs text-slate-500 mb-4">All questions must be answered to train your AI agent properly.</p>
+        <div className="space-y-3">
+          {STORE_QUESTIONS.map(({ id, q }) => (
+            <div key={id} className={cx("p-4 rounded-xl border transition-all", errors[id] ? "border-red-500/40 bg-red-500/5" : "border-white/10 bg-white/3")}>
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-sm text-slate-200 flex-1">{q}</p>
+                <div className="flex gap-2 flex-shrink-0">
+                  <button onClick={() => setData(d => ({ ...d, storeAnswers: { ...d.storeAnswers, [id]: "yes" } }))}
+                    className={cx("px-4 py-1.5 rounded-lg text-xs font-bold border transition-all",
+                      data.storeAnswers?.[id] === "yes"
+                        ? "bg-emerald-500/25 border-emerald-400/50 text-emerald-300"
+                        : "bg-white/5 border-white/10 text-slate-400 hover:border-emerald-400/30 hover:text-emerald-300")}>
+                    ✓ Yes
+                  </button>
+                  <button onClick={() => setData(d => ({ ...d, storeAnswers: { ...d.storeAnswers, [id]: "no" } }))}
+                    className={cx("px-4 py-1.5 rounded-lg text-xs font-bold border transition-all",
+                      data.storeAnswers?.[id] === "no"
+                        ? "bg-red-500/25 border-red-400/50 text-red-300"
+                        : "bg-white/5 border-white/10 text-slate-400 hover:border-red-400/30 hover:text-red-300")}>
+                    ✗ No
+                  </button>
+                </div>
+              </div>
+              {errors[id] && <p className="text-xs text-red-400 mt-2">{errors[id]}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+
       <Field label="Special Notes" id="notes" helper="Optional">
         <Textarea id="notes" placeholder="Anything the AI should know about your store..." value={data.notes || ""} onChange={e => setData(d => ({ ...d, notes: e.target.value }))} />
       </Field>
@@ -1033,7 +1077,7 @@ export default function App() {
   const [step, setStep] = useState(1);
   const [data, setData] = useState({
     storeUrl: "", platform: "", apiKey: "", accessToken: "", consumerKey: "", consumerSecret: "",
-    plan: "",
+    plan: "", storeAnswers: {},
     storeName: "", contactEmail: "", categories: [], deliveryMethods: [], returnPolicy: "", faqs: "", notes: "",
   });
   const next = () => setStep(s => Math.min(s + 1, 5));
