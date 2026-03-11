@@ -37,10 +37,11 @@ const icons = {
 };
 
 const STEPS = [
-  { id: 1, label: "Store URL" },
-  { id: 2, label: "Credentials" },
-  { id: 3, label: "Store Info" },
-  { id: 4, label: "Confirm" },
+  { id: 1, label: "Choose Plan" },
+  { id: 2, label: "Store URL" },
+  { id: 3, label: "Credentials" },
+  { id: 4, label: "Store Info" },
+  { id: 5, label: "Confirm" },
 ];
 
 const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:4000/api";
@@ -203,7 +204,80 @@ function MultiSelect({ options, selected, onChange }) {
   );
 }
 
-function Step1({ data, setData, onNext }) {
+function StepPlan({ data, setData, onNext }) {
+  const [error, setError] = useState("");
+  const plans = [
+    {
+      id: "starter",
+      name: "Starter",
+      price: "$19",
+      desc: "Perfect for small stores",
+      color: "slate",
+      features: ["🤖 AI Chat Agent 24/7","❓ FAQ automation","🧠 Memory — 10 messages","📦 Live product data","💰 Live stock & prices","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup"],
+    },
+    {
+      id: "pro",
+      name: "Pro",
+      price: "$49",
+      oldPrice: "$99",
+      desc: "For stores that want max sales",
+      color: "violet",
+      badge: "⭐ Most Popular",
+      features: ["✅ Everything in Starter","🧠 Memory — 50 messages","📦 Live recommendations","🛒 Abandoned cart recovery","📊 Monthly report","🚀 Priority support","🔥 GPT-4 powered"],
+    },
+  ];
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-2">Choose Your Plan</h2>
+        <p className="text-slate-400 text-sm">Select the plan that fits your store. You can upgrade anytime.</p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {plans.map(plan => (
+          <button key={plan.id} onClick={() => { setData(d => ({...d, plan: plan.id})); setError(""); }}
+            className={cx("relative text-left p-6 rounded-2xl border transition-all duration-200",
+              data.plan === plan.id
+                ? plan.color === "violet" ? "border-violet-400/60 bg-violet-500/15" : "border-white/30 bg-white/8"
+                : "border-white/10 bg-white/3 hover:border-white/25")}>
+            {plan.badge && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">{plan.badge}</div>
+            )}
+            <div className={cx("text-xs font-bold uppercase tracking-widest mb-2", plan.color === "violet" ? "text-violet-400" : "text-slate-400")}>{plan.name}</div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-4xl font-extrabold text-white">{plan.price}</span>
+              <span className="text-slate-500 text-sm">/mo</span>
+              {plan.oldPrice && <span className="text-slate-600 text-xs line-through">{plan.oldPrice}</span>}
+            </div>
+            <p className="text-slate-400 text-xs mb-4">{plan.desc}</p>
+            <div className="space-y-2">
+              {plan.features.map((f, i) => (
+                <div key={f} className={cx("flex items-center gap-2 text-xs", i === 0 && plan.color === "violet" ? "text-violet-300 font-semibold" : "text-slate-400")}>
+                  <Icon path={icons.check} size={11} className={plan.color === "violet" ? "text-violet-400" : "text-emerald-400"} />{f}
+                </div>
+              ))}
+            </div>
+            {data.plan === plan.id && (
+              <div className={cx("mt-4 flex items-center gap-1.5 text-xs font-bold", plan.color === "violet" ? "text-violet-300" : "text-white")}>
+                <Icon path={icons.check} size={12} /> Selected
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+      <div className="p-4 rounded-xl bg-violet-500/8 border border-violet-500/20">
+        <p className="text-xs text-slate-400">💡 <strong className="text-white">Pro tip:</strong> Most store owners recover <strong className="text-violet-300">$200-500/month</strong> in abandoned carts alone with the Pro plan — making it pay for itself instantly.</p>
+      </div>
+      {error && <p className="text-xs text-red-400">{error}</p>}
+      <div className="flex justify-end pt-2">
+        <Btn onClick={() => { if (!data.plan) { setError("Please select a plan to continue"); return; } onNext(); }}>
+          Continue <Icon path={icons.arrow} size={16} />
+        </Btn>
+      </div>
+    </div>
+  );
+}
+
+function Step1({ data, setData, onNext, onBack }) {
   const [errors, setErrors] = useState({});
   const validate = () => {
     const e = {};
@@ -236,7 +310,8 @@ function Step1({ data, setData, onNext }) {
         </div>
         {errors.platform && <p className="text-xs text-red-400 mt-2">{errors.platform}</p>}
       </div>
-      <div className="flex justify-end pt-2">
+      <div className="flex items-center justify-between pt-2">
+        <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
         <Btn onClick={() => validate() && onNext()}>Continue <Icon path={icons.arrow} size={16} /></Btn>
       </div>
     </div>
@@ -421,7 +496,7 @@ function Step4({ data, onBack }) {
         <p className="text-slate-400 text-sm">Review your information before submitting.</p>
       </div>
       <div className="rounded-xl border border-white/10 overflow-hidden">
-        {[["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Contact", data.contactEmail], ["Categories", (data.categories || []).join(", ") || "—"]].map(([label, value], i) => (
+        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{data.plan === "pro" ? "Pro — $49/mo" : "Starter — $19/mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Contact", data.contactEmail], ["Categories", (data.categories || []).join(", ") || "—"]].map(([label, value], i) => (
           <div key={label} className={cx("flex items-start justify-between gap-4 px-5 py-4", i % 2 === 0 ? "bg-white/3" : "bg-transparent")}>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest flex-shrink-0 pt-0.5">{label}</span>
             <span className="text-sm text-slate-200 text-right break-all">{value || "—"}</span>
@@ -942,9 +1017,10 @@ export default function App() {
   const [step, setStep] = useState(1);
   const [data, setData] = useState({
     storeUrl: "", platform: "", apiKey: "", accessToken: "", consumerKey: "", consumerSecret: "",
+    plan: "",
     storeName: "", contactEmail: "", categories: [], deliveryMethods: [], returnPolicy: "", faqs: "", notes: "",
   });
-  const next = () => setStep(s => Math.min(s + 1, 4));
+  const next = () => setStep(s => Math.min(s + 1, 5));
   const back = () => setStep(s => Math.max(s - 1, 1));
 
   return (
@@ -972,10 +1048,11 @@ export default function App() {
             </div>
             <Progress step={step} />
             <Card className="p-6 sm:p-8">
-              {step === 1 && <Step1 data={data} setData={setData} onNext={next} />}
-              {step === 2 && <Step2 data={data} setData={setData} onNext={next} onBack={back} />}
-              {step === 3 && <Step3 data={data} setData={setData} onNext={next} onBack={back} />}
-              {step === 4 && <Step4 data={data} onBack={back} />}
+              {step === 1 && <StepPlan data={data} setData={setData} onNext={next} />}
+              {step === 2 && <Step1 data={data} setData={setData} onNext={next} onBack={back} />}
+              {step === 3 && <Step2 data={data} setData={setData} onNext={next} onBack={back} />}
+              {step === 4 && <Step3 data={data} setData={setData} onNext={next} onBack={back} />}
+              {step === 5 && <Step4 data={data} onBack={back} />}
             </Card>
             {step < 4 && (
               <div className="flex items-center justify-center gap-6 mt-6">
