@@ -638,25 +638,57 @@ function LandingPage({ onStart }) {
       </section>
 
       {/* ── PRICING ── */}
-      <section className="relative z-10 max-w-3xl mx-auto px-6 pb-24 text-center">
+      <section className="relative z-10 max-w-5xl mx-auto px-6 pb-24 text-center">
         <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 font-medium mb-4">Pricing</div>
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
-        <p className="text-slate-400 mb-10">One plan, everything included. No hidden fees, no surprises.</p>
-        <Card className="p-8 sm:p-12 max-w-md mx-auto relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-t-2xl" />
-          <div className="inline-flex items-center gap-2 bg-violet-500/15 border border-violet-500/25 text-violet-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">⚡ Most Popular</div>
-          <div className="text-6xl font-extrabold text-white mb-2">$19<span className="text-xl font-normal text-slate-500">/mo</span></div>
-          <p className="text-slate-400 text-sm mb-8">Everything you need to automate your store</p>
-          <div className="space-y-3 text-left mb-8">
-            {["🤖 AI Chat Agent for your store", "🕐 24/7 Automated customer support", "❓ FAQ automation & instant answers", "🧠 Store memory — last 10 messages", "🛍️ Works with Shopify & WooCommerce", "⚡ 1–2 day setup by our team", "🔒 AES-256 secure integration", "📧 Email notifications & reports"].map(f => (
-              <div key={f} className="flex items-center gap-3 text-sm text-slate-300">
-                <Icon path={icons.check} size={14} className="text-emerald-400 flex-shrink-0" />{f}
+        <p className="text-slate-400 mb-10">Two plans, no hidden fees, no surprises. Cancel anytime.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          {/* STARTER */}
+          <Card className="p-8 relative overflow-hidden flex flex-col">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-500 to-slate-400 rounded-t-2xl" />
+            <div className="mb-6">
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Starter</div>
+              <div className="text-5xl font-extrabold text-white mb-1">$19<span className="text-lg font-normal text-slate-500">/mo</span></div>
+              <p className="text-slate-400 text-sm mt-2">Perfect for small stores getting started with AI</p>
+            </div>
+            <div className="space-y-3 text-left mb-8 flex-1">
+              {["🤖 AI Chat Agent 24/7","❓ FAQ automation","🧠 Memory — last 10 messages","📦 Live product data from store","💰 Live stock & price checking","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup by our team","🔒 AES-256 secure integration","📧 Email support"].map(f => (
+                <div key={f} className="flex items-center gap-3 text-sm text-slate-300">
+                  <Icon path={icons.check} size={14} className="text-emerald-400 flex-shrink-0" />{f}
+                </div>
+              ))}
+            </div>
+            <Btn variant="ghost" onClick={onStart} className="w-full justify-center text-base py-4 border-white/20">Get Started — $19/month</Btn>
+            <p className="text-xs text-slate-500 mt-3">No contracts · Cancel anytime</p>
+          </Card>
+          {/* PRO */}
+          <Card className="p-8 relative overflow-hidden flex flex-col border-violet-500/40" style={{background:'linear-gradient(135deg,rgba(124,58,237,0.15),rgba(168,85,247,0.08))'}}>
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-t-2xl" />
+            <div className="absolute top-4 right-4">
+              <div className="inline-flex items-center gap-1 bg-violet-500/25 border border-violet-400/40 text-violet-200 text-xs font-bold px-2.5 py-1 rounded-full">⭐ Most Popular</div>
+            </div>
+            <div className="mb-6">
+              <div className="text-xs font-bold text-violet-400 uppercase tracking-widest mb-3">Pro</div>
+              <div className="flex items-baseline gap-2">
+                <div className="text-5xl font-extrabold text-white mb-1">$49<span className="text-lg font-normal text-slate-500">/mo</span></div>
+                <div className="text-xs text-slate-500 line-through">$99</div>
               </div>
-            ))}
-          </div>
-          <Btn onClick={onStart} className="w-full justify-center text-base py-4">Get Started — $19/month</Btn>
-          <p className="text-xs text-slate-500 mt-4">No contracts · Cancel anytime · 14-day money back</p>
-        </Card>
+              <p className="text-slate-300 text-sm mt-2">For growing stores that want maximum sales</p>
+            </div>
+            <div className="space-y-3 text-left mb-8 flex-1">
+              {["✅ Everything in Starter","🧠 Memory — last 50 messages","📦 Live product recommendations","💰 Live stock & price checking","🛒 Abandoned cart recovery","📊 Monthly performance report","🚀 Priority 24hr support","🎯 Upsell & cross-sell AI","🔥 GPT-4 powered responses"].map((f, i) => (
+                <div key={f} className={`flex items-center gap-3 text-sm ${i === 0 ? "text-violet-300 font-semibold" : "text-slate-300"}`}>
+                  <Icon path={icons.check} size={14} className="text-violet-400 flex-shrink-0" />{f}
+                </div>
+              ))}
+            </div>
+            <Btn onClick={onStart} className="w-full justify-center text-base py-4">Get Pro — $49/month</Btn>
+            <p className="text-xs text-slate-500 mt-3">No contracts · 14-day money back guarantee</p>
+          </Card>
+        </div>
+        <div className="mt-8 p-4 rounded-xl bg-violet-500/8 border border-violet-500/20 max-w-2xl mx-auto">
+          <p className="text-sm text-slate-300">💡 <strong className="text-white">Most store owners choose Pro</strong> — the abandoned cart recovery alone typically recovers <strong className="text-violet-300">$200-500/month</strong> in lost sales, making it pay for itself instantly.</p>
+        </div>
       </section>
 
       {/* ── FAQ ── */}
@@ -747,20 +779,47 @@ function LandingPage({ onStart }) {
 
       {/* ── PRICING MODAL ── */}
       {pricingOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setPricingOpen(false)}>
-          <Card className="w-full max-w-md p-8 text-center relative" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setPricingOpen(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-slate-400 hover:text-white">✕</button>
-            <div className="inline-flex items-center gap-2 bg-violet-500/15 border border-violet-500/25 text-violet-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">⚡ Most Popular</div>
-            <div className="text-5xl font-extrabold text-white mb-1">$19<span className="text-lg font-normal text-slate-500">/mo</span></div>
-            <p className="text-slate-400 text-sm mb-6">Everything you need, no surprises</p>
-            <div className="space-y-2 text-left mb-6">
-              {["🤖 AI Chat Agent", "🕐 24/7 Support automation", "❓ FAQ handling", "🧠 Store memory (last 10 messages)", "🛍️ Shopify & WooCommerce", "⚡ 1–2 day setup", "🔒 Secure encryption"].map(f => (
-                <div key={f} className="flex items-center gap-2 text-sm text-slate-300"><Icon path={icons.check} size={12} className="text-emerald-400" />{f}</div>
-              ))}
+        <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.85)',display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}}>
+          <div style={{background:'#0f0f18',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'20px',padding:'32px',width:'100%',maxWidth:'700px',position:'relative',maxHeight:'90vh',overflowY:'auto'}}>
+            <button style={{position:'absolute',top:'16px',right:'16px',background:'rgba(255,255,255,0.1)',border:'none',borderRadius:'50%',width:'32px',height:'32px',color:'white',fontSize:'16px',cursor:'pointer'}} onClick={() => setPricingOpen(false)}>✕</button>
+            <h3 style={{color:'white',fontSize:'22px',fontWeight:'800',textAlign:'center',marginBottom:'6px'}}>Choose Your Plan</h3>
+            <p style={{color:'#64748b',fontSize:'13px',textAlign:'center',marginBottom:'24px'}}>No contracts · Cancel anytime</p>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}}>
+              {/* STARTER */}
+              <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'16px',padding:'24px'}}>
+                <div style={{fontSize:'11px',fontWeight:'700',color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px'}}>Starter</div>
+                <div style={{fontSize:'36px',fontWeight:'800',color:'white',marginBottom:'4px'}}>$19<span style={{fontSize:'14px',fontWeight:'400',color:'#64748b'}}>/mo</span></div>
+                <p style={{color:'#64748b',fontSize:'12px',marginBottom:'16px'}}>Perfect for small stores</p>
+                <div style={{marginBottom:'20px'}}>
+                  {["🤖 AI Chat Agent 24/7","❓ FAQ automation","🧠 Memory — 10 messages","📦 Live product data","💰 Live stock & prices","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup","🔒 Secure encryption"].map(f => (
+                    <div key={f} style={{display:'flex',alignItems:'center',gap:'8px',color:'#cbd5e1',fontSize:'12px',marginBottom:'8px'}}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>{f}
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => { setPricingOpen(false); onStart(); }} style={{width:'100%',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.2)',borderRadius:'10px',padding:'11px',color:'white',fontSize:'13px',fontWeight:'700',cursor:'pointer'}}>Get Starter — $19/mo</button>
+              </div>
+              {/* PRO */}
+              <div style={{background:'linear-gradient(135deg,rgba(124,58,237,0.2),rgba(168,85,247,0.1))',border:'1px solid rgba(139,92,246,0.5)',borderRadius:'16px',padding:'24px',position:'relative'}}>
+                <div style={{position:'absolute',top:'-10px',left:'50%',transform:'translateX(-50%)',background:'linear-gradient(135deg,#7c3aed,#a855f7)',borderRadius:'99px',padding:'3px 12px',fontSize:'10px',fontWeight:'800',color:'white',whiteSpace:'nowrap'}}>⭐ MOST POPULAR</div>
+                <div style={{fontSize:'11px',fontWeight:'700',color:'#a78bfa',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px'}}>Pro</div>
+                <div style={{display:'flex',alignItems:'baseline',gap:'8px',marginBottom:'4px'}}>
+                  <div style={{fontSize:'36px',fontWeight:'800',color:'white'}}>$49<span style={{fontSize:'14px',fontWeight:'400',color:'#64748b'}}>/mo</span></div>
+                  <div style={{fontSize:'12px',color:'#64748b',textDecoration:'line-through'}}>$99</div>
+                </div>
+                <p style={{color:'#c4b5fd',fontSize:'12px',marginBottom:'16px'}}>For stores that want max sales</p>
+                <div style={{marginBottom:'20px'}}>
+                  {["✅ Everything in Starter","🧠 Memory — 50 messages","📦 Live recommendations","🛒 Abandoned cart recovery","📊 Monthly report","🚀 Priority support","🎯 Upsell & cross-sell AI","🔥 GPT-4 powered"].map((f, i) => (
+                    <div key={f} style={{display:'flex',alignItems:'center',gap:'8px',color: i===0 ? '#c4b5fd' : '#cbd5e1',fontSize:'12px',marginBottom:'8px',fontWeight: i===0 ? '600' : '400'}}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>{f}
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => { setPricingOpen(false); onStart(); }} style={{width:'100%',background:'linear-gradient(135deg,#7c3aed,#a855f7)',border:'none',borderRadius:'10px',padding:'11px',color:'white',fontSize:'13px',fontWeight:'700',cursor:'pointer'}}>Get Pro — $49/mo</button>
+              </div>
             </div>
-            <Btn onClick={() => { setPricingOpen(false); onStart(); }} className="w-full justify-center">Get Started — $19/month</Btn>
-            <p className="text-xs text-slate-500 mt-3">No contracts · Cancel anytime · 14-day money back</p>
-          </Card>
+            <p style={{color:'#334155',fontSize:'11px',textAlign:'center',marginTop:'16px'}}>💡 Most store owners choose Pro — abandoned cart recovery pays for itself instantly</p>
+          </div>
         </div>
       )}
 
