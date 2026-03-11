@@ -1029,8 +1029,9 @@ export default function App() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;600;700;800&display=swap');
         * { box-sizing: border-box; } body { margin: 0; }
         ::selection { background: rgba(139,92,246,0.35); }
-        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 99px; }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: rgba(15,10,30,0.8); }
+        ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.8); border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(168,85,247,1); }
         .fill-amber-400 { fill: #fbbf24; }
       `}</style>
       <ParticleBg />
