@@ -267,9 +267,16 @@ function StepPlan({ data, setData, onNext }) {
       <div className="p-4 rounded-xl bg-violet-500/8 border border-violet-500/20">
         <p className="text-xs text-slate-400">💡 <strong className="text-white">Pro tip:</strong> Most store owners recover <strong className="text-violet-300">$200-500/month</strong> in abandoned carts alone with the Pro plan — making it pay for itself instantly.</p>
       </div>
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-400 font-semibold flex items-center gap-1"><Icon path={icons.info} size={12} /> {error}</p>}
       <div className="flex justify-end pt-2">
-        <Btn onClick={() => { if (!data.plan) { setError("Please select a plan to continue"); return; } onNext(); }}>
+        <Btn onClick={() => {
+          if (!data.plan || data.plan === "") {
+            setError("⚠️ Please select a plan before continuing!");
+            return;
+          }
+          setError("");
+          onNext();
+        }}>
           Continue <Icon path={icons.arrow} size={16} />
         </Btn>
       </div>
@@ -396,7 +403,7 @@ function Step2({ data, setData, onNext, onBack }) {
         </>)}
       </div>
       {apiStatus === "success" && <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-sm"><Icon path={icons.check} size={16} /> Credentials validated successfully!</div>}
-      {apiStatus === "error" && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> Could not validate. Check credentials or continue anyway.</div>}
+      {apiStatus === "error" && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> Invalid credentials. Your API key or access token is incorrect. Please double check and try again.</div>}
       <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-800/50 border border-white/5">
         <Icon path={icons.shield} size={16} className="text-violet-400 flex-shrink-0 mt-0.5" />
         <p className="text-xs text-slate-400 leading-relaxed">Your credentials are encrypted with AES-256 before storage and never exposed in our frontend.</p>
@@ -405,7 +412,7 @@ function Step2({ data, setData, onNext, onBack }) {
         <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
         <div className="flex gap-3">
           <Btn variant="ghost" onClick={handleValidate} loading={validating}>Test Connection</Btn>
-          <Btn onClick={() => validate() && onNext()}>Continue <Icon path={icons.arrow} size={16} /></Btn>
+          <Btn onClick={() => validate() && onNext()} disabled={apiStatus === "error"}>Continue <Icon path={icons.arrow} size={16} /></Btn>
         </div>
       </div>
     </div>
