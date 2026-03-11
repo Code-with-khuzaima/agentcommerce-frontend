@@ -526,28 +526,125 @@ function Step4({ data, onBack }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
+
   const handleSubmit = async () => {
     setSubmitting(true); setError(null);
-    try { await apiPost("/submit", data); setSubmitted(true); }
-    catch (e) { setError(e.message || "Submission failed."); }
-    finally { setSubmitting(false); }
+    try {
+      // Build full details message
+      const isShopify = data.platform === "shopify";
+      const answers = data.storeAnswers || {};
+      const yn = v => v === "yes" ? "✅ Yes" : v === "no" ? "❌ No" : "—";
+
+      const full_details = `
+========================================
+🛒 NEW STORE SUBMISSION — AGENTCOMERCE
+========================================
+
+📦 PLAN
+-------
+Plan: ${data.plan === "pro" ? "Pro — $49/mo" : "Starter — $19/mo"}
+
+🏪 STORE DETAILS
+----------------
+Store Name:     ${data.storeName || "—"}
+Store URL:      ${data.storeUrl || "—"}
+Platform:       ${data.platform?.toUpperCase() || "—"}
+Contact Email:  ${data.contactEmail || "—"}
+
+🔑 CREDENTIALS
+--------------
+${isShopify ? `API Key:        ${data.apiKey || "—"}
+Access Token:   ${data.accessToken || "—"}` :
+`Consumer Key:    ${data.consumerKey || "—"}
+Consumer Secret: ${data.consumerSecret || "—"}`}
+
+📋 STORE INFO
+-------------
+Categories:     ${(data.categories || []).join(", ") || "—"}
+Delivery:       ${(data.deliveryMethods || []).join(", ") || "—"}
+
+Return Policy:
+${data.returnPolicy || "—"}
+
+FAQs:
+${data.faqs || "—"}
+
+Special Notes:
+${data.notes || "—"}
+
+✅ STORE QUESTIONS
+------------------
+Free Shipping:          ${yn(answers.freeShipping)}
+International Shipping: ${yn(answers.internationalShipping)}
+Accept Returns:         ${yn(answers.acceptReturns)}
+Cash on Delivery:       ${yn(answers.cashOnDelivery)}
+Physical Store:         ${yn(answers.physicalStore)}
+Promo / Discounts:      ${yn(answers.promoDiscounts)}
+
+========================================
+Submitted from AgentComerce Website
+========================================
+      `.trim();
+
+      // Send via EmailJS
+      await window.emailjs.send(
+        "service_26d0u9m",
+        "template_3s3hffj",
+        {
+          store_name: data.storeName || "New Store",
+          full_details,
+        }
+      );
+
+      setSubmitted(true);
+    } catch (e) {
+      console.error(e);
+      setError("Failed to send. Please check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  // Success popup → then redirect to payment
   if (submitted) return (
     <div className="flex flex-col items-center text-center gap-6 py-4">
-      <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-400/30 shadow-xl shadow-emerald-500/20">
-        <Icon path={icons.check} size={36} className="text-emerald-400" />
+      <div className="w-24 h-24 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-400/30 shadow-xl shadow-emerald-500/20 animate-pulse">
+        <Icon path={icons.check} size={40} className="text-emerald-400" />
       </div>
       <div>
-        <h2 className="text-3xl font-bold text-white mb-3">You're All Set! 🎉</h2>
-        <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">We've received your store details. Our team will integrate your AI agent within <strong className="text-white">1–2 business days</strong>.</p>
+        <h2 className="text-3xl font-bold text-white mb-3">Submission Received! 🎉</h2>
+        <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">
+          Your store details have been sent to our team. You will be redirected to payment now.
+        </p>
       </div>
       <div className="w-full max-w-sm p-4 rounded-xl bg-emerald-500/8 border border-emerald-500/20 text-left">
-        <div className="flex items-center gap-2 text-emerald-300 text-sm font-semibold mb-1"><Icon path={icons.mail} size={14} /> Confirmation sent to</div>
-        <p className="text-slate-400 text-xs">{data.contactEmail}</p>
+        <div className="flex items-center gap-2 text-emerald-300 text-sm font-semibold mb-1">
+          <Icon path={icons.mail} size={14} /> Details sent to
+        </div>
+        <p className="text-slate-400 text-xs">agentcomrce@gmail.com</p>
       </div>
-      <Btn variant="ghost" onClick={() => window.location.reload()}>Start a New Integration</Btn>
+      <div className="w-full max-w-sm p-4 rounded-xl bg-violet-500/8 border border-violet-500/20 text-left">
+        <div className="flex items-center gap-2 text-violet-300 text-sm font-semibold mb-2">
+          <Icon path={icons.zap} size={14} /> Next Step — Complete Payment
+        </div>
+        <p className="text-slate-400 text-xs mb-3">
+          Complete your {data.plan === "pro" ? "Pro — $49/mo" : "Starter — $19/mo"} payment to activate your AI agent.
+        </p>
+        <Btn onClick={() => {
+          const url = data.plan === "pro"
+            ? "https://buy.stripe.com/your-pro-link"
+            : "https://buy.stripe.com/your-starter-link";
+          window.open(url, "_blank");
+        }}>
+          <Icon path={icons.zap} size={16} /> Complete Payment
+        </Btn>
+      </div>
+      <button onClick={() => window.location.reload()} className="text-xs text-slate-600 hover:text-slate-400 transition-colors">
+        Submit another store
+      </button>
     </div>
   );
+
   const isShopify = data.platform === "shopify";
   return (
     <div className="flex flex-col gap-6">
@@ -571,6 +668,7 @@ function Step4({ data, onBack }) {
     </div>
   );
 }
+
 
 // ── LANDING PAGE ──────────────────────────────────────────────
 function LandingPage({ onStart }) {
