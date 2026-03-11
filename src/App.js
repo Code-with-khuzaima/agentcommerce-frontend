@@ -427,39 +427,47 @@ function Step3({ data, setData, onNext, onBack }) {
     if (!data.storeName?.trim()) e.storeName = "Store name is required";
     if (!data.contactEmail?.trim()) e.contactEmail = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(data.contactEmail)) e.contactEmail = "Invalid email";
+    if (!data.categories?.length) e.categories = "Please select at least one category";
+    if (!data.deliveryMethods?.length) e.deliveryMethods = "Please select at least one delivery method";
+    if (!data.returnPolicy?.trim()) e.returnPolicy = "Return/refund policy is required";
+    if (!data.faqs?.trim()) e.faqs = "Please add at least one FAQ";
     setErrors(e); return Object.keys(e).length === 0;
   };
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Tell Us About Your Store</h2>
-        <p className="text-slate-400 text-sm">This helps us customize your AI agent for your business.</p>
+        <p className="text-slate-400 text-sm">All fields are required to properly train your AI agent.</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Store Name" id="storeName" error={errors.storeName}>
+        <Field label="Store Name *" id="storeName" error={errors.storeName}>
           <input id="storeName" type="text" placeholder="My Awesome Store" value={data.storeName || ""} onChange={e => setData(d => ({ ...d, storeName: e.target.value }))}
             className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.storeName ? "border-red-500/60" : "border-white/10")} />
           {errors.storeName && <p className="text-xs text-red-400">{errors.storeName}</p>}
         </Field>
-        <Field label="Contact Email" id="contactEmail" error={errors.contactEmail}>
+        <Field label="Contact Email *" id="contactEmail" error={errors.contactEmail}>
           <input id="contactEmail" type="email" placeholder="hello@yourstore.com" value={data.contactEmail || ""} onChange={e => setData(d => ({ ...d, contactEmail: e.target.value }))}
             className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.contactEmail ? "border-red-500/60" : "border-white/10")} />
           {errors.contactEmail && <p className="text-xs text-red-400">{errors.contactEmail}</p>}
         </Field>
       </div>
-      <Field label="Product Categories" id="categories" helper="Select all that apply">
+      <Field label="Product Categories *" id="categories" helper="Select all that apply">
         <MultiSelect options={CATEGORY_OPTIONS} selected={data.categories || []} onChange={v => setData(d => ({ ...d, categories: v }))} />
+        {errors.categories && <p className="text-xs text-red-400 mt-1">{errors.categories}</p>}
       </Field>
-      <Field label="Delivery Methods" id="delivery" helper="Select all that apply">
+      <Field label="Delivery Methods *" id="delivery" helper="Select all that apply">
         <MultiSelect options={DELIVERY_OPTIONS} selected={data.deliveryMethods || []} onChange={v => setData(d => ({ ...d, deliveryMethods: v }))} />
+        {errors.deliveryMethods && <p className="text-xs text-red-400 mt-1">{errors.deliveryMethods}</p>}
       </Field>
-      <Field label="Return / Refund Policy" id="returnPolicy">
+      <Field label="Return / Refund Policy *" id="returnPolicy" error={errors.returnPolicy}>
         <Textarea id="returnPolicy" placeholder="e.g. 30-day returns, unused items in original packaging..." value={data.returnPolicy || ""} onChange={e => setData(d => ({ ...d, returnPolicy: e.target.value }))} />
+        {errors.returnPolicy && <p className="text-xs text-red-400 mt-1">{errors.returnPolicy}</p>}
       </Field>
-      <Field label="Frequently Asked Questions" id="faqs" helper="One question per line">
+      <Field label="Frequently Asked Questions *" id="faqs" helper="One question per line" error={errors.faqs}>
         <Textarea id="faqs" rows={5} placeholder={"Do you ship internationally?\nHow long does delivery take?\nWhat payment methods do you accept?"} value={data.faqs || ""} onChange={e => setData(d => ({ ...d, faqs: e.target.value }))} />
+        {errors.faqs && <p className="text-xs text-red-400 mt-1">{errors.faqs}</p>}
       </Field>
-      <Field label="Special Notes" id="notes">
+      <Field label="Special Notes" id="notes" helper="Optional">
         <Textarea id="notes" placeholder="Anything the AI should know about your store..." value={data.notes || ""} onChange={e => setData(d => ({ ...d, notes: e.target.value }))} />
       </Field>
       <div className="flex items-center justify-between pt-2">
