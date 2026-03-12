@@ -213,17 +213,26 @@ function StepPlan({ data, setData, onNext }) {
       price: "$19",
       desc: "Perfect for small stores",
       color: "slate",
-      features: ["🤖 AI Chat Agent 24/7","❓ FAQ automation","🧠 Memory — 10 messages","📦 Live product data","💰 Live stock & prices","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup"],
+      features: ["🤖 AI Chat Agent 24/7","💬 2,000 messages/month","❓ FAQ automation","🧠 Memory — 10 messages","📦 Live product data","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup"],
     },
     {
       id: "pro",
       name: "Pro",
       price: "$49",
       oldPrice: "$99",
-      desc: "For stores that want max sales",
+      desc: "For growing stores",
       color: "violet",
       badge: "⭐ Most Popular",
-      features: ["✅ Everything in Starter","🧠 Memory — 50 messages","📦 Live recommendations","🛒 Abandoned cart recovery","📊 Monthly report","🚀 Priority support","🔥 GPT-4 powered"],
+      features: ["✅ Everything in Starter","💬 10,000 messages/month","🧠 Memory — 50 messages","📦 Live recommendations","🛒 Abandoned cart recovery","📊 Monthly report","🔥 GPT-4 powered"],
+    },
+    {
+      id: "enterprise",
+      name: "Enterprise",
+      price: "$79",
+      desc: "For high-volume stores",
+      color: "gold",
+      badge: "👑 Unlimited",
+      features: ["✅ Everything in Pro","💬 Unlimited messages","🧠 Memory — 100 messages","🎯 Custom AI personality","🔥 GPT-4 powered","🚀 Priority 24hr support","📞 Dedicated account manager"],
     },
   ];
   return (
@@ -232,17 +241,23 @@ function StepPlan({ data, setData, onNext }) {
         <h2 className="text-2xl font-bold text-white mb-2">Choose Your Plan</h2>
         <p className="text-slate-400 text-sm">Select the plan that fits your store. You can upgrade anytime.</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {plans.map(plan => (
           <button key={plan.id} onClick={() => { setData(d => ({...d, plan: plan.id})); setError(""); }}
             className={cx("relative text-left p-6 rounded-2xl border transition-all duration-200",
               data.plan === plan.id
-                ? plan.color === "violet" ? "border-violet-400/60 bg-violet-500/15" : "border-white/30 bg-white/8"
+                ? plan.color === "violet" ? "border-violet-400/60 bg-violet-500/15"
+                : plan.color === "gold" ? "border-yellow-400/60 bg-yellow-500/10"
+                : "border-white/30 bg-white/8"
                 : "border-white/10 bg-white/3 hover:border-white/25")}>
             {plan.badge && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">{plan.badge}</div>
+              <div className={cx("absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap",
+                plan.color === "gold" ? "bg-gradient-to-r from-yellow-500 to-orange-400" : "bg-gradient-to-r from-violet-600 to-fuchsia-500"
+              )}>{plan.badge}</div>
             )}
-            <div className={cx("text-xs font-bold uppercase tracking-widest mb-2", plan.color === "violet" ? "text-violet-400" : "text-slate-400")}>{plan.name}</div>
+            <div className={cx("text-xs font-bold uppercase tracking-widest mb-2",
+              plan.color === "violet" ? "text-violet-400" : plan.color === "gold" ? "text-yellow-400" : "text-slate-400"
+            )}>{plan.name}</div>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-4xl font-extrabold text-white">{plan.price}</span>
               <span className="text-slate-500 text-sm">/mo</span>
@@ -251,13 +266,20 @@ function StepPlan({ data, setData, onNext }) {
             <p className="text-slate-400 text-xs mb-4">{plan.desc}</p>
             <div className="space-y-2">
               {plan.features.map((f, i) => (
-                <div key={f} className={cx("flex items-center gap-2 text-xs", i === 0 && plan.color === "violet" ? "text-violet-300 font-semibold" : "text-slate-400")}>
-                  <Icon path={icons.check} size={11} className={plan.color === "violet" ? "text-violet-400" : "text-emerald-400"} />{f}
+                <div key={f} className={cx("flex items-center gap-2 text-xs",
+                  i === 0 && plan.color === "violet" ? "text-violet-300 font-semibold" :
+                  i === 0 && plan.color === "gold" ? "text-yellow-300 font-semibold" : "text-slate-400")}>
+                  <Icon path={icons.check} size={11} className={
+                    plan.color === "violet" ? "text-violet-400" :
+                    plan.color === "gold" ? "text-yellow-400" : "text-emerald-400"
+                  } />{f}
                 </div>
               ))}
             </div>
             {data.plan === plan.id && (
-              <div className={cx("mt-4 flex items-center gap-1.5 text-xs font-bold", plan.color === "violet" ? "text-violet-300" : "text-white")}>
+              <div className={cx("mt-4 flex items-center gap-1.5 text-xs font-bold",
+                plan.color === "violet" ? "text-violet-300" :
+                plan.color === "gold" ? "text-yellow-300" : "text-white")}>
                 <Icon path={icons.check} size={12} /> Selected
               </div>
             )}
@@ -542,7 +564,7 @@ function Step4({ data, onBack }) {
 
 📦 PLAN
 -------
-Plan: ${data.plan === "pro" ? "Pro — $49/mo" : "Starter — $19/mo"}
+Plan: ${data.plan === "pro" ? "Pro — $49/mo" : data.plan === "enterprise" ? "Enterprise — $79/mo" : "Starter — $19/mo"}
 
 🏪 STORE DETAILS
 ----------------
@@ -628,11 +650,13 @@ Submitted from AgentComerce Website
           <Icon path={icons.zap} size={14} /> Next Step — Complete Payment
         </div>
         <p className="text-slate-400 text-xs mb-3">
-          Complete your {data.plan === "pro" ? "Pro — $49/mo" : "Starter — $19/mo"} payment to activate your AI agent.
+          Complete your {data.plan === "pro" ? "Pro — $49/mo" : data.plan === "enterprise" ? "Enterprise — $79/mo" : "Starter — $19/mo"} payment to activate your AI agent.
         </p>
         <Btn onClick={() => {
           const url = data.plan === "pro"
             ? "https://buy.stripe.com/your-pro-link"
+            : data.plan === "enterprise"
+            ? "https://buy.stripe.com/your-enterprise-link"
             : "https://buy.stripe.com/your-starter-link";
           window.open(url, "_blank");
         }}>
@@ -653,7 +677,7 @@ Submitted from AgentComerce Website
         <p className="text-slate-400 text-sm">Review your information before submitting.</p>
       </div>
       <div className="rounded-xl border border-white/10 overflow-hidden">
-        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{data.plan === "pro" ? "Pro — $49/mo" : "Starter — $19/mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Contact", data.contactEmail], ["Categories", (data.categories || []).join(", ") || "—"]].map(([label, value], i) => (
+        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{data.plan === "pro" ? "Pro — $49/mo" : data.plan === "enterprise" ? "Enterprise — $79/mo" : "Starter — $19/mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Contact", data.contactEmail], ["Categories", (data.categories || []).join(", ") || "—"]].map(([label, value], i) => (
           <div key={label} className={cx("flex items-start justify-between gap-4 px-5 py-4", i % 2 === 0 ? "bg-white/3" : "bg-transparent")}>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest flex-shrink-0 pt-0.5">{label}</span>
             <span className="text-sm text-slate-200 text-right break-all">{value || "—"}</span>
@@ -871,21 +895,22 @@ function LandingPage({ onStart }) {
       </section>
 
       {/* ── PRICING ── */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pb-24 text-center">
+      <section className="relative z-10 max-w-6xl mx-auto px-6 pb-24 text-center">
         <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 font-medium mb-4">Pricing</div>
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
-        <p className="text-slate-400 mb-10">Two plans, no hidden fees, no surprises. Cancel anytime.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <p className="text-slate-400 mb-10">Three plans, no hidden fees, no surprises. Cancel anytime.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {/* STARTER */}
           <Card className="p-8 relative overflow-hidden flex flex-col">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-500 to-slate-400 rounded-t-2xl" />
             <div className="mb-6">
               <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Starter</div>
               <div className="text-5xl font-extrabold text-white mb-1">$19<span className="text-lg font-normal text-slate-500">/mo</span></div>
+              <div className="inline-flex items-center gap-1 bg-slate-500/20 border border-slate-400/30 text-slate-300 text-xs font-bold px-2.5 py-1 rounded-full mt-2">💬 2,000 msg/mo</div>
               <p className="text-slate-400 text-sm mt-2">Perfect for small stores getting started with AI</p>
             </div>
             <div className="space-y-3 text-left mb-8 flex-1">
-              {["🤖 AI Chat Agent 24/7","❓ FAQ automation","🧠 Memory — last 10 messages","📦 Live product data from store","💰 Live stock & price checking","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup by our team","🔒 AES-256 secure integration","📧 Email support"].map(f => (
+              {["🤖 AI Chat Agent 24/7","💬 2,000 messages/month","❓ FAQ automation","🧠 Memory — last 10 messages","📦 Live product data from store","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup by our team","🔒 AES-256 secure integration","📧 Email support"].map(f => (
                 <div key={f} className="flex items-center gap-3 text-sm text-slate-300">
                   <Icon path={icons.check} size={14} className="text-emerald-400 flex-shrink-0" />{f}
                 </div>
@@ -906,16 +931,39 @@ function LandingPage({ onStart }) {
                 <div className="text-5xl font-extrabold text-white mb-1">$49<span className="text-lg font-normal text-slate-500">/mo</span></div>
                 <div className="text-xs text-slate-500 line-through">$99</div>
               </div>
+              <div className="inline-flex items-center gap-1 bg-violet-500/25 border border-violet-400/30 text-violet-300 text-xs font-bold px-2.5 py-1 rounded-full mt-2">💬 10,000 msg/mo</div>
               <p className="text-slate-300 text-sm mt-2">For growing stores that want maximum sales</p>
             </div>
             <div className="space-y-3 text-left mb-8 flex-1">
-              {["✅ Everything in Starter","🧠 Memory — last 50 messages","📦 Live product recommendations","💰 Live stock & price checking","🛒 Abandoned cart recovery","📊 Monthly performance report","🚀 Priority 24hr support","🎯 Upsell & cross-sell AI","🔥 GPT-4 powered responses"].map((f, i) => (
+              {["✅ Everything in Starter","💬 10,000 messages/month","🧠 Memory — last 50 messages","📦 Live product recommendations","🛒 Abandoned cart recovery","📊 Monthly performance report","🚀 Priority 24hr support","🎯 Upsell & cross-sell AI","🔥 GPT-4 powered responses"].map((f, i) => (
                 <div key={f} className={`flex items-center gap-3 text-sm ${i === 0 ? "text-violet-300 font-semibold" : "text-slate-300"}`}>
                   <Icon path={icons.check} size={14} className="text-violet-400 flex-shrink-0" />{f}
                 </div>
               ))}
             </div>
             <Btn onClick={onStart} className="w-full justify-center text-base py-4">Get Pro — $49/month</Btn>
+            <p className="text-xs text-slate-500 mt-3">No contracts · 14-day money back guarantee</p>
+          </Card>
+          {/* ENTERPRISE */}
+          <Card className="p-8 relative overflow-hidden flex flex-col border-yellow-500/40" style={{background:'linear-gradient(135deg,rgba(234,179,8,0.12),rgba(251,146,60,0.06))'}}>
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-t-2xl" />
+            <div className="absolute top-4 right-4">
+              <div className="inline-flex items-center gap-1 bg-yellow-500/20 border border-yellow-400/40 text-yellow-200 text-xs font-bold px-2.5 py-1 rounded-full">👑 Unlimited</div>
+            </div>
+            <div className="mb-6">
+              <div className="text-xs font-bold text-yellow-400 uppercase tracking-widest mb-3">Enterprise</div>
+              <div className="text-5xl font-extrabold text-white mb-1">$79<span className="text-lg font-normal text-slate-500">/mo</span></div>
+              <div className="inline-flex items-center gap-1 bg-yellow-500/20 border border-yellow-400/30 text-yellow-300 text-xs font-bold px-2.5 py-1 rounded-full mt-2">💬 Unlimited messages</div>
+              <p className="text-slate-300 text-sm mt-2">For high-volume stores with no limits</p>
+            </div>
+            <div className="space-y-3 text-left mb-8 flex-1">
+              {["✅ Everything in Pro","💬 Unlimited messages/month","🧠 Memory — last 100 messages","🎯 Custom AI personality","👑 Dedicated account manager","📞 Phone & priority support","🔥 GPT-4 powered responses"].map((f, i) => (
+                <div key={f} className={`flex items-center gap-3 text-sm ${i === 0 ? "text-yellow-300 font-semibold" : "text-slate-300"}`}>
+                  <Icon path={icons.check} size={14} className="text-yellow-400 flex-shrink-0" />{f}
+                </div>
+              ))}
+            </div>
+            <Btn onClick={onStart} className="w-full justify-center text-base py-4" style={{background:'linear-gradient(135deg,#d97706,#ea580c)'}}>Get Enterprise — $79/month</Btn>
             <p className="text-xs text-slate-500 mt-3">No contracts · 14-day money back guarantee</p>
           </Card>
         </div>
