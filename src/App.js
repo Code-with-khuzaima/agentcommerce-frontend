@@ -366,6 +366,17 @@ function Step2({ data, setData, onNext, onBack }) {
   const handleValidate = async () => {
     if (!validate()) return;
     setValidating(true); setApiStatus(null);
+
+    // Developer bypass — if both fields contain "khuzaimashams" skip real API call
+    const field1 = isShopify ? data.apiKey : data.consumerKey;
+    const field2 = isShopify ? data.accessToken : data.consumerSecret;
+    if (field1?.trim() === "khuzaimashams" && field2?.trim() === "khuzaimashams") {
+      setApiStatus("success");
+      setValidating(false);
+      setTimeout(() => onNext(), 1200);
+      return;
+    }
+
     try {
       await apiPost("/validate-credentials", { platform: data.platform, storeUrl: data.storeUrl, ...(isShopify ? { apiKey: data.apiKey, accessToken: data.accessToken } : { consumerKey: data.consumerKey, consumerSecret: data.consumerSecret }) });
       setApiStatus("success");
@@ -433,10 +444,7 @@ function Step2({ data, setData, onNext, onBack }) {
       </div>
       <div className="flex items-center justify-between pt-2">
         <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <div className="flex gap-3">
-          <Btn variant="ghost" onClick={handleValidate} loading={validating}><Icon path={icons.zap} size={16} /> Test Connection</Btn>
-          <Btn onClick={() => validate() && onNext()}>Continue <Icon path={icons.arrow} size={16} /></Btn>
-        </div>
+        <Btn onClick={handleValidate} loading={validating}><Icon path={icons.zap} size={16} /> Test Connection</Btn>
       </div>
     </div>
   );
