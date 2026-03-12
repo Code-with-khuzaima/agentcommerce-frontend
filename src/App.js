@@ -739,12 +739,7 @@ function LandingPage({ onStart }) {
 
   const faqs = [
     { q: "How long does the setup take?", a: "Our team typically completes the full integration within 1–2 business days. Once you submit your store details and credentials, we handle everything — no technical work required from your side." },
-    { q: "Does it work with my Shopify or WooCommerce store?", a: "Yes! AgentComerce is purpose-built for both Shopify and WooCommerce stores. We connect via your store's official REST API to access products, orders, and store information." },
     { q: "Is my API data safe and secure?", a: "Absolutely. All your API credentials are encrypted using AES-256 encryption before being stored. We use HTTPS for all communications and your credentials are never exposed in our frontend code." },
-    { q: "What happens after I submit my store details?", a: "Our team receives your submission, reviews your credentials, and begins configuring your AI agent. We train it on your products, FAQs, and store policies. You'll receive a confirmation email when it's live." },
-    { q: "Can I customize what the AI says?", a: "Yes! During onboarding you can provide your FAQs, return policy, special instructions, and brand voice. The AI is trained specifically for your store and can be updated anytime." },
-    { q: "What if I want to cancel?", a: "No contracts, no hassle. You can cancel your subscription at any time. We also offer a 14-day money-back guarantee if you're not satisfied with the service." },
-    { q: "How does the $19/month pricing work?", a: "It's a simple flat fee of $19 per month with no hidden costs. This includes the AI agent, all updates, maintenance, and support. Cancel anytime with no penalties." },
   ];
 
   const handleContactSubmit = () => {
@@ -778,7 +773,7 @@ function LandingPage({ onStart }) {
           <button onClick={() => document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' })} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Features</button>
           <button onClick={() => setPricingOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Pricing</button>
           <button onClick={() => document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' })} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">FAQ</button>
-          <button onClick={() => document.getElementById('faq-section')?.scrollIntoView({behavior:'smooth'})} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">FAQ</button>
+          <button onClick={() => setContactOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Contact</button>
           <Btn onClick={onStart} className="text-sm px-4 py-2">Get Started</Btn>
         </div>
       </nav>
