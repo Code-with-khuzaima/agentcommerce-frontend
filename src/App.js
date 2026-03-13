@@ -41,7 +41,8 @@ const STEPS = [
   { id: 2, label: "Store URL" },
   { id: 3, label: "Credentials" },
   { id: 4, label: "Store Info" },
-  { id: 5, label: "Confirm" },
+  { id: 5, label: "Train AI" },
+  { id: 6, label: "Confirm" },
 ];
 
 const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:4000/api";
@@ -552,6 +553,145 @@ function Step3({ data, setData, onNext, onBack }) {
   );
 }
 
+function StepQnA({ data, setData, onNext, onBack }) {
+  const emptyPair = { question: "", answer: "" };
+  const [pairs, setPairs] = useState(
+    data.qnaPairs?.length ? data.qnaPairs : [{ ...emptyPair }]
+  );
+  const [error, setError] = useState("");
+
+  const updatePair = (index, field, value) => {
+    setPairs(prev => prev.map((p, i) => i === index ? { ...p, [field]: value } : p));
+  };
+
+  const addPair = () => {
+    if (pairs.length >= 10) return;
+    setPairs(prev => [...prev, { ...emptyPair }]);
+  };
+
+  const removePair = (index) => {
+    if (pairs.length === 1) return;
+    setPairs(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleNext = () => {
+    const filled = pairs.filter(p => p.question.trim() && p.answer.trim());
+    if (filled.length === 0) {
+      setError("⚠️ Please add at least 1 question and answer.");
+      return;
+    }
+    setData(d => ({ ...d, qnaPairs: filled }));
+    onNext();
+  };
+
+  const suggestions = [
+    "What are your delivery charges?",
+    "How long does delivery take?",
+    "Do you offer cash on delivery?",
+    "What is your return policy?",
+    "Can I exchange an item?",
+    "What sizes do you have?",
+    "Do you have a physical store?",
+    "What payment methods do you accept?",
+    "Do you offer any discounts?",
+    "How do I track my order?",
+  ];
+
+  const fillSuggestion = (q) => {
+    const emptyIndex = pairs.findIndex(p => !p.question.trim());
+    if (emptyIndex !== -1) {
+      updatePair(emptyIndex, "question", q);
+    } else if (pairs.length < 10) {
+      setPairs(prev => [...prev, { question: q, answer: "" }]);
+    }
+  };
+
+  const usedQuestions = pairs.map(p => p.question.trim());
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-2">Train Your AI 🧠</h2>
+        <p className="text-slate-400 text-sm">Add questions your customers ask most. The more you add, the smarter your AI gets. You can add up to 10 Q&As.</p>
+      </div>
+
+      {/* Suggestion chips */}
+      <div>
+        <p className="text-xs text-slate-500 uppercase tracking-widest mb-2 font-semibold">Quick add common questions</p>
+        <div className="flex flex-wrap gap-2">
+          {suggestions.filter(s => !usedQuestions.includes(s)).slice(0, 6).map(s => (
+            <button
+              key={s}
+              onClick={() => fillSuggestion(s)}
+              className="text-xs px-3 py-1.5 rounded-full border border-violet-500/30 text-violet-300 bg-violet-500/10 hover:bg-violet-500/20 transition-colors text-left"
+            >
+              + {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Q&A pairs */}
+      <div className="flex flex-col gap-3">
+        {pairs.map((pair, index) => (
+          <div key={index} className="rounded-xl border border-white/10 bg-white/3 p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Q&A #{index + 1}</span>
+              {pairs.length > 1 && (
+                <button onClick={() => removePair(index)} className="text-xs text-red-400/60 hover:text-red-400 transition-colors">✕ Remove</button>
+              )}
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Question</label>
+              <input
+                value={pair.question}
+                onChange={e => updatePair(index, "question", e.target.value)}
+                placeholder="e.g. What are your delivery charges?"
+                className="w-full bg-slate-900/60 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-violet-500/50 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Answer</label>
+              <textarea
+                value={pair.answer}
+                onChange={e => updatePair(index, "answer", e.target.value)}
+                placeholder="e.g. Free delivery above Rs.5000, otherwise Rs.200 flat charge."
+                rows={2}
+                className="w-full bg-slate-900/60 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-violet-500/50 transition-colors resize-none"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Add more button */}
+      {pairs.length < 10 && (
+        <button
+          onClick={addPair}
+          className="w-full py-3 rounded-xl border border-dashed border-white/20 text-slate-400 hover:border-violet-500/40 hover:text-violet-300 transition-colors text-sm font-medium"
+        >
+          + Add Another Q&A ({pairs.length}/10 used)
+        </button>
+      )}
+
+      {pairs.length === 10 && (
+        <p className="text-center text-xs text-slate-500">Maximum 10 Q&As reached. You can add more later.</p>
+      )}
+
+      {error && (
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm">
+          <Icon path={icons.info} size={16} /> {error}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between pt-2">
+        <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
+        <Btn onClick={handleNext}>Review & Submit <Icon path={icons.arrow} size={16} /></Btn>
+      </div>
+    </div>
+  );
+}
+
 function Step4({ data, onBack }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -610,6 +750,10 @@ Accept Returns:         ${yn(answers.acceptReturns)}
 Cash on Delivery:       ${yn(answers.cashOnDelivery)}
 Physical Store:         ${yn(answers.physicalStore)}
 Promo / Discounts:      ${yn(answers.promoDiscounts)}
+
+🧠 TRAINED Q&A PAIRS
+---------------------
+${(data.qnaPairs || []).map((p, i) => `Q${i+1}: ${p.question}\nA${i+1}: ${p.answer}`).join("\n\n") || "— None added —"}
 
 ========================================
 Submitted from AgentComerce Website
@@ -1284,7 +1428,8 @@ export default function App() {
               {step === 2 && <Step1 data={data} setData={setData} onNext={next} onBack={back} />}
               {step === 3 && <Step2 data={data} setData={setData} onNext={next} onBack={back} />}
               {step === 4 && <Step3 data={data} setData={setData} onNext={next} onBack={back} />}
-              {step === 5 && <Step4 data={data} onBack={back} />}
+              {step === 5 && <StepQnA data={data} setData={setData} onNext={next} onBack={back} />}
+              {step === 6 && <Step4 data={data} onBack={back} />}
             </Card>
             {step < 4 && (
               <div className="flex items-center justify-center gap-6 mt-6">
