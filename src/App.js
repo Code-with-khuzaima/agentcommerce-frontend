@@ -556,7 +556,11 @@ function Step3({ data, setData, onNext, onBack }) {
 function StepQnA({ data, setData, onNext, onBack }) {
   const emptyPair = { question: "", answer: "" };
   const [pairs, setPairs] = useState(
-    data.qnaPairs?.length ? data.qnaPairs : [{ ...emptyPair }, { ...emptyPair }, { ...emptyPair }]
+    data.qnaPairs?.length ? data.qnaPairs : [
+      { question: "What is your contact phone number?", answer: "" },
+      { ...emptyPair },
+      { ...emptyPair }
+    ]
   );
   const [error, setError] = useState("");
 
@@ -575,12 +579,17 @@ function StepQnA({ data, setData, onNext, onBack }) {
   };
 
   const handleNext = () => {
-    const filled = pairs.filter(p => p.question.trim() && p.answer.trim());
-    if (filled.length < 3) {
-      setError("⚠️ Please add at least 3 questions and answers to train your AI.");
+    const filled = pairs.filter((p, i) => {
+      if (i === 0) return p.answer.trim() !== "" ? (p.question.trim() && p.answer.trim()) : true;
+      return p.question.trim() && p.answer.trim();
+    });
+    const requiredFilled = pairs.slice(1).filter(p => p.question.trim() && p.answer.trim());
+    if (requiredFilled.length < 2) {
+      setError("⚠️ Please fill at least 2 more Q&As (phone number is optional).");
       return;
     }
-    setData(d => ({ ...d, qnaPairs: filled }));
+    const toSave = pairs.filter((p, i) => i === 0 ? p.answer.trim() : p.question.trim() && p.answer.trim());
+    setData(d => ({ ...d, qnaPairs: toSave }));
     onNext();
   };
 
@@ -636,8 +645,11 @@ function StepQnA({ data, setData, onNext, onBack }) {
         {pairs.map((pair, index) => (
           <div key={index} className="rounded-xl border border-white/10 bg-white/3 p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Q&A #{index + 1}</span>
-              {pairs.length > 3 && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Q&A #{index + 1}</span>
+                {index === 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-400 border border-slate-500/20">Optional</span>}
+              </div>
+              {pairs.length > 3 && index !== 0 && (
                 <button onClick={() => removePair(index)} className="text-xs text-red-400/60 hover:text-red-400 transition-colors">✕ Remove</button>
               )}
             </div>
@@ -655,10 +667,11 @@ function StepQnA({ data, setData, onNext, onBack }) {
               <textarea
                 value={pair.answer}
                 onChange={e => updatePair(index, "answer", e.target.value)}
-                placeholder="e.g. Free delivery above Rs.5000, otherwise Rs.200 flat charge."
+                placeholder={index === 0 ? "e.g. +92 300 1234567 (leave blank to skip)" : "e.g. Free delivery above Rs.5000, otherwise Rs.200 flat charge."}
                 rows={2}
                 className="w-full bg-slate-900/60 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-violet-500/50 transition-colors resize-none"
               />
+              {index === 0 && <p className="text-xs text-slate-600 mt-1">Leave blank if you prefer not to share your phone number.</p>}
             </div>
           </div>
         ))}
