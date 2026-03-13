@@ -556,7 +556,7 @@ function Step3({ data, setData, onNext, onBack }) {
 function StepQnA({ data, setData, onNext, onBack }) {
   const emptyPair = { question: "", answer: "" };
   const [pairs, setPairs] = useState(
-    data.qnaPairs?.length ? data.qnaPairs : [{ ...emptyPair }]
+    data.qnaPairs?.length ? data.qnaPairs : [{ ...emptyPair }, { ...emptyPair }, { ...emptyPair }]
   );
   const [error, setError] = useState("");
 
@@ -570,14 +570,14 @@ function StepQnA({ data, setData, onNext, onBack }) {
   };
 
   const removePair = (index) => {
-    if (pairs.length === 1) return;
+    if (pairs.length <= 3) return;
     setPairs(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleNext = () => {
     const filled = pairs.filter(p => p.question.trim() && p.answer.trim());
-    if (filled.length === 0) {
-      setError("⚠️ Please add at least 1 question and answer.");
+    if (filled.length < 3) {
+      setError("⚠️ Please add at least 3 questions and answers to train your AI.");
       return;
     }
     setData(d => ({ ...d, qnaPairs: filled }));
@@ -612,7 +612,7 @@ function StepQnA({ data, setData, onNext, onBack }) {
     <div className="flex flex-col gap-5">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Train Your AI 🧠</h2>
-        <p className="text-slate-400 text-sm">Add questions your customers ask most. The more you add, the smarter your AI gets. You can add up to 10 Q&As.</p>
+        <p className="text-slate-400 text-sm">Add questions your customers ask most. Minimum 3 required — add as many as you want. The more you add, the smarter your AI gets.</p>
       </div>
 
       {/* Suggestion chips */}
@@ -637,7 +637,7 @@ function StepQnA({ data, setData, onNext, onBack }) {
           <div key={index} className="rounded-xl border border-white/10 bg-white/3 p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Q&A #{index + 1}</span>
-              {pairs.length > 1 && (
+              {pairs.length > 3 && (
                 <button onClick={() => removePair(index)} className="text-xs text-red-400/60 hover:text-red-400 transition-colors">✕ Remove</button>
               )}
             </div>
@@ -665,18 +665,12 @@ function StepQnA({ data, setData, onNext, onBack }) {
       </div>
 
       {/* Add more button */}
-      {pairs.length < 10 && (
-        <button
+      <button
           onClick={addPair}
           className="w-full py-3 rounded-xl border border-dashed border-white/20 text-slate-400 hover:border-violet-500/40 hover:text-violet-300 transition-colors text-sm font-medium"
         >
-          + Add Another Q&A ({pairs.length}/10 used)
+          + Add Another Q&A ({pairs.length} added)
         </button>
-      )}
-
-      {pairs.length === 10 && (
-        <p className="text-center text-xs text-slate-500">Maximum 10 Q&As reached. You can add more later.</p>
-      )}
 
       {error && (
         <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm">
