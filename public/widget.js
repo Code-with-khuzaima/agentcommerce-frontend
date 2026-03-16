@@ -1,4 +1,4 @@
-notepad C:\Users\PMLS\agentcommerce-frontend\public\widget.js(function () {
+(function () {
   'use strict';
 
   // ── Config injected by store owner's script tag ──

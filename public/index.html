@@ -3,30 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#7c3aed" />
-    <meta name="description" content="Deploy an AI sales agent to your Shopify or WooCommerce store in 1-2 days. Automate customer support 24/7 for just $19/month." />
-    <meta property="og:title" content="AgentComerce — AI Sales Agent for Your Store" />
-    <meta property="og:description" content="Deploy an AI sales agent to your Shopify or WooCommerce store in 1-2 days. Automate customer support 24/7 for just $19/month." />
-    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="AgentComerce — AI Sales Agent for Shopify & WooCommerce" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <title>AgentComerce — AI Sales Agent for Your Store</title>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script>window.addEventListener('load', function(){ emailjs.init("Nvak4g2MT8AuvKpb6"); });</script>
+    <title>AgentComerce — AI Sales Agent</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-<script>
-  window.AgentComerce = {
-    store_id: "store_001",
-    webhook_url: "https://aicontactsupport.app.n8n.cloud/webhook/starter-chat",
-    agent_name: "AI Assistant",
-    accent_color: "#7C3AED",
-    welcome_message: "Hi! How can I help you today?"
-  };
-</script>
-<script src="/widget.js"></script>
+
+    <!-- AgentComerce Widget Test -->
+    <script>
+      window.AgentComerce = {
+        store_id: "store_001",
+        webhook_url: "https://aicontactsupport.app.n8n.cloud/webhook/starter-chat",
+        agent_name: "AI Assistant",
+        accent_color: "#7C3AED",
+        welcome_message: "Hi! How can I help you today?"
+      };
+    </script>
+    <script src="%PUBLIC_URL%/widget.js"></script>
   </body>
 </html>
