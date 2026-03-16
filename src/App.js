@@ -579,7 +579,7 @@ function StepQnA({ data, setData, onNext, onBack }) {
   };
 
   const handleNext = () => {
-    const filled = pairs.filter((p, i) => {
+    const _filled = pairs.filter\(\(p, i\) => \{
       if (i === 0) return p.answer.trim() !== "" ? (p.question.trim() && p.answer.trim()) : true;
       return p.question.trim() && p.answer.trim();
     });
