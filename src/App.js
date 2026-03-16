@@ -579,10 +579,6 @@ function StepQnA({ data, setData, onNext, onBack }) {
   };
 
   const handleNext = () => {
-    const _filled = pairs.filter\(\(p, i\) => \{
-      if (i === 0) return p.answer.trim() !== "" ? (p.question.trim() && p.answer.trim()) : true;
-      return p.question.trim() && p.answer.trim();
-    });
     const requiredFilled = pairs.slice(1).filter(p => p.question.trim() && p.answer.trim());
     if (requiredFilled.length < 2) {
       setError("⚠️ Please fill at least 2 more Q&As (phone number is optional).");
@@ -719,7 +715,9 @@ function Step4({ data, onBack }) {
 
 📦 PLAN
 -------
-Plan: ${data.plan === "pro" ? "Pro — $49/mo" : data.plan === "enterprise" ? "Enterprise — $79/mo" : "Starter — $19/mo"}
+Plan:           ${data.plan === "pro" ? "Pro — $49/mo" : data.plan === "enterprise" ? "Enterprise — $79/mo" : "Starter — $19/mo"}
+Msg Limit:      ${data.plan === "pro" ? "13,000 / month" : data.plan === "enterprise" ? "Unlimited" : "5,000 / month"}
+Memory:         ${data.plan === "pro" ? "Full conversation" : data.plan === "enterprise" ? "Unlimited" : "Last 20 messages"}
 
 🏪 STORE DETAILS
 ----------------
@@ -727,6 +725,7 @@ Store Name:     ${data.storeName || "—"}
 Store URL:      ${data.storeUrl || "—"}
 Platform:       ${data.platform?.toUpperCase() || "—"}
 Contact Email:  ${data.contactEmail || "—"}
+Phone:          ${(data.qnaPairs || []).find(p => p.question.toLowerCase().includes("phone"))?.answer || "— Not provided —"}
 
 🔑 CREDENTIALS
 --------------
@@ -758,9 +757,25 @@ Cash on Delivery:       ${yn(answers.cashOnDelivery)}
 Physical Store:         ${yn(answers.physicalStore)}
 Promo / Discounts:      ${yn(answers.promoDiscounts)}
 
-🧠 TRAINED Q&A PAIRS
+🧠 TRAINED Q&A PAIRS (${(data.qnaPairs || []).length} total)
 ---------------------
 ${(data.qnaPairs || []).map((p, i) => `Q${i+1}: ${p.question}\nA${i+1}: ${p.answer}`).join("\n\n") || "— None added —"}
+
+========================================
+📊 GOOGLE SHEETS — COPY PASTE READY
+========================================
+
+▸ usage_tracker row:
+store_id  | store_name       | plan       | msg_count | msg_limit | reset_date
+[NEW_ID]  | ${(data.storeName || "—").padEnd(16)}| ${(data.plan || "starter").padEnd(10)}| 0         | ${data.plan === "pro" ? "13000" : data.plan === "enterprise" ? "999999" : "5000"}      | ${(() => { const d = new Date(); d.setMonth(d.getMonth() + 1); d.setDate(1); return d.toISOString().split("T")[0]; })()}
+
+▸ store_info row:
+store_id | store_name | platform | store_url | categories | delivery | return_policy | free_shipping | intl_shipping | cod | physical | promo | special_notes | api_key | access_token
+[NEW_ID] | ${data.storeName || "—"} | ${data.platform || "—"} | ${data.storeUrl || "—"} | ${(data.categories || []).join(", ") || "—"} | ${(data.deliveryMethods || []).join(", ") || "—"} | ${data.returnPolicy?.replace(/\n/g, " ") || "—"} | ${answers.freeShipping || "—"} | ${answers.internationalShipping || "—"} | ${answers.cashOnDelivery || "—"} | ${answers.physicalStore || "—"} | ${answers.promoDiscounts || "—"} | ${data.notes?.replace(/\n/g, " ") || "—"} | ${data.apiKey || data.consumerKey || "—"} | ${data.accessToken || data.consumerSecret || "—"}
+
+▸ qna_bank rows:
+store_id | question | answer | category | active
+${(data.qnaPairs || []).map(p => `[NEW_ID] | ${p.question} | ${p.answer} | general | TRUE`).join("\n")}
 
 ========================================
 Submitted from AgentComerce Website
