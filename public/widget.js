@@ -42,7 +42,7 @@
     '@keyframes ac-msg-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }',
     '.ac-msg.bot { align-self: flex-start; }',
     '.ac-msg.user { align-self: flex-end; }',
-    '.ac-bubble { padding: 10px 14px; border-radius: 16px; font-size: 13.5px; line-height: 1.5; word-break: break-word; }',
+    '.ac-bubble { padding: 14px 18px; border-radius: 16px; font-size: 13.5px; line-height: 1.5; word-break: break-word; }',
     '.ac-msg.bot .ac-bubble { background: #f1f5f9; color: #1e293b; border-bottom-left-radius: 4px; }',
     '.ac-msg.user .ac-bubble { color: #fff; border-bottom-right-radius: 4px; }',
     '.ac-time { font-size: 10px; color: #94a3b8; padding: 0 4px; }',
