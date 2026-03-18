@@ -214,7 +214,7 @@ function StepPlan({ data, setData, onNext }) {
       price: "$19",
       desc: "Perfect for small stores",
       color: "slate",
-      features: ["🤖 AI Chat Agent 24/7","💬 5,000 messages/month","❓ FAQ automation","🧠 Memory — last 20 messages","📦 Live product data","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup"],
+      features: ["🤖 AI Chat Agent 24/7","💬 5,000 messages/month","📦 Live product data & recommendations","🧠 Memory — last 20 messages","❓ FAQ automation","🛍️ Shopify & WooCommerce","🔒 AES-256 secure integration","⚡ 1–2 day setup","📧 Email support"],
     },
     {
       id: "pro",
@@ -224,7 +224,7 @@ function StepPlan({ data, setData, onNext }) {
       desc: "For growing stores",
       color: "violet",
       badge: "⭐ Most Popular",
-      features: ["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","📦 Live recommendations","🛒 Abandoned cart recovery","📊 Monthly report","🔥 Smart AI model routing"],
+      features: ["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","🛒 Abandoned cart recovery","📊 Monthly performance report","🔥 Smart AI model routing","🎯 Upsell & cross-sell AI","🚀 Priority 24hr support"],
     },
     {
       id: "enterprise",
@@ -233,7 +233,7 @@ function StepPlan({ data, setData, onNext }) {
       desc: "For high-volume stores",
       color: "gold",
       badge: "👑 Unlimited",
-      features: ["✅ Everything in Pro","💬 Unlimited messages","🧠 Unlimited memory","📦 Live product recommendations","📊 Monthly performance report","🎯 Custom AI personality","🔥 Best AI models","🚀 Priority 24hr support","📞 Dedicated account manager"],
+      features: ["✅ Everything in Pro","💬 Unlimited messages","🧠 Unlimited memory","🎯 Custom AI personality","🔥 Best AI models","📊 Monthly performance report","👑 Dedicated account manager","📞 Phone & priority support"],
     },
   ];
   return (
@@ -1084,7 +1084,7 @@ function LandingPage({ onStart }) {
               <p className="text-slate-400 text-sm mt-2">Perfect for small stores getting started with AI</p>
             </div>
             <div className="space-y-3 text-left mb-8 flex-1">
-              {["🤖 AI Chat Agent 24/7","💬 5,000 messages/month","❓ FAQ automation","🧠 Memory — last 20 messages","📦 Live product data from store","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup by our team","🔒 AES-256 secure integration","📧 Email support"].map(f => (
+              {["🤖 AI Chat Agent 24/7","💬 5,000 messages/month","📦 Live product data & recommendations","🧠 Memory — last 20 messages","❓ FAQ automation","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup by our team","🔒 AES-256 secure integration","📧 Email support"].map(f => (
                 <div key={f} className="flex items-center gap-3 text-sm text-slate-300">
                   <Icon path={icons.check} size={14} className="text-emerald-400 flex-shrink-0" />{f}
                 </div>
@@ -1109,7 +1109,7 @@ function LandingPage({ onStart }) {
               <p className="text-slate-300 text-sm mt-2">For growing stores that want maximum sales</p>
             </div>
             <div className="space-y-3 text-left mb-8 flex-1">
-              {["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","📦 Live product recommendations","🛒 Abandoned cart recovery","📊 Monthly performance report","🚀 Priority 24hr support","🎯 Upsell & cross-sell AI","🔥 Smart AI model routing"].map((f, i) => (
+              {["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","🛒 Abandoned cart recovery","📊 Monthly performance report","🔥 Smart AI model routing","🚀 Priority 24hr support","🎯 Upsell & cross-sell AI"].map((f, i) => (
                 <div key={f} className={`flex items-center gap-3 text-sm ${i === 0 ? "text-violet-300 font-semibold" : "text-slate-300"}`}>
                   <Icon path={icons.check} size={14} className="text-violet-400 flex-shrink-0" />{f}
                 </div>
@@ -1131,7 +1131,7 @@ function LandingPage({ onStart }) {
               <p className="text-slate-300 text-sm mt-2">For high-volume stores with no limits</p>
             </div>
             <div className="space-y-3 text-left mb-8 flex-1">
-              {["✅ Everything in Pro","💬 Unlimited messages/month","🧠 Unlimited memory","📦 Live product recommendations","📊 Monthly performance report","🎯 Custom AI personality","👑 Dedicated account manager","📞 Phone & priority support","🔥 Best AI models"].map((f, i) => (
+              {["✅ Everything in Pro","💬 Unlimited messages/month","🧠 Unlimited memory","🎯 Custom AI personality","🔥 Best AI models","📊 Monthly performance report","👑 Dedicated account manager","📞 Phone & priority support"].map((f, i) => (
                 <div key={f} className={`flex items-center gap-3 text-sm ${i === 0 ? "text-yellow-300 font-semibold" : "text-slate-300"}`}>
                   <Icon path={icons.check} size={14} className="text-yellow-400 flex-shrink-0" />{f}
                 </div>
@@ -1247,7 +1247,7 @@ function LandingPage({ onStart }) {
                 <div style={{display:'inline-flex',alignItems:'center',background:'rgba(100,116,139,0.2)',border:'1px solid rgba(100,116,139,0.3)',borderRadius:'99px',padding:'2px 10px',fontSize:'11px',fontWeight:'700',color:'#94a3b8',marginBottom:'8px'}}>💬 5,000 msg/mo</div>
                 <p style={{color:'#64748b',fontSize:'12px',marginBottom:'16px'}}>Perfect for small stores</p>
                 <div style={{marginBottom:'20px'}}>
-                  {["🤖 AI Chat Agent 24/7","💬 5,000 messages/month","❓ FAQ automation","🧠 Memory — last 20 messages","📦 Live product data","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup","🔒 Secure encryption"].map(f => (
+                  {["🤖 AI Chat Agent 24/7","💬 5,000 messages/month","📦 Live product data & recommendations","🧠 Memory — last 20 messages","❓ FAQ automation","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup","🔒 Secure encryption"].map(f => (
                     <div key={f} style={{display:'flex',alignItems:'center',gap:'8px',color:'#cbd5e1',fontSize:'12px',marginBottom:'8px'}}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>{f}
                     </div>
@@ -1266,7 +1266,7 @@ function LandingPage({ onStart }) {
                 <div style={{display:'inline-flex',alignItems:'center',background:'rgba(139,92,246,0.2)',border:'1px solid rgba(139,92,246,0.3)',borderRadius:'99px',padding:'2px 10px',fontSize:'11px',fontWeight:'700',color:'#c4b5fd',marginBottom:'8px'}}>💬 13,000 msg/mo</div>
                 <p style={{color:'#c4b5fd',fontSize:'12px',marginBottom:'16px'}}>For stores that want max sales</p>
                 <div style={{marginBottom:'20px'}}>
-                  {["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","📦 Live recommendations","🛒 Abandoned cart recovery","📊 Monthly report","🎯 Upsell & cross-sell AI","🔥 Smart AI model routing"].map((f, i) => (
+                  {["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","🛒 Abandoned cart recovery","📊 Monthly report","🎯 Upsell & cross-sell AI","🔥 Smart AI model routing","🚀 Priority 24hr support"].map((f, i) => (
                     <div key={f} style={{display:'flex',alignItems:'center',gap:'8px',color: i===0 ? '#c4b5fd' : '#cbd5e1',fontSize:'12px',marginBottom:'8px',fontWeight: i===0 ? '600' : '400'}}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>{f}
                     </div>
@@ -1282,7 +1282,7 @@ function LandingPage({ onStart }) {
                 <div style={{display:'inline-flex',alignItems:'center',background:'rgba(234,179,8,0.15)',border:'1px solid rgba(234,179,8,0.3)',borderRadius:'99px',padding:'2px 10px',fontSize:'11px',fontWeight:'700',color:'#fde68a',marginBottom:'8px'}}>💬 Unlimited msg/mo</div>
                 <p style={{color:'#fde68a',fontSize:'12px',marginBottom:'16px'}}>For high-volume stores</p>
                 <div style={{marginBottom:'20px'}}>
-                  {["✅ Everything in Pro","💬 Unlimited messages","🧠 Unlimited memory","📦 Live product recommendations","📊 Monthly performance report","🎯 Custom AI personality","👑 Dedicated account manager","📞 Phone & priority support","🔥 Best AI models"].map((f, i) => (
+                  {["✅ Everything in Pro","💬 Unlimited messages","🧠 Unlimited memory","🎯 Custom AI personality","🔥 Best AI models","📊 Monthly performance report","👑 Dedicated account manager","📞 Phone & priority support"].map((f, i) => (
                     <div key={f} style={{display:'flex',alignItems:'center',gap:'8px',color: i===0 ? '#fde68a' : '#cbd5e1',fontSize:'12px',marginBottom:'8px',fontWeight: i===0 ? '600' : '400'}}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>{f}
                     </div>
