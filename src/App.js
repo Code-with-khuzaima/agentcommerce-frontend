@@ -219,21 +219,21 @@ function StepPlan({ data, setData, onNext }) {
     {
       id: "pro",
       name: "Pro",
-      price: "$49",
-      oldPrice: "$99",
+      price: "$29",
+      oldPrice: "$49",
       desc: "For growing stores",
       color: "violet",
       badge: "⭐ Most Popular",
-      features: ["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","🛒 Abandoned cart recovery","📊 Monthly performance report","🔥 Smart AI model routing","🎯 Upsell & cross-sell AI","🚀 Priority 24hr support"],
+      features: ["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","📦 Live product image cards","🔍 Order tracking","📢 Proactive messages","🛒 Abandoned cart recovery","🚀 Priority 24hr support"],
     },
     {
       id: "enterprise",
       name: "Enterprise",
-      price: "$79",
+      price: "$49",
       desc: "For high-volume stores",
       color: "gold",
       badge: "👑 Unlimited",
-      features: ["✅ Everything in Pro","💬 Unlimited messages","🧠 Unlimited memory","🎯 Custom AI personality","🔥 Best AI models","📊 Monthly performance report","👑 Dedicated account manager","📞 Phone & priority support"],
+      features: ["✅ Everything in Pro","💬 Unlimited messages","🧠 Unlimited memory","🎯 Custom AI personality","🔥 Best AI models","📊 Monthly report + My Report tab","👑 Dedicated account manager","📞 Phone & priority support"],
     },
   ];
   return (
@@ -715,7 +715,7 @@ function Step4({ data, onBack }) {
 
 📦 PLAN
 -------
-Plan:           ${data.plan === "pro" ? "Pro — $49/mo" : data.plan === "enterprise" ? "Enterprise — $79/mo" : "Starter — $19/mo"}
+Plan:           ${data.plan === "pro" ? "Pro — $29/mo" : data.plan === "enterprise" ? "Enterprise — $49/mo" : "Starter — $19/mo"}
 Msg Limit:      ${data.plan === "pro" ? "13,000 / month" : data.plan === "enterprise" ? "Unlimited" : "5,000 / month"}
 Memory:         ${data.plan === "pro" ? "Full conversation" : data.plan === "enterprise" ? "Unlimited" : "Last 20 messages"}
 
@@ -824,7 +824,7 @@ Submitted from AgentComerce Website
           <Icon path={icons.zap} size={14} /> Next Step — Complete Payment
         </div>
         <p className="text-slate-400 text-xs mb-3">
-          Complete your {data.plan === "pro" ? "Pro — $49/mo" : data.plan === "enterprise" ? "Enterprise — $79/mo" : "Starter — $19/mo"} payment to activate your AI agent.
+          Complete your {data.plan === "pro" ? "Pro — $29/mo" : data.plan === "enterprise" ? "Enterprise — $49/mo" : "Starter — $19/mo"} payment to activate your AI agent.
         </p>
         <Btn onClick={() => {
           const url = data.plan === "pro"
@@ -851,7 +851,7 @@ Submitted from AgentComerce Website
         <p className="text-slate-400 text-sm">Review your information before submitting.</p>
       </div>
       <div className="rounded-xl border border-white/10 overflow-hidden">
-        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{data.plan === "pro" ? "Pro — $49/mo" : data.plan === "enterprise" ? "Enterprise — $79/mo" : "Starter — $19/mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Contact", data.contactEmail], ["Categories", (data.categories || []).join(", ") || "—"]].map(([label, value], i) => (
+        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{data.plan === "pro" ? "Pro — $29/mo" : data.plan === "enterprise" ? "Enterprise — $49/mo" : "Starter — $19/mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Contact", data.contactEmail], ["Categories", (data.categories || []).join(", ") || "—"]].map(([label, value], i) => (
           <div key={label} className={cx("flex items-start justify-between gap-4 px-5 py-4", i % 2 === 0 ? "bg-white/3" : "bg-transparent")}>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest flex-shrink-0 pt-0.5">{label}</span>
             <span className="text-sm text-slate-200 text-right break-all">{value || "—"}</span>
@@ -918,7 +918,7 @@ function LandingPage({ onStart }) {
     { q: "What happens after I submit my store details?", a: "Our team receives your submission, reviews your credentials, and begins configuring your AI agent. We train it on your products, FAQs, and store policies. You'll receive a confirmation email when it's live." },
     { q: "Can I customize what the AI says?", a: "Yes! During onboarding you can provide your FAQs, return policy, special instructions, and brand voice. The AI is trained specifically for your store and can be updated anytime." },
     { q: "What if I want to cancel?", a: "No contracts, no hassle. You can cancel your subscription at any time. We also offer a 14-day money-back guarantee if you're not satisfied with the service." },
-    { q: "How does the $19/month pricing work?", a: "It's a simple flat fee of $19 per month per store with no hidden costs. Includes 5,000 messages/month, AI agent, all updates, maintenance, and support. Cancel anytime with no penalties." },
+    { q: "How does pricing work?", a: "Simple flat monthly fee per store — Starter $19, Pro $29, Enterprise $49. No hidden costs, no setup fees. Cancel anytime with no penalties." },
   ];
 
   const handleContactSubmit = () => {
@@ -1102,8 +1102,8 @@ function LandingPage({ onStart }) {
             <div className="mb-6">
               <div className="text-xs font-bold text-violet-400 uppercase tracking-widest mb-3">Pro</div>
               <div className="flex items-baseline gap-2">
-                <div className="text-5xl font-extrabold text-white mb-1">$49<span className="text-lg font-normal text-slate-500">/mo</span></div>
-                <div className="text-xs text-slate-500 line-through">$99</div>
+                <div className="text-5xl font-extrabold text-white mb-1">$29<span className="text-lg font-normal text-slate-500">/mo</span></div>
+                <div className="text-xs text-slate-500 line-through">$49</div>
               </div>
               <div className="inline-flex items-center gap-1 bg-violet-500/25 border border-violet-400/30 text-violet-300 text-xs font-bold px-2.5 py-1 rounded-full mt-2">💬 13,000 msg/mo</div>
               <p className="text-slate-300 text-sm mt-2">For growing stores that want maximum sales</p>
@@ -1115,7 +1115,7 @@ function LandingPage({ onStart }) {
                 </div>
               ))}
             </div>
-            <Btn onClick={onStart} className="w-full justify-center text-base py-4">Get Pro — $49/month</Btn>
+            <Btn onClick={onStart} className="w-full justify-center text-base py-4">Get Pro — $29/month</Btn>
             <p className="text-xs text-slate-500 mt-3">No contracts · 14-day money back guarantee</p>
           </Card>
           {/* ENTERPRISE */}
@@ -1126,7 +1126,7 @@ function LandingPage({ onStart }) {
             </div>
             <div className="mb-6">
               <div className="text-xs font-bold text-yellow-400 uppercase tracking-widest mb-3">Enterprise</div>
-              <div className="text-5xl font-extrabold text-white mb-1">$79<span className="text-lg font-normal text-slate-500">/mo</span></div>
+              <div className="text-5xl font-extrabold text-white mb-1">$49<span className="text-lg font-normal text-slate-500">/mo</span></div>
               <div className="inline-flex items-center gap-1 bg-yellow-500/20 border border-yellow-400/30 text-yellow-300 text-xs font-bold px-2.5 py-1 rounded-full mt-2">💬 Unlimited messages</div>
               <p className="text-slate-300 text-sm mt-2">For high-volume stores with no limits</p>
             </div>
@@ -1137,7 +1137,7 @@ function LandingPage({ onStart }) {
                 </div>
               ))}
             </div>
-            <Btn onClick={onStart} className="w-full justify-center text-base py-4" style={{background:'linear-gradient(135deg,#d97706,#ea580c)'}}>Get Enterprise — $79/month</Btn>
+            <Btn onClick={onStart} className="w-full justify-center text-base py-4" style={{background:'linear-gradient(135deg,#d97706,#ea580c)'}}>Get Enterprise — $49/month</Btn>
             <p className="text-xs text-slate-500 mt-3">No contracts · 14-day money back guarantee</p>
           </Card>
         </div>
@@ -1260,8 +1260,8 @@ function LandingPage({ onStart }) {
                 <div style={{position:'absolute',top:'-10px',left:'50%',transform:'translateX(-50%)',background:'linear-gradient(135deg,#7c3aed,#a855f7)',borderRadius:'99px',padding:'3px 12px',fontSize:'10px',fontWeight:'800',color:'white',whiteSpace:'nowrap'}}>⭐ MOST POPULAR</div>
                 <div style={{fontSize:'11px',fontWeight:'700',color:'#a78bfa',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px'}}>Pro</div>
                 <div style={{display:'flex',alignItems:'baseline',gap:'8px',marginBottom:'4px'}}>
-                  <div style={{fontSize:'36px',fontWeight:'800',color:'white'}}>$49<span style={{fontSize:'14px',fontWeight:'400',color:'#64748b'}}>/mo</span></div>
-                  <div style={{fontSize:'12px',color:'#64748b',textDecoration:'line-through'}}>$99</div>
+                  <div style={{fontSize:'36px',fontWeight:'800',color:'white'}}>$29<span style={{fontSize:'14px',fontWeight:'400',color:'#64748b'}}>/mo</span></div>
+                  <div style={{fontSize:'12px',color:'#64748b',textDecoration:'line-through'}}>$49</div>
                 </div>
                 <div style={{display:'inline-flex',alignItems:'center',background:'rgba(139,92,246,0.2)',border:'1px solid rgba(139,92,246,0.3)',borderRadius:'99px',padding:'2px 10px',fontSize:'11px',fontWeight:'700',color:'#c4b5fd',marginBottom:'8px'}}>💬 13,000 msg/mo</div>
                 <p style={{color:'#c4b5fd',fontSize:'12px',marginBottom:'16px'}}>For stores that want max sales</p>
@@ -1278,7 +1278,7 @@ function LandingPage({ onStart }) {
               <div style={{background:'linear-gradient(135deg,rgba(234,179,8,0.15),rgba(251,146,60,0.08))',border:'1px solid rgba(234,179,8,0.4)',borderRadius:'16px',padding:'24px',position:'relative'}}>
                 <div style={{position:'absolute',top:'-10px',left:'50%',transform:'translateX(-50%)',background:'linear-gradient(135deg,#d97706,#ea580c)',borderRadius:'99px',padding:'3px 12px',fontSize:'10px',fontWeight:'800',color:'white',whiteSpace:'nowrap'}}>👑 UNLIMITED</div>
                 <div style={{fontSize:'11px',fontWeight:'700',color:'#fbbf24',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px'}}>Enterprise</div>
-                <div style={{fontSize:'36px',fontWeight:'800',color:'white',marginBottom:'4px'}}>$79<span style={{fontSize:'14px',fontWeight:'400',color:'#64748b'}}>/mo</span></div>
+                <div style={{fontSize:'36px',fontWeight:'800',color:'white',marginBottom:'4px'}}>$49<span style={{fontSize:'14px',fontWeight:'400',color:'#64748b'}}>/mo</span></div>
                 <div style={{display:'inline-flex',alignItems:'center',background:'rgba(234,179,8,0.15)',border:'1px solid rgba(234,179,8,0.3)',borderRadius:'99px',padding:'2px 10px',fontSize:'11px',fontWeight:'700',color:'#fde68a',marginBottom:'8px'}}>💬 Unlimited msg/mo</div>
                 <p style={{color:'#fde68a',fontSize:'12px',marginBottom:'16px'}}>For high-volume stores</p>
                 <div style={{marginBottom:'20px'}}>
