@@ -445,10 +445,7 @@ function Step2({ data, setData, onNext, onBack }) {
       </div>
       <div className="flex items-center justify-between pt-2">
         <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <div className="flex gap-2">
-          <Btn variant="ghost" onClick={() => validate() && onNext()} className="text-slate-400 border-white/10">Skip Test <Icon path={icons.arrow} size={16} /></Btn>
-          <Btn onClick={handleValidate} loading={validating}><Icon path={icons.zap} size={16} /> Test & Continue</Btn>
-        </div>
+        <Btn onClick={handleValidate} loading={validating}><Icon path={icons.zap} size={16} /> Verify & Continue</Btn>
       </div>
     </div>
   );
@@ -793,8 +790,14 @@ Submitted from AgentComerce Website
         "template_3s3hffj",
         {
           store_name: data.storeName || "New Store",
-          full_details,
-        }
+          from_name: data.storeName || "New Store",
+          to_name: "AgentComerce",
+          subject: "New Store Submission - " + (data.storeName || "New Store"),
+          message: full_details.substring(0, 4000),
+          full_details: full_details.substring(0, 4000),
+          reply_to: data.contactEmail || "agentcomrce@gmail.com",
+        },
+        "Nvak4g2MT8AuvKpb6"
       );
 
       // 2. Send confirmation email to client
