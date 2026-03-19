@@ -1464,7 +1464,7 @@ export default function App() {
     plan: "", storeAnswers: {},
     storeName: "", contactEmail: "", categories: [], deliveryMethods: [], returnPolicy: "", faqs: "", notes: "",
   });
-  const next = () => setStep(s => Math.min(s + 1, 5));
+  const next = () => setStep(s => Math.min(s + 1, 6));
   const back = () => setStep(s => Math.max(s - 1, 1));
 
   return (
