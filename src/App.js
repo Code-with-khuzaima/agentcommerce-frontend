@@ -784,67 +784,48 @@ Submitted from AgentComerce Website
 ========================================
       `.trim();
 
-      // 1. Send full details to admin
-      await window.emailjs.send(
-        "service_26d0u9m",
-        "template_3s3hffj",
-        {
-          store_name: data.storeName || "New Store",
-          from_name: data.storeName || "New Store",
-          to_name: "AgentComerce",
-          subject: "New Store Submission - " + (data.storeName || "New Store"),
-          message: full_details.substring(0, 4000),
-          full_details: full_details.substring(0, 4000),
-          reply_to: data.contactEmail || "agentcomrce@gmail.com",
-        },
-        "Nvak4g2MT8AuvKpb6"
-      );
+      // 1. Send full details to admin — uses template_wovwhva
+      try {
+        await window.emailjs.send(
+          "service_26d0u9m",
+          "template_wovwhva",
+          {
+            store_name: data.storeName || "New Store",
+            full_details: full_details.substring(0, 4000),
+            email: data.contactEmail || "agentcomrce@gmail.com",
+          },
+          "Nvak4g2MT8AuvKpb6"
+        );
+      } catch(adminEmailErr) {
+        // Log but don't block — submission still completes
+        console.error("Admin email error:", adminEmailErr);
+      }
 
       // 2. Send confirmation email to client
       if (data.contactEmail) {
         try {
           await window.emailjs.send(
             "service_26d0u9m",
-            "template_wovwhva",
+            "template_3s3hffj",
             {
+              title: "Submission Confirmed - " + (data.storeName || "Your Store"),
               from_name: "AgentComerce Team",
               from_email: "agentcomrce@gmail.com",
-              message: `Hi,
-
-Thank you for choosing AgentComerce! 🎉
-
-We've received your store submission for ${data.storeName || "your store"}.
-
-Your plan: ${data.plan === "pro" ? "Pro — $29/month" : data.plan === "enterprise" ? "Enterprise — $49/month" : "Starter — $19/month"}
-
-What happens next:
-✅ Our team will review your submission
-✅ We'll configure your AI agent within 1–2 business days
-✅ You'll receive another email when your agent is live
-
-Next step: Complete your payment to activate your AI agent.
-Payment link will be sent to you shortly.
-
-If you have any questions, reply to this email or WhatsApp us.
-
-Best regards,
-AgentComerce Team
-agentcomrce@gmail.com
-agentcomerce.com`,
-              to_email: data.contactEmail,
+              name: "AgentComerce Team",
+              message: `Hi, thank you for choosing AgentComerce! We received your store submission for ${data.storeName || "your store"}. Your plan: ${data.plan === "pro" ? "Pro $29/month" : data.plan === "enterprise" ? "Enterprise $49/month" : "Starter $19/month"}. Our team will configure your AI agent within 1-2 business days and email you when live. AgentComerce Team - agentcomrce@gmail.com`,
             },
             "Nvak4g2MT8AuvKpb6"
           );
-        } catch(emailErr) {
-          console.log("Client confirmation email failed:", emailErr);
-          // Don't block submission if client email fails
+        } catch(clientEmailErr) {
+          console.log("Client email error:", clientEmailErr);
         }
       }
 
+      // Always mark as submitted — emails are best-effort
       setSubmitted(true);
     } catch (e) {
-      console.error(e);
-      setError("Failed to send. Please check your connection and try again.");
+      console.error("Submit error:", e);
+      setError("Failed to submit. Please check your internet connection and try again. If the issue persists email us at agentcomrce@gmail.com");
     } finally {
       setSubmitting(false);
     }
@@ -977,8 +958,14 @@ function LandingPage({ onStart }) {
     if (!contactForm.name || !contactForm.email || !contactForm.message) return;
     window.emailjs.send(
       "service_26d0u9m",
-      "template_wovwhva",
-      { from_name: contactForm.name, from_email: contactForm.email, message: contactForm.message },
+      "template_3s3hffj",
+      { 
+        title: "Contact Form Message",
+        from_name: contactForm.name, 
+        from_email: contactForm.email, 
+        message: contactForm.message,
+        name: contactForm.name
+      },
       "Nvak4g2MT8AuvKpb6"
     ).then(() => {
       setContactSent(true);
