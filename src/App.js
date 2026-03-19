@@ -782,7 +782,7 @@ Submitted from AgentComerce Website
 ========================================
       `.trim();
 
-      // Send via EmailJS
+      // 1. Send full details to admin
       await window.emailjs.send(
         "service_26d0u9m",
         "template_3s3hffj",
@@ -791,6 +791,47 @@ Submitted from AgentComerce Website
           full_details,
         }
       );
+
+      // 2. Send confirmation email to client
+      if (data.contactEmail) {
+        try {
+          await window.emailjs.send(
+            "service_26d0u9m",
+            "template_wovwhva",
+            {
+              from_name: "AgentComerce Team",
+              from_email: "agentcomrce@gmail.com",
+              message: `Hi,
+
+Thank you for choosing AgentComerce! 🎉
+
+We've received your store submission for ${data.storeName || "your store"}.
+
+Your plan: ${data.plan === "pro" ? "Pro — $29/month" : data.plan === "enterprise" ? "Enterprise — $49/month" : "Starter — $19/month"}
+
+What happens next:
+✅ Our team will review your submission
+✅ We'll configure your AI agent within 1–2 business days
+✅ You'll receive another email when your agent is live
+
+Next step: Complete your payment to activate your AI agent.
+Payment link will be sent to you shortly.
+
+If you have any questions, reply to this email or WhatsApp us.
+
+Best regards,
+AgentComerce Team
+agentcomrce@gmail.com
+agentcomerce.com`,
+              to_email: data.contactEmail,
+            },
+            "Nvak4g2MT8AuvKpb6"
+          );
+        } catch(emailErr) {
+          console.log("Client confirmation email failed:", emailErr);
+          // Don't block submission if client email fails
+        }
+      }
 
       setSubmitted(true);
     } catch (e) {
@@ -833,8 +874,8 @@ Submitted from AgentComerce Website
             ? "https://buy.stripe.com/your-enterprise-link"
             : "https://buy.stripe.com/your-starter-link";
           window.open(url, "_blank");
-        }}>
-          <Icon path={icons.zap} size={16} /> Complete Payment
+        }} className="w-full justify-center">
+          <Icon path={icons.zap} size={16} /> Complete Payment →
         </Btn>
       </div>
       <button onClick={() => window.location.reload()} className="text-xs text-slate-600 hover:text-slate-400 transition-colors">
@@ -913,12 +954,15 @@ function LandingPage({ onStart }) {
 
   const faqs = [
     { q: "How long does the setup take?", a: "Our team typically completes the full integration within 1–2 business days. Once you submit your store details and credentials, we handle everything — no technical work required from your side." },
-    { q: "Does it work with my Shopify or WooCommerce store?", a: "Yes! AgentComerce is purpose-built for both Shopify and WooCommerce stores. We connect via your store's official REST API to access products, orders, and store information." },
-    { q: "Is my API data safe and secure?", a: "Absolutely. All your API credentials are encrypted using AES-256 encryption before being stored. We use HTTPS for all communications and your credentials are never exposed in our frontend code." },
-    { q: "What happens after I submit my store details?", a: "Our team receives your submission, reviews your credentials, and begins configuring your AI agent. We train it on your products, FAQs, and store policies. You'll receive a confirmation email when it's live." },
-    { q: "Can I customize what the AI says?", a: "Yes! During onboarding you can provide your FAQs, return policy, special instructions, and brand voice. The AI is trained specifically for your store and can be updated anytime." },
-    { q: "What if I want to cancel?", a: "No contracts, no hassle. You can cancel your subscription at any time. We also offer a 14-day money-back guarantee if you're not satisfied with the service." },
-    { q: "How does pricing work?", a: "Simple flat monthly fee per store — Starter $19, Pro $29, Enterprise $49. No hidden costs, no setup fees. Cancel anytime with no penalties." },
+    { q: "Does it work with my Shopify or WooCommerce store?", a: "Yes! AgentComerce is purpose-built for both Shopify and WooCommerce stores. We connect via your store's official REST API to access live products, orders, prices, and stock in real time." },
+    { q: "Can the AI show product images and prices?", a: "Yes! On Pro and Enterprise plans, the AI shows live product image cards inside the chat — with price, stock status, sale badge, and an Add to Cart button. Customers can browse and buy without leaving the chat." },
+    { q: "Does it track customer orders?", a: "Yes. Customers can type their order number and the AI instantly fetches the real order status, payment, fulfillment, and tracking number from your store." },
+    { q: "Is my API data safe and secure?", a: "Absolutely. All your store credentials are encrypted using AES-256 encryption. We use HTTPS for all communications and your credentials are never exposed in our frontend code." },
+    { q: "What happens after I submit?", a: "You'll receive a confirmation email immediately. Our team then configures your AI agent with your products and FAQs, and emails you when it's live — usually within 1–2 business days." },
+    { q: "Can I customize what the AI says?", a: "Yes! You provide your FAQs, return policy, delivery info, and brand voice during onboarding. The AI is trained specifically for your store and can be updated anytime by emailing us." },
+    { q: "What if I want to cancel?", a: "No contracts, no hassle. Cancel your subscription anytime. We also offer a 14-day money-back guarantee if you're not satisfied with the service." },
+    { q: "How does pricing work?", a: "Simple flat monthly fee — Starter $19/mo (5,000 messages), Pro $29/mo (13,000 messages), Enterprise $49/mo (unlimited). No hidden costs, no setup fees. Cancel anytime." },
+    { q: "What languages does the AI support?", a: "The AI automatically detects the customer's language and replies in the same language. Works with Urdu, English, Arabic, and most other languages out of the box." },
   ];
 
   const handleContactSubmit = () => {
