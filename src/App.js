@@ -445,7 +445,10 @@ function Step2({ data, setData, onNext, onBack }) {
       </div>
       <div className="flex items-center justify-between pt-2">
         <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <Btn onClick={handleValidate} loading={validating}><Icon path={icons.zap} size={16} /> Test Connection</Btn>
+        <div className="flex gap-2">
+          <Btn variant="ghost" onClick={() => validate() && onNext()} className="text-slate-400 border-white/10">Skip Test <Icon path={icons.arrow} size={16} /></Btn>
+          <Btn onClick={handleValidate} loading={validating}><Icon path={icons.zap} size={16} /> Test & Continue</Btn>
+        </div>
       </div>
     </div>
   );
@@ -471,7 +474,8 @@ function Step3({ data, setData, onNext, onBack }) {
     if (!data.categories?.length) e.categories = "Please select at least one category";
     if (!data.deliveryMethods?.length) e.deliveryMethods = "Please select at least one delivery method";
     if (!data.returnPolicy?.trim()) e.returnPolicy = "Return/refund policy is required";
-    if (!data.faqs?.trim()) e.faqs = "Please add at least one FAQ";
+    // FAQs are handled in Train AI step — not required here
+    // if (!data.faqs?.trim()) e.faqs = "Please add at least one FAQ";
     STORE_QUESTIONS.forEach(({ id }) => {
       if (!data.storeAnswers?.[id]) e[id] = "Please answer this question";
     });
@@ -507,10 +511,7 @@ function Step3({ data, setData, onNext, onBack }) {
         <Textarea id="returnPolicy" placeholder="e.g. 30-day returns, unused items in original packaging..." value={data.returnPolicy || ""} onChange={e => setData(d => ({ ...d, returnPolicy: e.target.value }))} />
         {errors.returnPolicy && <p className="text-xs text-red-400 mt-1">{errors.returnPolicy}</p>}
       </Field>
-      <Field label="Frequently Asked Questions *" id="faqs" helper="One question per line" error={errors.faqs}>
-        <Textarea id="faqs" rows={5} placeholder={"Do you ship internationally?\nHow long does delivery take?\nWhat payment methods do you accept?"} value={data.faqs || ""} onChange={e => setData(d => ({ ...d, faqs: e.target.value }))} />
-        {errors.faqs && <p className="text-xs text-red-400 mt-1">{errors.faqs}</p>}
-      </Field>
+      {/* FAQs handled in Train AI step */}
       <div>
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Store Questions <span className="text-red-400">*</span></p>
         <p className="text-xs text-slate-500 mb-4">All questions must be answered to train your AI agent properly.</p>
@@ -547,7 +548,7 @@ function Step3({ data, setData, onNext, onBack }) {
       </Field>
       <div className="flex items-center justify-between pt-2">
         <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <Btn onClick={() => validate() && onNext()}>Review & Submit <Icon path={icons.arrow} size={16} /></Btn>
+        <Btn onClick={() => validate() && onNext()}>Next: Train AI <Icon path={icons.arrow} size={16} /></Btn>
       </div>
     </div>
   );
@@ -579,14 +580,15 @@ function StepQnA({ data, setData, onNext, onBack }) {
   };
 
   const handleNext = () => {
-    // Count all fully filled pairs (question + answer both filled)
-    const allFilled = pairs.filter(p => p.question.trim() && p.answer.trim());
-    if (allFilled.length < 3) {
-      setError("⚠️ Please fill at least 3 Q&As — both question and answer for each.");
+    // Pair[0] is optional phone number — skip it in validation
+    // Require pairs[1] onwards: at least 2 fully filled (question + answer)
+    const nonPhoneFilled = pairs.slice(1).filter(p => p.question.trim() && p.answer.trim());
+    if (nonPhoneFilled.length < 2) {
+      setError("Please fill at least 2 Q&As completely — both question and answer.");
       return;
     }
     setError("");
-    // Save only pairs that have at least an answer (phone optional question)
+    // Save all filled pairs (phone included if answered)
     const toSave = pairs.filter(p => p.answer.trim());
     setData(d => ({ ...d, qnaPairs: toSave }));
     onNext();
@@ -620,7 +622,7 @@ function StepQnA({ data, setData, onNext, onBack }) {
     <div className="flex flex-col gap-5">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Train Your AI 🧠</h2>
-        <p className="text-slate-400 text-sm">Add questions your customers ask most. Fill at least 3 Q&As completely (question + answer). The more you add, the smarter your AI gets.</p>
+        <p className="text-slate-400 text-sm">Add questions your customers ask most. Fill at least 2 Q&As completely. The phone number is optional. The more you add, the smarter your AI gets.</p>
       </div>
 
       {/* Suggestion chips */}
