@@ -579,12 +579,15 @@ function StepQnA({ data, setData, onNext, onBack }) {
   };
 
   const handleNext = () => {
-    const requiredFilled = pairs.slice(1).filter(p => p.question.trim() && p.answer.trim());
-    if (requiredFilled.length < 2) {
-      setError("⚠️ Please fill at least 2 more Q&As (phone number is optional).");
+    // Count all fully filled pairs (question + answer both filled)
+    const allFilled = pairs.filter(p => p.question.trim() && p.answer.trim());
+    if (allFilled.length < 3) {
+      setError("⚠️ Please fill at least 3 Q&As — both question and answer for each.");
       return;
     }
-    const toSave = pairs.filter((p, i) => i === 0 ? p.answer.trim() : p.question.trim() && p.answer.trim());
+    setError("");
+    // Save only pairs that have at least an answer (phone optional question)
+    const toSave = pairs.filter(p => p.answer.trim());
     setData(d => ({ ...d, qnaPairs: toSave }));
     onNext();
   };
@@ -617,7 +620,7 @@ function StepQnA({ data, setData, onNext, onBack }) {
     <div className="flex flex-col gap-5">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Train Your AI 🧠</h2>
-        <p className="text-slate-400 text-sm">Add questions your customers ask most. Minimum 3 required — add as many as you want. The more you add, the smarter your AI gets.</p>
+        <p className="text-slate-400 text-sm">Add questions your customers ask most. Fill at least 3 Q&As completely (question + answer). The more you add, the smarter your AI gets.</p>
       </div>
 
       {/* Suggestion chips */}
