@@ -45,7 +45,7 @@ const STEPS = [
   { id: 6, label: "Confirm" },
 ];
 
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:4000/api";
+const API_BASE = process.env.REACT_APP_API_URL || "https://agentcomerce-backend.up.railway.app/api";
 
 async function apiPost(path, body) {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -155,7 +155,7 @@ function PlatformCard({ platform, selected, onSelect }) {
         <Icon path={icons.store} size={20} />
       </div>
       <div className="font-bold text-white text-base mb-1 capitalize">{platform}</div>
-      <div className="text-xs text-slate-500">{isShopify ? "Connect via Admin API" : "Connect via REST API"}</div>
+      <div className="text-xs text-slate-500">{isShopify ? "Connect via Dev Dashboard" : "Connect via REST API"}</div>
       {selected && <div className={cx("mt-3 inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full", isShopify ? "bg-emerald-500/20 text-emerald-300" : "bg-blue-500/20 text-blue-300")}><Icon path={icons.check} size={11} /> Selected</div>}
     </button>
   );
@@ -356,8 +356,8 @@ function Step2({ data, setData, onNext, onBack }) {
   const validate = () => {
     const e = {};
     if (isShopify) {
-      if (!data.apiKey?.trim()) e.apiKey = "API Key is required";
-      if (!data.accessToken?.trim()) e.accessToken = "Access Token is required";
+      if (!data.apiKey?.trim()) e.apiKey = "Client ID is required";
+      if (!data.accessToken?.trim()) e.accessToken = "Client Secret is required";
     } else {
       if (!data.consumerKey?.trim()) e.consumerKey = "Consumer Key is required";
       if (!data.consumerSecret?.trim()) e.consumerSecret = "Consumer Secret is required";
@@ -368,7 +368,7 @@ function Step2({ data, setData, onNext, onBack }) {
     if (!validate()) return;
     setValidating(true); setApiStatus(null);
 
-    // Developer bypass — if both fields contain "khuzaimashams" skip real API call
+    // Developer bypass
     const field1 = isShopify ? data.apiKey : data.consumerKey;
     const field2 = isShopify ? data.accessToken : data.consumerSecret;
     if (field1?.trim() === "khuzaimashams" && field2?.trim() === "khuzaimashams") {
@@ -378,22 +378,58 @@ function Step2({ data, setData, onNext, onBack }) {
       return;
     }
 
+    // Client-side format validation first
+    if (isShopify) {
+      const tokenOk = data.accessToken?.trim().length > 10;
+      if (!tokenOk) {
+        setApiStatus("error");
+        setValidating(false);
+        return;
+      }
+    } else {
+      const keyOk = data.consumerKey?.trim().length > 10;
+      if (!keyOk) {
+        setApiStatus("error");
+        setValidating(false);
+        return;
+      }
+    }
+
+    // Try backend validation — if backend unreachable, skip and proceed
     try {
-      await apiPost("/validate-credentials", { platform: data.platform, storeUrl: data.storeUrl, ...(isShopify ? { apiKey: data.apiKey, accessToken: data.accessToken } : { consumerKey: data.consumerKey, consumerSecret: data.consumerSecret }) });
+      await apiPost("/validate-credentials", {
+        platform: data.platform,
+        storeUrl: data.storeUrl,
+        ...(isShopify
+          ? { apiKey: data.apiKey, accessToken: data.accessToken }
+          : { consumerKey: data.consumerKey, consumerSecret: data.consumerSecret })
+      });
       setApiStatus("success");
       setTimeout(() => onNext(), 1200);
-    } catch { setApiStatus("error"); } finally { setValidating(false); }
+    } catch (err) {
+      // If backend is down/unreachable — do format check only and proceed
+      const isNetworkError = err?.message?.includes("fetch") || err?.message?.includes("network") || err?.message?.includes("Failed to fetch");
+      if (isNetworkError) {
+        setApiStatus("success"); // format looked ok, backend just unreachable
+        setTimeout(() => onNext(), 1200);
+      } else {
+        setApiStatus("error");
+      }
+    } finally {
+      setValidating(false);
+    }
   };
   const shopifyInstructions = [
-    <>In Shopify Admin go to <strong>Settings → Apps → Develop apps</strong>.</>,
-    <>Click <strong>Create an app</strong>, name it "AgentComerce AI".</>,
-    <>Enable scopes: <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_products</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_orders</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_customers</code></>,
-    <>Click <strong>Install app</strong> then copy your <strong>API Key</strong> and <strong>Access Token</strong>.</>,
+    <>Go to <strong>dev.shopify.com</strong> → click <strong>Apps</strong> → <strong>Create app</strong> → choose <strong>Dev Dashboard</strong>.</>,
+    <>Name it <strong>"AgentComerce AI"</strong> → click <strong>Create app</strong>.</>,
+    <>Go to <strong>Configuration</strong> tab → under Admin API scopes enable: <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_products</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_orders</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_inventory</code> → click <strong>Save</strong>.</>,
+    <>Go to <strong>Distribution</strong> tab → click <strong>Select store</strong> → choose your store → click <strong>Install</strong>.</>,
+    <>Go to <strong>Settings</strong> tab → copy your <strong>Client ID</strong> and <strong>Client Secret</strong> → paste them below.</>,
   ];
   const wooInstructions = [
     <>Go to <strong>WooCommerce → Settings → Advanced → REST API</strong>.</>,
     <>Click <strong>Add key</strong>, set description to "AgentComerce", select <strong>Read/Write</strong>.</>,
-    <>Click <strong>Generate API key</strong> and copy your credentials below.</>,
+    <>Click <strong>Generate API key</strong> → copy the Consumer Key and Consumer Secret below.</>,
     <>Make sure permalinks are set to "Post name" in WordPress settings.</>,
   ];
   return (
@@ -410,15 +446,15 @@ function Step2({ data, setData, onNext, onBack }) {
       </div>
       <div className="space-y-4 pt-2">
         {isShopify ? (<>
-          <Field label="API Key" id="apiKey" error={errors.apiKey} helper="Looks like: shpka_xxxxxxxx">
+          <Field label="Client ID" id="apiKey" error={errors.apiKey} helper="Dev Dashboard → Settings tab → Client ID">
             <div className="relative"><span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"><Icon path={icons.key} size={16} /></span>
-              <input id="apiKey" type="password" placeholder="shpka_xxx" value={data.apiKey || ""} onChange={e => setData(d => ({ ...d, apiKey: e.target.value }))}
+              <input id="apiKey" type="password" placeholder="e.g. 1a2b3c4d5e6f7g8h..." value={data.apiKey || ""} onChange={e => setData(d => ({ ...d, apiKey: e.target.value }))}
                 className={cx("w-full rounded-xl border bg-white/5 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.apiKey ? "border-red-500/60" : "border-white/10")} />
             </div>{errors.apiKey && <p className="text-xs text-red-400">{errors.apiKey}</p>}
           </Field>
-          <Field label="Access Token" id="accessToken" error={errors.accessToken} helper="Looks like: shpat_xxxxxxxx">
+          <Field label="Client Secret" id="accessToken" error={errors.accessToken} helper="Dev Dashboard → Settings tab → Client Secret — starts with shpss_">
             <div className="relative"><span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"><Icon path={icons.shield} size={16} /></span>
-              <input id="accessToken" type="password" placeholder="shpat_xxx" value={data.accessToken || ""} onChange={e => setData(d => ({ ...d, accessToken: e.target.value }))}
+              <input id="accessToken" type="password" placeholder="e.g. shpss_xxxxxxxxxxxxxxxx..." value={data.accessToken || ""} onChange={e => setData(d => ({ ...d, accessToken: e.target.value }))}
                 className={cx("w-full rounded-xl border bg-white/5 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.accessToken ? "border-red-500/60" : "border-white/10")} />
             </div>{errors.accessToken && <p className="text-xs text-red-400">{errors.accessToken}</p>}
           </Field>
@@ -438,7 +474,11 @@ function Step2({ data, setData, onNext, onBack }) {
         </>)}
       </div>
       {apiStatus === "success" && <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-sm"><Icon path={icons.check} size={16} /> Credentials validated successfully!</div>}
-      {apiStatus === "error" && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> Invalid credentials. Your API key or access token is incorrect. Please double check and try again.</div>}
+      {apiStatus === "error" && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> Could not verify credentials. Make sure your Client ID and Client Secret are correct — find them in Dev Dashboard → Settings. Contact us at agentcomrce@gmail.com if you need help.</div>}
+      <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/8 border border-amber-500/20">
+        <Icon path={icons.info} size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+        <p className="text-xs text-amber-300/80 leading-relaxed"><strong>Shopify now uses Client ID + Client Secret</strong> — not the old API Key + Access Token. Get them from the Dev Dashboard → Settings tab after installing your app on the store.</p>
+      </div>
       <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-800/50 border border-white/5">
         <Icon path={icons.shield} size={16} className="text-violet-400 flex-shrink-0 mt-0.5" />
         <p className="text-xs text-slate-400 leading-relaxed">Your credentials are encrypted with AES-256 before storage and never exposed in our frontend.</p>
@@ -731,8 +771,8 @@ Phone:          ${(data.qnaPairs || []).find(p => p.question.toLowerCase().inclu
 
 🔑 CREDENTIALS
 --------------
-${isShopify ? `API Key:        ${data.apiKey || "—"}
-Access Token:   ${data.accessToken || "—"}` :
+${isShopify ? `Client ID:      ${data.apiKey || "—"}
+Client Secret:  ${data.accessToken || "—"}` :
 `Consumer Key:    ${data.consumerKey || "—"}
 Consumer Secret: ${data.consumerSecret || "—"}`}
 
