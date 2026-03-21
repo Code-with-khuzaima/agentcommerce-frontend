@@ -475,10 +475,7 @@ function Step2({ data, setData, onNext, onBack }) {
       </div>
       {apiStatus === "success" && <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-sm"><Icon path={icons.check} size={16} /> Credentials validated successfully!</div>}
       {apiStatus === "error" && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> Could not verify credentials. Make sure your Client ID and Client Secret are correct — find them in Dev Dashboard → Settings. Contact us at agentcomrce@gmail.com if you need help.</div>}
-      <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/8 border border-amber-500/20">
-        <Icon path={icons.info} size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-amber-300/80 leading-relaxed"><strong>Shopify now uses Client ID + Client Secret</strong> — not the old API Key + Access Token. Get them from the Dev Dashboard → Settings tab after installing your app on the store.</p>
-      </div>
+
       <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-800/50 border border-white/5">
         <Icon path={icons.shield} size={16} className="text-violet-400 flex-shrink-0 mt-0.5" />
         <p className="text-xs text-slate-400 leading-relaxed">Your credentials are encrypted with AES-256 before storage and never exposed in our frontend.</p>
