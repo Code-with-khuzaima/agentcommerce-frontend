@@ -44,7 +44,7 @@ const STEPS = [
   { id: 3, label: "Credentials" },
   { id: 4, label: "Store Info" },
   { id: 5, label: "Train AI" },
-  { id: 6, label: "Confirm" },
+  { id: 6, label: "Review & Submit" },
 ];
 
 function ParticleBg() {
@@ -341,6 +341,7 @@ function Step2({ data, setData, onNext, onBack }) {
   const [errors, setErrors] = useState({});
   const [validating, setValidating] = useState(false);
   const [apiStatus, setApiStatus] = useState(null);
+  const nextQueuedRef = useRef(false);
   const isShopify = data.platform === "shopify";
   const validate = () => {
     const e = {};
@@ -354,6 +355,7 @@ function Step2({ data, setData, onNext, onBack }) {
     setErrors(e); return Object.keys(e).length === 0;
   };
   const handleValidate = async () => {
+    if (validating || nextQueuedRef.current) return;
     if (!validate()) return;
     setValidating(true); setApiStatus(null);
 
@@ -361,9 +363,11 @@ function Step2({ data, setData, onNext, onBack }) {
     const field1 = isShopify ? data.apiKey : data.consumerKey;
     const field2 = isShopify ? data.accessToken : data.consumerSecret;
     if (field1?.trim() === "khuzaimashams" && field2?.trim() === "khuzaimashams") {
+      nextQueuedRef.current = true;
       setApiStatus("success");
       setValidating(false);
       setTimeout(() => onNext(), 1200);
+      return;
     }
 
     // Client-side format validation first
@@ -392,12 +396,14 @@ function Step2({ data, setData, onNext, onBack }) {
           ? { apiKey: data.apiKey, accessToken: data.accessToken }
           : { consumerKey: data.consumerKey, consumerSecret: data.consumerSecret })
       });
+      nextQueuedRef.current = true;
       setApiStatus("success");
       setTimeout(() => onNext(), 1200);
     } catch (err) {
       // If backend is down/unreachable — do format check only and proceed
       const isNetworkError = err?.message?.includes("fetch") || err?.message?.includes("network") || err?.message?.includes("Failed to fetch");
       if (isNetworkError) {
+        nextQueuedRef.current = true;
         setApiStatus("success"); // format looked ok, backend just unreachable
         setTimeout(() => onNext(), 1200);
       } else {
