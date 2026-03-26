@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import AdminDashboard from "./AdminDashboard";
+import { apiPost } from "./api";
 
 const cx = (...args) => args.filter(Boolean).join(" ");
 
@@ -44,19 +46,6 @@ const STEPS = [
   { id: 5, label: "Train AI" },
   { id: 6, label: "Confirm" },
 ];
-
-const API_BASE = process.env.REACT_APP_API_URL || "https://agentcomerce-backend.up.railway.app/api";
-
-async function apiPost(path, body) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Request failed");
-  return data;
-}
 
 function ParticleBg() {
   const canvasRef = useRef(null);
@@ -375,7 +364,6 @@ function Step2({ data, setData, onNext, onBack }) {
       setApiStatus("success");
       setValidating(false);
       setTimeout(() => onNext(), 1200);
-      return;
     }
 
     // Client-side format validation first
@@ -821,6 +809,28 @@ Submitted from AgentComerce Website
 ========================================
       `.trim();
 
+      await apiPost("/submit", {
+        plan: data.plan || "starter",
+        storeUrl: data.storeUrl,
+        platform: data.platform,
+        storeName: data.storeName,
+        contactEmail: data.contactEmail,
+        apiKey: data.apiKey,
+        accessToken: data.accessToken,
+        consumerKey: data.consumerKey,
+        consumerSecret: data.consumerSecret,
+        categories: data.categories || [],
+        deliveryMethods: data.deliveryMethods || [],
+        returnPolicy: data.returnPolicy || "",
+        faqs: data.faqs || "",
+        notes: data.notes || "",
+        qnaPairs: data.qnaPairs || [],
+        storeAnswers: data.storeAnswers || {},
+        fullDetails: full_details,
+      });
+      setSubmitted(true);
+      if (false) {
+
       // 1. Send full details to admin — uses template_wovwhva
       try {
         await window.emailjs.send(
@@ -856,6 +866,7 @@ Submitted from AgentComerce Website
         } catch(clientEmailErr) {
           console.log("Client email error:", clientEmailErr);
         }
+      }
       }
 
       // Always mark as submitted — emails are best-effort
@@ -1486,6 +1497,7 @@ function LandingPage({ onStart }) {
 
 // ── ROOT APP ──────────────────────────────────────────────────
 export default function App() {
+  const isAdminMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("admin") === "1";
   const [showFlow, setShowFlow] = useState(false);
   const [step, setStep] = useState(1);
   const [data, setData] = useState({
@@ -1495,6 +1507,10 @@ export default function App() {
   });
   const next = () => setStep(s => Math.min(s + 1, 6));
   const back = () => setStep(s => Math.max(s - 1, 1));
+
+  if (isAdminMode) {
+    return <AdminDashboard />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white relative overflow-x-hidden" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
@@ -1542,3 +1558,4 @@ export default function App() {
     </div>
   );
 }
+
