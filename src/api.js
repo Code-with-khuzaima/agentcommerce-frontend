@@ -1,4 +1,4 @@
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:4000/api";
+const API_BASE = process.env.REACT_APP_API_URL || "https://agentcomerce-backend.up.railway.app/api";
 
 async function parseJsonSafe(res) {
   const text = await res.text();
@@ -44,3 +44,4 @@ export function apiPatch(path, body) {
 }
 
 export { API_BASE };
+
