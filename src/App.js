@@ -830,7 +830,13 @@ Submitted from AgentComerce Website
 ========================================
       `.trim();
 
-      await apiPost("/submit", {
+      if (!window.emailjs) {
+        throw new Error("Email service is still loading. Please wait a few seconds and try again.");
+      }
+
+      // Temporary production fallback: submit via EmailJS while backend submit endpoint is unavailable.
+      // Keep the full payload ready so backend can be restored without changing the form fields.
+      const submissionPayload = {
         plan: data.plan || "starter",
         storeUrl: data.storeUrl,
         platform: data.platform,
@@ -848,9 +854,9 @@ Submitted from AgentComerce Website
         qnaPairs: data.qnaPairs || [],
         storeAnswers: data.storeAnswers || {},
         fullDetails: full_details,
-      });
-      setSubmitted(true);
-      if (false) {
+      };
+      console.log("Submission payload prepared", submissionPayload);
+      if (window.emailjs) {
 
       // 1. Send full details to admin — uses template_wovwhva
       try {
@@ -1579,5 +1585,6 @@ export default function App() {
     </div>
   );
 }
+
 
 
