@@ -728,6 +728,27 @@ function Step4({ data, onBack }) {
   const [error, setError] = useState(null);
 
   const handleSubmit = async () => {
+    if (!data.storeName?.trim()) {
+      setError("Store name is required before submitting.");
+      return;
+    }
+    if (!data.contactEmail?.trim()) {
+      setError("Contact email is required before submitting.");
+      return;
+    }
+    if (!data.categories?.length) {
+      setError("Please select at least one product category before submitting.");
+      return;
+    }
+    if (!data.deliveryMethods?.length) {
+      setError("Please select at least one delivery method before submitting.");
+      return;
+    }
+    if (!data.returnPolicy?.trim()) {
+      setError("Return policy is required before submitting.");
+      return;
+    }
+
     setSubmitting(true); setError(null);
     try {
       // Build full details message
@@ -873,7 +894,7 @@ Submitted from AgentComerce Website
       setSubmitted(true);
     } catch (e) {
       console.error("Submit error:", e);
-      setError("Failed to submit. Please check your internet connection and try again. If the issue persists email us at agentcomrce@gmail.com");
+      setError(e?.message || "Failed to submit. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -1558,4 +1579,5 @@ export default function App() {
     </div>
   );
 }
+
 
