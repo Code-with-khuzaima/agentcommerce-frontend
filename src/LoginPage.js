@@ -1,7 +1,6 @@
+// LoginPage.js
 import { useState } from "react";
 import { apiLogin } from "./api";
-
-const cx = (...a) => a.filter(Boolean).join(" ");
 
 const Icon = ({ path, size = 20, className = "" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
@@ -33,13 +32,19 @@ export default function LoginPage({ onLogin, onBack }) {
       setError("Please enter your email and password");
       return;
     }
+
     setLoading(true);
     setError("");
+
     try {
       const res = await apiLogin(email.trim().toLowerCase(), password);
+
+      // Save token and user info
       localStorage.setItem("ac_token", res.token);
       localStorage.setItem("ac_user", JSON.stringify(res.user));
-      onLogin(res.user);
+
+      // Call onLogin callback
+      if (onLogin) onLogin(res.user);
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {
@@ -48,16 +53,10 @@ export default function LoginPage({ onLogin, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 relative overflow-hidden"
-      style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;600;700&display=swap'); * { box-sizing: border-box; }`}</style>
 
-      {/* Background glow */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
-
-      <div className="w-full max-w-sm relative z-10">
-
-        {/* Logo */}
+      <div className="w-full max-w-sm">
         <div className="flex items-center gap-2.5 mb-8 justify-center">
           <div className="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center">
             <Icon path={icons.bot} size={18} className="text-white" />
@@ -65,7 +64,6 @@ export default function LoginPage({ onLogin, onBack }) {
           <span className="font-bold text-white text-xl tracking-tight">AgentComerce</span>
         </div>
 
-        {/* Card */}
         <div className="bg-slate-900 border border-white/8 rounded-2xl p-8">
           <h1 className="text-xl font-bold text-white mb-1">Welcome back</h1>
           <p className="text-sm text-slate-400 mb-6">Sign in to your client dashboard</p>
