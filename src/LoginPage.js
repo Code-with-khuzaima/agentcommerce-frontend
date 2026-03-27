@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { apiLogin } from "./api";
+
+const cx = (...a) => a.filter(Boolean).join(" ");
+
 const Icon = ({ path, size = 20, className = "" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"
@@ -126,7 +129,7 @@ export default function LoginPage({ onLogin, onBack }) {
           <p className="text-xs text-slate-500 text-center mt-6">
             Don't have an account?{" "}
             <button onClick={onBack} className="text-violet-400 hover:text-violet-300 transition-colors">
-              Get started
+              Sign up now →
             </button>
           </p>
         </div>

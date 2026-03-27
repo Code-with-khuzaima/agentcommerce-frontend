@@ -1577,7 +1577,7 @@ export default function App() {
   if (isAdminMode) return <AdminDashboard />;
 
   // Login page
-  if (view === "login") return <LoginPage onLogin={handleLogin} onBack={() => { setView("home"); window.history.pushState({}, "", "/"); }} />;
+  if (view === "login") return <LoginPage onLogin={handleLogin} onBack={() => { setView("home"); setShowFlow(true); window.history.pushState({}, "", "/"); }} />;
 
   // Client dashboard
   if (view === "dashboard" && authUser) return <ClientDashboard onLogout={handleLogout} />;
