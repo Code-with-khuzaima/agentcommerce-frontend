@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import AdminDashboard from "./AdminDashboard";
+import LoginPage from "./LoginPage";
+import ClientDashboard from "./ClientDashboard";
 import { apiPost } from "./api";
 
 const cx = (...args) => args.filter(Boolean).join(" ");
@@ -980,7 +982,7 @@ Submitted from AgentComerce Website
 
 
 // ── LANDING PAGE ──────────────────────────────────────────────
-function LandingPage({ onStart }) {
+function LandingPage({ onStart, onLogin }) {
   const [activeFaq, setActiveFaq] = useState(null);
   const [pricingOpen, setPricingOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
@@ -1073,7 +1075,10 @@ function LandingPage({ onStart }) {
           <button onClick={() => setPricingOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Pricing</button>
           <button onClick={() => document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' })} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">FAQ</button>
           <button onClick={() => setContactOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Contact</button>
-          <Btn onClick={onStart} className="text-sm px-4 py-2">Get Started</Btn>
+          <div className="flex items-center gap-3">
+            <button onClick={onLogin} className="text-sm text-slate-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5">Login</button>
+            <Btn onClick={onStart} className="text-sm px-4 py-2">Get Started</Btn>
+          </div>
         </div>
       </nav>
 
@@ -1531,6 +1536,19 @@ function LandingPage({ onStart }) {
 // ── ROOT APP ──────────────────────────────────────────────────
 export default function App() {
   const isAdminMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("admin") === "1";
+
+  // ── Auth state ─────────────────────────────────────────────
+  const [view, setView] = useState(() => {
+    const path = window.location.pathname;
+    const token = localStorage.getItem("ac_token");
+    if (path === "/login") return "login";
+    if (path === "/dashboard") return token ? "dashboard" : "login";
+    return "home";
+  });
+  const [authUser, setAuthUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("ac_user") || "null"); } catch { return null; }
+  });
+
   const [showFlow, setShowFlow] = useState(false);
   const [step, setStep] = useState(1);
   const [data, setData] = useState({
@@ -1541,9 +1559,28 @@ export default function App() {
   const next = () => setStep(s => Math.min(s + 1, 6));
   const back = () => setStep(s => Math.max(s - 1, 1));
 
-  if (isAdminMode) {
-    return <AdminDashboard />;
-  }
+  const handleLogin = (user) => {
+    setAuthUser(user);
+    setView("dashboard");
+    window.history.pushState({}, "", "/dashboard");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("ac_token");
+    localStorage.removeItem("ac_user");
+    setAuthUser(null);
+    setView("login");
+    window.history.pushState({}, "", "/login");
+  };
+
+  // Admin mode
+  if (isAdminMode) return <AdminDashboard />;
+
+  // Login page
+  if (view === "login") return <LoginPage onLogin={handleLogin} onBack={() => { setView("home"); window.history.pushState({}, "", "/"); }} />;
+
+  // Client dashboard
+  if (view === "dashboard" && authUser) return <ClientDashboard onLogout={handleLogout} />;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white relative overflow-x-hidden" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
@@ -1560,7 +1597,7 @@ export default function App() {
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-violet-600/10 blur-3xl pointer-events-none z-0" />
 
       {!showFlow ? (
-        <LandingPage onStart={() => setShowFlow(true)} />
+        <LandingPage onStart={() => setShowFlow(true)} onLogin={() => { setView("login"); window.history.pushState({}, "", "/login"); }} />
       ) : (
         <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-xl">

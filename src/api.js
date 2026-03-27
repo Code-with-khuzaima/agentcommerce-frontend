@@ -45,3 +45,19 @@ export function apiPatch(path, body) {
 
 export { API_BASE };
 
+
+// ── AUTH API CALLS ────────────────────────────────────────────
+export function apiLogin(email, password) {
+  return request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export function apiGetDashboard() {
+  const token = localStorage.getItem("ac_token");
+  return request("/client/dashboard", {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
