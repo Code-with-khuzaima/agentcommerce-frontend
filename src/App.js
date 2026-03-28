@@ -44,7 +44,7 @@ const icons = {
 const STEPS = [
   { id: 1, label: "Choose Plan" },
   { id: 2, label: "Store URL" },
-  { id: 3, label: "Credentials" },
+  { id: 3, label: "API Access" },
   { id: 4, label: "Store Info" },
   { id: 5, label: "Train AI" },
   { id: 6, label: "Review & Submit" },
@@ -502,6 +502,8 @@ function Step3({ data, setData, onNext, onBack }) {
     if (!data.storeName?.trim()) e.storeName = "Store name is required";
     if (!data.contactEmail?.trim()) e.contactEmail = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(data.contactEmail)) e.contactEmail = "Invalid email";
+    if (!data.accountPassword?.trim()) e.accountPassword = "Password is required";
+    else if (data.accountPassword.trim().length < 8) e.accountPassword = "Password must be at least 8 characters";
     if (!data.categories?.length) e.categories = "Please select at least one category";
     if (!data.deliveryMethods?.length) e.deliveryMethods = "Please select at least one delivery method";
     if (!data.returnPolicy?.trim()) e.returnPolicy = "Return/refund policy is required";
@@ -518,17 +520,28 @@ function Step3({ data, setData, onNext, onBack }) {
         <h2 className="text-2xl font-bold text-white mb-2">Tell Us About Your Store</h2>
         <p className="text-slate-400 text-sm">All fields are required to properly train your AI agent.</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Store Name *" id="storeName" error={errors.storeName}>
-          <input id="storeName" type="text" placeholder="My Awesome Store" value={data.storeName || ""} onChange={e => setData(d => ({ ...d, storeName: e.target.value }))}
-            className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.storeName ? "border-red-500/60" : "border-white/10")} />
-          {errors.storeName && <p className="text-xs text-red-400">{errors.storeName}</p>}
-        </Field>
-        <Field label="Contact Email *" id="contactEmail" error={errors.contactEmail}>
-          <input id="contactEmail" type="email" placeholder="hello@yourstore.com" value={data.contactEmail || ""} onChange={e => setData(d => ({ ...d, contactEmail: e.target.value }))}
-            className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.contactEmail ? "border-red-500/60" : "border-white/10")} />
-          {errors.contactEmail && <p className="text-xs text-red-400">{errors.contactEmail}</p>}
-        </Field>
+      <Field label="Store Name *" id="storeName" error={errors.storeName}>
+        <input id="storeName" type="text" placeholder="My Awesome Store" value={data.storeName || ""} onChange={e => setData(d => ({ ...d, storeName: e.target.value }))}
+          className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.storeName ? "border-red-500/60" : "border-white/10")} />
+        {errors.storeName && <p className="text-xs text-red-400">{errors.storeName}</p>}
+      </Field>
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+        <div className="mb-4">
+          <h3 className="text-base font-bold text-white">Client Login Details</h3>
+          <p className="text-sm text-slate-400 mt-1">These credentials are for the client account setup. They are separate from your store API access.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Email *" id="contactEmail" error={errors.contactEmail}>
+            <input id="contactEmail" type="email" placeholder="hello@yourstore.com" value={data.contactEmail || ""} onChange={e => setData(d => ({ ...d, contactEmail: e.target.value }))}
+              className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.contactEmail ? "border-red-500/60" : "border-white/10")} />
+            {errors.contactEmail && <p className="text-xs text-red-400">{errors.contactEmail}</p>}
+          </Field>
+          <Field label="Password *" id="accountPassword" error={errors.accountPassword} helper="Minimum 8 characters">
+            <input id="accountPassword" type="password" placeholder="Create a client password" value={data.accountPassword || ""} onChange={e => setData(d => ({ ...d, accountPassword: e.target.value }))}
+              className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.accountPassword ? "border-red-500/60" : "border-white/10")} />
+            {errors.accountPassword && <p className="text-xs text-red-400">{errors.accountPassword}</p>}
+          </Field>
+        </div>
       </div>
       <Field label="Product Categories *" id="categories" helper="Select all that apply">
         <MultiSelect options={CATEGORY_OPTIONS} selected={data.categories || []} onChange={v => setData(d => ({ ...d, categories: v }))} />
@@ -742,7 +755,15 @@ function Step4({ data, onBack }) {
       return;
     }
     if (!data.contactEmail?.trim()) {
-      setError("Contact email is required before submitting.");
+      setError("Client email is required before submitting.");
+      return;
+    }
+    if (!data.accountPassword?.trim()) {
+      setError("Client password is required before submitting.");
+      return;
+    }
+    if (data.accountPassword.trim().length < 8) {
+      setError("Client password must be at least 8 characters.");
       return;
     }
     if (!data.categories?.length) {
@@ -851,6 +872,7 @@ Submitted from AgentComerce Website
         platform: data.platform,
         storeName: data.storeName,
         contactEmail: data.contactEmail,
+        accountPassword: data.accountPassword,
         apiKey: data.apiKey,
         accessToken: data.accessToken,
         consumerKey: data.consumerKey,
@@ -965,10 +987,10 @@ Submitted from AgentComerce Website
         <p className="text-slate-400 text-sm">Review your information before submitting.</p>
       </div>
       <div className="rounded-xl border border-white/10 overflow-hidden">
-        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{data.plan === "pro" ? "Pro — $29/mo" : data.plan === "enterprise" ? "Enterprise — $49/mo" : "Starter — $19/mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Contact", data.contactEmail], ["Categories", (data.categories || []).join(", ") || "—"]].map(([label, value], i) => (
-          <div key={label} className={cx("flex items-start justify-between gap-4 px-5 py-4", i % 2 === 0 ? "bg-white/3" : "bg-transparent")}>
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest flex-shrink-0 pt-0.5">{label}</span>
-            <span className="text-sm text-slate-200 text-right break-all">{value || "—"}</span>
+        {[ ["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{data.plan === "pro" ? "Pro - $29/mo" : data.plan === "enterprise" ? "Enterprise - $49/mo" : "Starter - $19/mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Client Email", data.contactEmail], ["Client Password", data.accountPassword ? "********" : "-"], ["Categories", (data.categories || []).join(", ") || "-"] ].map(([label, value], i) => (
+          <div key={label} className={cx("grid grid-cols-1 sm:grid-cols-[170px_minmax(0,1fr)] items-start gap-3 px-5 py-4", i % 2 === 0 ? "bg-white/3" : "bg-transparent")}>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest pt-0.5">{label}</span>
+            <div className="text-sm text-slate-200 break-words sm:text-right">{value || "-"}</div>
           </div>
         ))}
       </div>
@@ -1550,7 +1572,7 @@ export default function App() {
   const [data, setData] = useState({
     storeUrl: "", platform: "", apiKey: "", accessToken: "", consumerKey: "", consumerSecret: "",
     plan: "", storeAnswers: {},
-    storeName: "", contactEmail: "", categories: [], deliveryMethods: [], returnPolicy: "", faqs: "", notes: "",
+    storeName: "", contactEmail: "", accountPassword: "", categories: [], deliveryMethods: [], returnPolicy: "", faqs: "", notes: "",
   });
   const next = () => setStep((s) => Math.min(s + 1, 6));
   const back = () => setStep((s) => Math.max(s - 1, 1));
@@ -1652,3 +1674,4 @@ export default function App() {
     </div>
   );
 }
+
