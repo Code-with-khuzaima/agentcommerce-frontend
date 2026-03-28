@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { apiGet, apiPatch, apiPost, clearAdminSession } from "./api";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -100,7 +99,6 @@ function mapForm(store) {
 }
 
 export default function AdminDashboard() {
-  const navigate = useNavigate();
   const [filters, setFilters] = useState({ search: "", status: "all", plan: "all", platform: "all" });
   const [summary, setSummary] = useState(null);
   const [stores, setStores] = useState([]);
@@ -115,7 +113,8 @@ export default function AdminDashboard() {
 
   function handleLogout() {
     clearAdminSession();
-    navigate("/admin");
+    localStorage.removeItem("ac_admin_auth");
+    window.location.replace("/admin");
   }
 
   async function loadDashboard(nextFilters = filters, preferredId = selectedId) {
