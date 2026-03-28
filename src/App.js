@@ -981,7 +981,7 @@ Submitted from AgentComerce Website
 
 
 // ── LANDING PAGE ──────────────────────────────────────────────
-function LandingPage({ onStart }) {
+function LandingPage({ onStart, onLogin }) {
   const [activeFaq, setActiveFaq] = useState(null);
   const [pricingOpen, setPricingOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
@@ -1075,6 +1075,7 @@ function LandingPage({ onStart }) {
           <button onClick={() => document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' })} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">FAQ</button>
           <button onClick={() => setContactOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Contact</button>
           <div className="flex items-center gap-3">
+            <Btn onClick={onLogin} className="text-sm px-4 py-2">Login</Btn>
             <Btn onClick={onStart} className="text-sm px-4 py-2">Get Started</Btn>
           </div>
         </div>
@@ -1593,7 +1594,7 @@ export default function App() {
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-violet-600/10 blur-3xl pointer-events-none z-0" />
 
       {!showFlow ? (
-        <LandingPage onStart={() => setShowFlow(true)} />
+        <LandingPage onStart={() => setShowFlow(true)} onLogin={() => window.location.assign("/admin")} />
       ) : (
         <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-xl">
