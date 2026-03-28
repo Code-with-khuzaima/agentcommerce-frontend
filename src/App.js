@@ -1,8 +1,6 @@
 import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 import AdminDashboard from "./AdminDashboard";
 import AdminLoginPage from "./AdminLoginPage";
-import ClientDashboard from "./ClientDashboard";
-import LoginPage from "./LoginPage";
 
 function LandingPage() {
   return (
@@ -27,20 +25,19 @@ function LandingPage() {
       </p>
 
       <div>
-        <a href="/login">
-          <button
-            style={{
-              padding: "12px 20px",
-              borderRadius: "8px",
-              border: "none",
-              background: "#7c3aed",
-              color: "white",
-              cursor: "pointer",
-            }}
-          >
-            Client Login
-          </button>
-        </a>
+        <button
+          type="button"
+          style={{
+            padding: "12px 20px",
+            borderRadius: "8px",
+            border: "none",
+            background: "#7c3aed",
+            color: "white",
+            cursor: "pointer",
+          }}
+        >
+          Get Started
+        </button>
       </div>
     </div>
   );
@@ -61,8 +58,8 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<ClientDashboard />} />
+        <Route path="/login" element={<Navigate to="/" replace />} />
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
         <Route path="/admin" element={<AdminEntryRoute />} />
         <Route
           path="/admin/dashboard"
