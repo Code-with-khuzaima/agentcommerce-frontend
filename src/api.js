@@ -1,5 +1,12 @@
-const API_BASE = process.env.REACT_APP_API_URL || (window.location.hostname === "localhost" ? "http://localhost:4000/api" : "https://agentcomerce-backend.up.railway.app/api");
+// api.js
+// Handles all API requests for Agent Commerce frontend
 
+const API_BASE = process.env.REACT_APP_API_URL || 
+  (window.location.hostname === "localhost" 
+    ? "http://localhost:4000/api" 
+    : "https://agentcommerce-backend-production.up.railway.app/api"); // <- deployed backend
+
+// Safely parse JSON response
 async function parseJsonSafe(res) {
   const text = await res.text();
   try {
@@ -9,6 +16,7 @@ async function parseJsonSafe(res) {
   }
 }
 
+// Generic request function
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     headers: {
@@ -19,12 +27,15 @@ async function request(path, options = {}) {
   });
 
   const data = await parseJsonSafe(res);
+
   if (!res.ok) {
     throw new Error(data.message || "Request failed");
   }
+
   return data;
 }
 
+// HTTP helper functions
 export function apiGet(path) {
   return request(path, { method: "GET" });
 }
@@ -43,10 +54,12 @@ export function apiPatch(path, body) {
   });
 }
 
+// Export API base for reference
 export { API_BASE };
 
-
 // ── AUTH API CALLS ────────────────────────────────────────────
+
+// Login user
 export function apiLogin(email, password) {
   return request("/auth/login", {
     method: "POST",
@@ -54,6 +67,7 @@ export function apiLogin(email, password) {
   });
 }
 
+// Get dashboard data
 export function apiGetDashboard() {
   const token = localStorage.getItem("ac_token");
   return request("/client/dashboard", {

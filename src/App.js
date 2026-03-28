@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import AdminDashboard from "./AdminDashboard";
-import LoginPage from "./LoginPage";
+import AdminLoginPage from "./AdminLoginPage";
 import ClientDashboard from "./ClientDashboard";
+import LoginPage from "./LoginPage";
 import { apiPost } from "./api";
 
 const cx = (...args) => args.filter(Boolean).join(" ");
@@ -1077,7 +1078,10 @@ function LandingPage({ onStart, onLogin }) {
           <button onClick={() => setContactOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Contact</button>
           <div className="flex items-center gap-3">
             <button onClick={onLogin} className="text-sm text-slate-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5">Login</button>
+            <div className="flex items-center gap-3">
+            <button onClick={onLogin} className="text-sm text-slate-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5">Login</button>
             <Btn onClick={onStart} className="text-sm px-4 py-2">Get Started</Btn>
+          </div>
           </div>
         </div>
       </nav>
@@ -1535,20 +1539,25 @@ function LandingPage({ onStart, onLogin }) {
 
 // ── ROOT APP ──────────────────────────────────────────────────
 export default function App() {
-  const isAdminMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("admin") === "1";
+  // ── Route detection ──────────────────────────────────────
+  const path = window.location.pathname;
+  const isAdminPath = path === "/admin" || path === "/admin/";
+  const isLoginPath = path === "/login" || path === "/login/";
+  const isDashPath = path === "/dashboard" || path === "/dashboard/";
 
-  // ── Auth state ─────────────────────────────────────────────
+  // ── Auth state ────────────────────────────────────────────
   const [view, setView] = useState(() => {
-    const path = window.location.pathname;
     const token = localStorage.getItem("ac_token");
-    if (path === "/login") return "login";
-    if (path === "/dashboard") return token ? "dashboard" : "login";
+    const adminAuth = localStorage.getItem("ac_admin_auth");
+    if (isAdminPath) return adminAuth ? "admin" : "admin-login";
+    if (isLoginPath) return token ? "dashboard" : "login";
+    if (isDashPath) return token ? "dashboard" : "login";
     return "home";
   });
+
   const [authUser, setAuthUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("ac_user") || "null"); } catch { return null; }
   });
-
   const [showFlow, setShowFlow] = useState(false);
   const [step, setStep] = useState(1);
   const [data, setData] = useState({
@@ -1559,29 +1568,34 @@ export default function App() {
   const next = () => setStep(s => Math.min(s + 1, 6));
   const back = () => setStep(s => Math.max(s - 1, 1));
 
-  const handleLogin = (user) => {
-    setAuthUser(user);
-    setView("dashboard");
-    window.history.pushState({}, "", "/dashboard");
-  };
+  const goTo = (v, url) => { setView(v); window.history.pushState({}, "", url); };
 
-  const handleLogout = () => {
-    localStorage.removeItem("ac_token");
-    localStorage.removeItem("ac_user");
-    setAuthUser(null);
-    setView("login");
-    window.history.pushState({}, "", "/login");
-  };
+  const handleClientLogin = (user) => { setAuthUser(user); goTo("dashboard", "/dashboard"); };
+  const handleClientLogout = () => { localStorage.removeItem("ac_token"); localStorage.removeItem("ac_user"); goTo("login", "/login"); };
+  const handleAdminLogin = () => goTo("admin", "/admin");
+  const handleAdminLogout = () => { localStorage.removeItem("ac_admin_auth"); goTo("admin-login", "/admin"); };
 
-  // Admin mode
-  if (isAdminMode) return <AdminDashboard />;
+  // ── Route: Admin login ────────────────────────────────────
+  if (view === "admin-login") return <AdminLoginPage onLogin={handleAdminLogin} />;
 
-  // Login page
-  if (view === "login") return <LoginPage onLogin={handleLogin} onBack={() => { setView("home"); setShowFlow(true); window.history.pushState({}, "", "/"); }} />;
+  // ── Route: Admin dashboard ────────────────────────────────
+  if (view === "admin") return (
+    <div>
+      <div className="flex items-center justify-between px-6 py-3 bg-slate-950 border-b border-white/6">
+        <span className="text-xs text-slate-500 font-mono">admin panel · agentcomerce</span>
+        <button onClick={handleAdminLogout} className="text-xs text-slate-500 hover:text-red-400 transition-colors">Logout admin</button>
+      </div>
+      <AdminDashboard />
+    </div>
+  );
 
-  // Client dashboard
-  if (view === "dashboard" && authUser) return <ClientDashboard onLogout={handleLogout} />;
+  // ── Route: Client login ───────────────────────────────────
+  if (view === "login") return <LoginPage onLogin={handleClientLogin} onBack={() => { setView("home"); setShowFlow(true); window.history.pushState({}, "", "/"); }} />;
 
+  // ── Route: Client dashboard ───────────────────────────────
+  if (view === "dashboard") return <ClientDashboard onLogout={handleClientLogout} />;
+
+  // ── Route: Landing page ───────────────────────────────────
   return (
     <div className="min-h-screen bg-slate-950 text-white relative overflow-x-hidden" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <style>{`
@@ -1597,7 +1611,7 @@ export default function App() {
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-violet-600/10 blur-3xl pointer-events-none z-0" />
 
       {!showFlow ? (
-        <LandingPage onStart={() => setShowFlow(true)} onLogin={() => { setView("login"); window.history.pushState({}, "", "/login"); }} />
+        <LandingPage onStart={() => setShowFlow(true)} onLogin={() => goTo("login", "/login")} />
       ) : (
         <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-xl">
@@ -1628,6 +1642,3 @@ export default function App() {
     </div>
   );
 }
-
-
-
