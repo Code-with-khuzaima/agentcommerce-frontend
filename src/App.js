@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import AdminDashboard from "./AdminDashboard";
 import AdminLoginPage from "./AdminLoginPage";
+import ClientDashboard from "./ClientDashboard";
+import LoginPage from "./LoginPage";
 import { apiPost } from "./api";
 
 const cx = (...args) => args.filter(Boolean).join(" ");
@@ -1537,12 +1539,12 @@ export default function App() {
   const path = window.location.pathname;
   const isAdminPath = path === "/admin" || path === "/admin/";
   const isAdminDashPath = path === "/admin/dashboard" || path === "/admin/dashboard/";
-  const isLegacyClientPath = path === "/login" || path === "/login/" || path === "/dashboard" || path === "/dashboard/";
+  const isLoginPath = path === "/login" || path === "/login/";
+  const isDashPath = path === "/dashboard" || path === "/dashboard/";
 
-  if (isLegacyClientPath) {
-    window.history.replaceState({}, "", "/");
-  }
-
+  const [authUser, setAuthUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("ac_user") || "null"); } catch { return null; }
+  });
   const [showFlow, setShowFlow] = useState(false);
   const [step, setStep] = useState(1);
   const [data, setData] = useState({
@@ -1559,7 +1561,32 @@ export default function App() {
     window.location.replace("/admin");
   };
 
+  const handleClientLogin = (user) => {
+    setAuthUser(user);
+    window.location.replace("/dashboard");
+  };
+
+  const handleClientLogout = () => {
+    localStorage.removeItem("ac_token");
+    localStorage.removeItem("ac_user");
+    setAuthUser(null);
+    window.location.replace("/login");
+  };
+
   if (isAdminPath) return <AdminLoginPage />;
+
+  if (isLoginPath) {
+    return <LoginPage onLogin={handleClientLogin} onBack={() => window.location.replace("/")} />;
+  }
+
+  if (isDashPath) {
+    const token = localStorage.getItem("ac_token");
+    if (!token || !authUser) {
+      window.location.replace("/login");
+      return null;
+    }
+    return <ClientDashboard onLogout={handleClientLogout} />;
+  }
 
   if (isAdminDashPath) {
     const adminToken = localStorage.getItem("ac_admin_token");
@@ -1594,7 +1621,7 @@ export default function App() {
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-violet-600/10 blur-3xl pointer-events-none z-0" />
 
       {!showFlow ? (
-        <LandingPage onStart={() => setShowFlow(true)} onLogin={() => window.location.assign("/admin")} />
+        <LandingPage onStart={() => setShowFlow(true)} onLogin={() => window.location.assign("/login")} />
       ) : (
         <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-xl">
