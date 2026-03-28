@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { apiAdminLogin } from "./api";
 
 const Icon = ({ path, size = 20, className = "" }) => (
@@ -22,7 +21,6 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleLogin = async () => {
     if (!password.trim()) {
@@ -34,8 +32,11 @@ export default function AdminLoginPage() {
     setError("");
 
     try {
-      await apiAdminLogin(password);
-      navigate("/admin/dashboard");
+      const data = await apiAdminLogin(password);
+      if (data.token) {
+        localStorage.setItem("ac_admin_auth", "1");
+      }
+      window.location.replace("/admin/dashboard");
     } catch (err) {
       setError(err.message || "Incorrect password");
     } finally {
