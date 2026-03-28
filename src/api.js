@@ -1,12 +1,8 @@
-// api.js
-// Handles all API requests for Agent Commerce frontend
+const API_BASE = process.env.REACT_APP_API_URL ||
+  (window.location.hostname === "localhost"
+    ? "http://localhost:4000/api"
+    : "https://agentcommerce-backend-production.up.railway.app/api");
 
-const API_BASE = process.env.REACT_APP_API_URL || 
-  (window.location.hostname === "localhost" 
-    ? "http://localhost:4000/api" 
-    : "https://agentcommerce-backend-production.up.railway.app/api"); // <- deployed backend
-
-// Safely parse JSON response
 async function parseJsonSafe(res) {
   const text = await res.text();
   try {
@@ -16,11 +12,16 @@ async function parseJsonSafe(res) {
   }
 }
 
-// Generic request function
+function getAdminAuthHeaders() {
+  const token = localStorage.getItem("ac_admin_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     headers: {
       "Content-Type": "application/json",
+      ...getAdminAuthHeaders(),
       ...(options.headers || {}),
     },
     ...options,
@@ -35,7 +36,6 @@ async function request(path, options = {}) {
   return data;
 }
 
-// HTTP helper functions
 export function apiGet(path) {
   return request(path, { method: "GET" });
 }
@@ -54,12 +54,6 @@ export function apiPatch(path, body) {
   });
 }
 
-// Export API base for reference
-export { API_BASE };
-
-// ── AUTH API CALLS ────────────────────────────────────────────
-
-// Login user
 export function apiLogin(email, password) {
   return request("/auth/login", {
     method: "POST",
@@ -67,7 +61,23 @@ export function apiLogin(email, password) {
   });
 }
 
-// Get dashboard data
+export async function apiAdminLogin(password) {
+  const data = await request("/admin/login", {
+    method: "POST",
+    body: JSON.stringify({ password }),
+  });
+
+  if (data.token) {
+    localStorage.setItem("ac_admin_token", data.token);
+  }
+
+  return data;
+}
+
+export function clearAdminSession() {
+  localStorage.removeItem("ac_admin_token");
+}
+
 export function apiGetDashboard() {
   const token = localStorage.getItem("ac_token");
   return request("/client/dashboard", {
@@ -75,3 +85,5 @@ export function apiGetDashboard() {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
+
+export { API_BASE };

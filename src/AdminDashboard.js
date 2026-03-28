@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { apiGet, apiPatch, apiPost } from "./api";
+import { useNavigate } from "react-router-dom";
+import { apiGet, apiPatch, apiPost, clearAdminSession } from "./api";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const number = new Intl.NumberFormat("en-US");
@@ -99,6 +100,7 @@ function mapForm(store) {
 }
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState({ search: "", status: "all", plan: "all", platform: "all" });
   const [summary, setSummary] = useState(null);
   const [stores, setStores] = useState([]);
@@ -110,6 +112,11 @@ export default function AdminDashboard() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  function handleLogout() {
+    clearAdminSession();
+    navigate("/admin");
+  }
 
   async function loadDashboard(nextFilters = filters, preferredId = selectedId) {
     setLoading(true);
@@ -208,6 +215,7 @@ export default function AdminDashboard() {
             <div className="flex flex-wrap gap-3">
               <button onClick={() => loadDashboard(filters, selectedId)} className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/20">Refresh Data</button>
               <button onClick={() => addLog("manual_follow_up")} disabled={!selectedId || saving} className="rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 disabled:opacity-50">Log Follow-Up</button>
+              <button onClick={handleLogout} className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/20">Log Out</button>
             </div>
           </div>
 
