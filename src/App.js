@@ -26,7 +26,7 @@ function LandingPage() {
         AI Powered Store Dashboard
       </p>
 
-      <div style={{ display: "flex", gap: "20px" }}>
+      <div>
         <a href="/login">
           <button
             style={{
@@ -39,21 +39,6 @@ function LandingPage() {
             }}
           >
             Client Login
-          </button>
-        </a>
-
-        <a href="/admin">
-          <button
-            style={{
-              padding: "12px 20px",
-              borderRadius: "8px",
-              border: "none",
-              background: "#10b981",
-              color: "white",
-              cursor: "pointer",
-            }}
-          >
-            Admin Login
           </button>
         </a>
       </div>
