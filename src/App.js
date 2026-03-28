@@ -746,7 +746,7 @@ function StepQnA({ data, setData, onNext, onBack }) {
 
 function Step4({ data, onBack }) {
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(null);
   const [error, setError] = useState(null);
 
   const handleSubmit = async () => {
@@ -779,94 +779,50 @@ function Step4({ data, onBack }) {
       return;
     }
 
-    setSubmitting(true); setError(null);
+    setSubmitting(true);
+    setError(null);
+
     try {
-      // Build full details message
-      const isShopify = data.platform === "shopify";
       const answers = data.storeAnswers || {};
-      const yn = v => v === "yes" ? "✅ Yes" : v === "no" ? "❌ No" : "—";
+      const yn = (v) => (v === "yes" ? "Yes" : v === "no" ? "No" : "-");
+      const isShopify = data.platform === "shopify";
+      const fullDetails = [
+        "NEW STORE SUBMISSION - AGENTCOMERCE",
+        "",
+        "PLAN",
+        `Plan: ${data.plan === "pro" ? "Pro - $29/mo" : data.plan === "enterprise" ? "Enterprise - $49/mo" : "Starter - $19/mo"}`,
+        `Message Limit: ${data.plan === "pro" ? "13,000 / month" : data.plan === "enterprise" ? "Unlimited" : "5,000 / month"}`,
+        "",
+        "STORE DETAILS",
+        `Store Name: ${data.storeName || "-"}`,
+        `Store URL: ${data.storeUrl || "-"}`,
+        `Platform: ${data.platform?.toUpperCase() || "-"}`,
+        `Client Email: ${data.contactEmail || "-"}`,
+        `Phone: ${(data.qnaPairs || []).find((p) => p.question.toLowerCase().includes("phone"))?.answer || "-"}`,
+        "",
+        "CREDENTIALS",
+        isShopify ? `Client ID: ${data.apiKey || "-"}` : `Consumer Key: ${data.consumerKey || "-"}`,
+        isShopify ? `Client Secret: ${data.accessToken || "-"}` : `Consumer Secret: ${data.consumerSecret || "-"}`,
+        "",
+        "STORE INFO",
+        `Categories: ${(data.categories || []).join(", ") || "-"}`,
+        `Delivery: ${(data.deliveryMethods || []).join(", ") || "-"}`,
+        `Return Policy: ${data.returnPolicy || "-"}`,
+        `Special Notes: ${data.notes || "-"}`,
+        "",
+        "STORE QUESTIONS",
+        `Free Shipping: ${yn(answers.freeShipping)}`,
+        `International Shipping: ${yn(answers.internationalShipping)}`,
+        `Accept Returns: ${yn(answers.acceptReturns)}`,
+        `Cash on Delivery: ${yn(answers.cashOnDelivery)}`,
+        `Physical Store: ${yn(answers.physicalStore)}`,
+        `Promo / Discounts: ${yn(answers.promoDiscounts)}`,
+        "",
+        "TRAINED Q&A PAIRS",
+        (data.qnaPairs || []).map((p, i) => `Q${i + 1}: ${p.question}\nA${i + 1}: ${p.answer}`).join("\n\n") || "-",
+      ].join("\n");
 
-      const full_details = `
-========================================
-🛒 NEW STORE SUBMISSION — AGENTCOMERCE
-========================================
-
-📦 PLAN
--------
-Plan:           ${data.plan === "pro" ? "Pro — $29/mo" : data.plan === "enterprise" ? "Enterprise — $49/mo" : "Starter — $19/mo"}
-Msg Limit:      ${data.plan === "pro" ? "13,000 / month" : data.plan === "enterprise" ? "Unlimited" : "5,000 / month"}
-Memory:         ${data.plan === "pro" ? "Full conversation" : data.plan === "enterprise" ? "Unlimited" : "Last 20 messages"}
-
-🏪 STORE DETAILS
-----------------
-Store Name:     ${data.storeName || "—"}
-Store URL:      ${data.storeUrl || "—"}
-Platform:       ${data.platform?.toUpperCase() || "—"}
-Contact Email:  ${data.contactEmail || "—"}
-Phone:          ${(data.qnaPairs || []).find(p => p.question.toLowerCase().includes("phone"))?.answer || "— Not provided —"}
-
-🔑 CREDENTIALS
---------------
-${isShopify ? `Client ID:      ${data.apiKey || "—"}
-Client Secret:  ${data.accessToken || "—"}` :
-`Consumer Key:    ${data.consumerKey || "—"}
-Consumer Secret: ${data.consumerSecret || "—"}`}
-
-📋 STORE INFO
--------------
-Categories:     ${(data.categories || []).join(", ") || "—"}
-Delivery:       ${(data.deliveryMethods || []).join(", ") || "—"}
-
-Return Policy:
-${data.returnPolicy || "—"}
-
-FAQs:
-${data.faqs || "—"}
-
-Special Notes:
-${data.notes || "—"}
-
-✅ STORE QUESTIONS
-------------------
-Free Shipping:          ${yn(answers.freeShipping)}
-International Shipping: ${yn(answers.internationalShipping)}
-Accept Returns:         ${yn(answers.acceptReturns)}
-Cash on Delivery:       ${yn(answers.cashOnDelivery)}
-Physical Store:         ${yn(answers.physicalStore)}
-Promo / Discounts:      ${yn(answers.promoDiscounts)}
-
-🧠 TRAINED Q&A PAIRS (${(data.qnaPairs || []).length} total)
----------------------
-${(data.qnaPairs || []).map((p, i) => `Q${i+1}: ${p.question}\nA${i+1}: ${p.answer}`).join("\n\n") || "— None added —"}
-
-========================================
-📊 GOOGLE SHEETS — COPY PASTE READY
-========================================
-
-▸ usage_tracker row:
-store_id  | store_name       | plan       | msg_count | msg_limit | reset_date
-[NEW_ID]  | ${(data.storeName || "—").padEnd(16)}| ${(data.plan || "starter").padEnd(10)}| 0         | ${data.plan === "pro" ? "13000" : data.plan === "enterprise" ? "999999" : "5000"}      | ${(() => { const d = new Date(); d.setMonth(d.getMonth() + 1); d.setDate(1); return d.toISOString().split("T")[0]; })()}
-
-▸ store_info row:
-store_id | store_name | platform | store_url | categories | delivery | return_policy | free_shipping | intl_shipping | cod | physical | promo | special_notes | api_key | access_token
-[NEW_ID] | ${data.storeName || "—"} | ${data.platform || "—"} | ${data.storeUrl || "—"} | ${(data.categories || []).join(", ") || "—"} | ${(data.deliveryMethods || []).join(", ") || "—"} | ${data.returnPolicy?.replace(/\n/g, " ") || "—"} | ${answers.freeShipping || "—"} | ${answers.internationalShipping || "—"} | ${answers.cashOnDelivery || "—"} | ${answers.physicalStore || "—"} | ${answers.promoDiscounts || "—"} | ${data.notes?.replace(/\n/g, " ") || "—"} | ${data.apiKey || data.consumerKey || "—"} | ${data.accessToken || data.consumerSecret || "—"}
-
-▸ qna_bank rows:
-store_id | question | answer | category | active
-${(data.qnaPairs || []).map(p => `[NEW_ID] | ${p.question} | ${p.answer} | general | TRUE`).join("\n")}
-
-========================================
-Submitted from AgentComerce Website
-========================================
-      `.trim();
-
-      if (!window.emailjs) {
-        throw new Error("Email service is still loading. Please wait a few seconds and try again.");
-      }
-
-      // Temporary production fallback: submit via EmailJS while backend submit endpoint is unavailable.
-      // Keep the full payload ready so backend can be restored without changing the form fields.
-      const submissionPayload = {
+      const payload = {
         plan: data.plan || "starter",
         storeUrl: data.storeUrl,
         platform: data.platform,
@@ -884,100 +840,52 @@ Submitted from AgentComerce Website
         notes: data.notes || "",
         qnaPairs: data.qnaPairs || [],
         storeAnswers: data.storeAnswers || {},
-        fullDetails: full_details,
+        fullDetails,
       };
-      console.log("Submission payload prepared", submissionPayload);
-      if (window.emailjs) {
 
-      // 1. Send full details to admin — uses template_wovwhva
-      try {
-        await window.emailjs.send(
-          "service_26d0u9m",
-          "template_wovwhva",
-          {
-            store_name: data.storeName || "New Store",
-            full_details: full_details.substring(0, 4000),
-            email: data.contactEmail || "agentcomrce@gmail.com",
-          },
-          "Nvak4g2MT8AuvKpb6"
-        );
-      } catch(adminEmailErr) {
-        // Log but don't block — submission still completes
-        console.error("Admin email error:", adminEmailErr);
-      }
-
-      // 2. Send confirmation email to client
-      if (data.contactEmail) {
-        try {
-          await window.emailjs.send(
-            "service_26d0u9m",
-            "template_3s3hffj",
-            {
-              title: "Submission Confirmed - " + (data.storeName || "Your Store"),
-              from_name: "AgentComerce Team",
-              from_email: "agentcomrce@gmail.com",
-              name: "AgentComerce Team",
-              message: `Hi, thank you for choosing AgentComerce! We received your store submission for ${data.storeName || "your store"}. Your plan: ${data.plan === "pro" ? "Pro $29/month" : data.plan === "enterprise" ? "Enterprise $49/month" : "Starter $19/month"}. Our team will configure your AI agent within 1-2 business days and email you when live. AgentComerce Team - agentcomrce@gmail.com`,
-            },
-            "Nvak4g2MT8AuvKpb6"
-          );
-        } catch(clientEmailErr) {
-          console.log("Client email error:", clientEmailErr);
-        }
-      }
-      }
-
-      // Always mark as submitted — emails are best-effort
-      setSubmitted(true);
+      const response = await apiPost("/submit", payload);
+      setSubmitted({
+        storeId: response.storeId,
+        loginEmail: response.loginEmail || data.contactEmail,
+      });
     } catch (e) {
-      console.error("Submit error:", e);
       setError(e?.message || "Failed to submit. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Success popup → then redirect to payment
-  if (submitted) return (
-    <div className="flex flex-col items-center text-center gap-6 py-4">
-      <div className="w-24 h-24 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-400/30 shadow-xl shadow-emerald-500/20 animate-pulse">
-        <Icon path={icons.check} size={40} className="text-emerald-400" />
-      </div>
-      <div>
-        <h2 className="text-3xl font-bold text-white mb-3">Submission Received! 🎉</h2>
-        <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">
-          Your store details have been sent to our team. You will be redirected to payment now.
-        </p>
-      </div>
-      <div className="w-full max-w-sm p-4 rounded-xl bg-emerald-500/8 border border-emerald-500/20 text-left">
-        <div className="flex items-center gap-2 text-emerald-300 text-sm font-semibold mb-1">
-          <Icon path={icons.mail} size={14} /> Details sent to
+  if (submitted) {
+    return (
+      <div className="flex flex-col items-center text-center gap-6 py-4">
+        <div className="w-24 h-24 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-400/30 shadow-xl shadow-emerald-500/20 animate-pulse">
+          <Icon path={icons.check} size={40} className="text-emerald-400" />
         </div>
-        <p className="text-slate-400 text-xs">agentcomrce@gmail.com</p>
-      </div>
-      <div className="w-full max-w-sm p-4 rounded-xl bg-violet-500/8 border border-violet-500/20 text-left">
-        <div className="flex items-center gap-2 text-violet-300 text-sm font-semibold mb-2">
-          <Icon path={icons.zap} size={14} /> Next Step — Complete Payment
+        <div>
+          <h2 className="text-3xl font-bold text-white mb-3">Submission Received</h2>
+          <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">
+            Your store is now saved in the admin dashboard. You can log in with the email and password you just submitted.
+          </p>
         </div>
-        <p className="text-slate-400 text-xs mb-3">
-          Complete your {data.plan === "pro" ? "Pro — $29/mo" : data.plan === "enterprise" ? "Enterprise — $49/mo" : "Starter — $19/mo"} payment to activate your AI agent.
-        </p>
-        <Btn onClick={() => {
-          const url = data.plan === "pro"
-            ? "https://buy.stripe.com/your-pro-link"
-            : data.plan === "enterprise"
-            ? "https://buy.stripe.com/your-enterprise-link"
-            : "https://buy.stripe.com/your-starter-link";
-          window.open(url, "_blank");
-        }} className="w-full justify-center">
-          <Icon path={icons.zap} size={16} /> Complete Payment →
+        <div className="w-full max-w-sm p-4 rounded-xl bg-emerald-500/8 border border-emerald-500/20 text-left space-y-2">
+          <div>
+            <div className="text-emerald-300 text-sm font-semibold">Store ID</div>
+            <p className="text-slate-300 text-sm">{submitted.storeId || "Pending assignment"}</p>
+          </div>
+          <div>
+            <div className="text-emerald-300 text-sm font-semibold">Login Email</div>
+            <p className="text-slate-300 text-sm break-all">{submitted.loginEmail}</p>
+          </div>
+        </div>
+        <Btn onClick={() => window.location.assign("/login")} className="w-full max-w-sm justify-center">
+          <Icon path={icons.arrow} size={16} /> Go to Client Login
         </Btn>
+        <button onClick={() => window.location.reload()} className="text-xs text-slate-600 hover:text-slate-400 transition-colors">
+          Submit another store
+        </button>
       </div>
-      <button onClick={() => window.location.reload()} className="text-xs text-slate-600 hover:text-slate-400 transition-colors">
-        Submit another store
-      </button>
-    </div>
-  );
+    );
+  }
 
   const isShopify = data.platform === "shopify";
   return (
@@ -987,7 +895,7 @@ Submitted from AgentComerce Website
         <p className="text-slate-400 text-sm">Review your information before submitting.</p>
       </div>
       <div className="rounded-xl border border-white/10 overflow-hidden">
-        {[ ["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{data.plan === "pro" ? "Pro - $29/mo" : data.plan === "enterprise" ? "Enterprise - $49/mo" : "Starter - $19/mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Client Email", data.contactEmail], ["Client Password", data.accountPassword ? "********" : "-"], ["Categories", (data.categories || []).join(", ") || "-"] ].map(([label, value], i) => (
+        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{data.plan === "pro" ? "Pro - $29/mo" : data.plan === "enterprise" ? "Enterprise - $49/mo" : "Starter - $19/mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Client Email", data.contactEmail], ["Client Password", data.accountPassword ? "********" : "-"], ["Categories", (data.categories || []).join(", ") || "-"]].map(([label, value], i) => (
           <div key={label} className={cx("grid grid-cols-1 sm:grid-cols-[170px_minmax(0,1fr)] items-start gap-3 px-5 py-4", i % 2 === 0 ? "bg-white/3" : "bg-transparent")}>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest pt-0.5">{label}</span>
             <div className="text-sm text-slate-200 break-words sm:text-right">{value || "-"}</div>
@@ -997,14 +905,11 @@ Submitted from AgentComerce Website
       {error && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> {error}</div>}
       <div className="flex items-center justify-between pt-2">
         <Btn variant="ghost" onClick={onBack} disabled={submitting}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <Btn onClick={handleSubmit} loading={submitting}><Icon path={icons.zap} size={16} /> Submit & Get Started</Btn>
+        <Btn onClick={handleSubmit} loading={submitting}><Icon path={icons.zap} size={16} /> Create Store Account</Btn>
       </div>
     </div>
   );
 }
-
-
-// ── LANDING PAGE ──────────────────────────────────────────────
 function LandingPage({ onStart, onLogin }) {
   const [activeFaq, setActiveFaq] = useState(null);
   const [pricingOpen, setPricingOpen] = useState(false);
@@ -1674,4 +1579,5 @@ export default function App() {
     </div>
   );
 }
+
 
