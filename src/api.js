@@ -61,6 +61,13 @@ export function apiLogin(email, password) {
   });
 }
 
+export function apiForgotPassword(email) {
+  return request("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
 export async function apiAdminLogin(password) {
   const data = await request("/admin/login", {
     method: "POST",

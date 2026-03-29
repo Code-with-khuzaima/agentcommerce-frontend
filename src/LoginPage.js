@@ -1,6 +1,6 @@
 // LoginPage.js
 import React, { useState } from "react";
-import { apiLogin } from "./api";
+import { apiForgotPassword, apiLogin } from "./api";
 
 const Icon = ({ path, size = 20, className = "" }) => (
   <svg
@@ -33,7 +33,9 @@ export default function LoginPage({ onLogin, onBack }) {
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -43,6 +45,7 @@ export default function LoginPage({ onLogin, onBack }) {
 
     setLoading(true);
     setError("");
+    setNotice("");
 
     try {
       const res = await apiLogin(email.trim().toLowerCase(), password);
@@ -57,6 +60,26 @@ export default function LoginPage({ onLogin, onBack }) {
       setError(err.message || "Invalid email or password");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      setError("Enter your email first.");
+      return;
+    }
+
+    setForgotLoading(true);
+    setError("");
+    setNotice("");
+
+    try {
+      const res = await apiForgotPassword(email.trim().toLowerCase());
+      setNotice(res.message || "If the email exists, reset details have been sent.");
+    } catch (err) {
+      setError(err.message || "Failed to process forgot password request.");
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -83,6 +106,13 @@ export default function LoginPage({ onLogin, onBack }) {
             <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm mb-5">
               <Icon path={icons.info} size={14} className="shrink-0" />
               {error}
+            </div>
+          )}
+
+          {notice && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm mb-5">
+              <Icon path={icons.info} size={14} className="shrink-0" />
+              {notice}
             </div>
           )}
 
@@ -132,6 +162,14 @@ export default function LoginPage({ onLogin, onBack }) {
                 ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 : <Icon path={icons.arrow} size={15} />}
               {loading ? "Signing in..." : "Sign in to Dashboard"}
+            </button>
+
+            <button
+              onClick={handleForgotPassword}
+              disabled={forgotLoading}
+              className="w-full rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-slate-300 transition-colors hover:border-violet-500/30 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {forgotLoading ? "Sending..." : "Forgot Password?"}
             </button>
           </div>
 

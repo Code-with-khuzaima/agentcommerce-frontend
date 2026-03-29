@@ -199,100 +199,64 @@ function MultiSelect({ options, selected, onChange }) {
 
 function StepPlan({ data, setData, onNext }) {
   const [error, setError] = useState("");
+  const billingCycle = data.billingCycle || "monthly";
   const plans = [
-    {
-      id: "starter",
-      name: "Starter",
-      price: "$19",
-      desc: "Perfect for small stores",
-      color: "slate",
-      features: ["🤖 AI Chat Agent 24/7","💬 5,000 messages/month","📦 Live product data & recommendations","🧠 Memory — last 20 messages","❓ FAQ automation","🛍️ Shopify & WooCommerce","🔒 AES-256 secure integration","⚡ 1–2 day setup","📧 Email support"],
-    },
-    {
-      id: "pro",
-      name: "Pro",
-      price: "$29",
-      oldPrice: "$49",
-      desc: "For growing stores",
-      color: "violet",
-      badge: "⭐ Most Popular",
-      features: ["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","📦 Live product image cards","🔍 Order tracking","📢 Proactive messages","🛒 Abandoned cart recovery","🚀 Priority 24hr support"],
-    },
-    {
-      id: "enterprise",
-      name: "Enterprise",
-      price: "$49",
-      desc: "For high-volume stores",
-      color: "gold",
-      badge: "👑 Unlimited",
-      features: ["✅ Everything in Pro","💬 Unlimited messages","🧠 Unlimited memory","🎯 Custom AI personality","🔥 Best AI models","📊 Monthly report + My Report tab","👑 Dedicated account manager","📞 Phone & priority support"],
-    },
+    { id: "starter", name: "Starter", monthly: 19, yearly: 15, desc: "Chat-only assistant for stores getting started.", color: "slate", features: ["AI chat assistant", "5,000 messages", "Basic store details", "Email support"] },
+    { id: "pro", name: "Pro", monthly: 29, yearly: 25, desc: "Product cards, memory, and stronger sales automation.", color: "violet", badge: "Most Popular", features: ["Everything in Starter", "13,000 messages", "Product cards", "Memory", "Some reports"] },
+    { id: "enterprise", name: "Enterprise", monthly: 49, yearly: 35, desc: "Advanced analytics, reports, and full support.", color: "gold", badge: "Best Value", features: ["Everything in Pro", "Advanced analytics", "Advanced reports", "Full support"] },
   ];
+
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Choose Your Plan</h2>
-        <p className="text-slate-400 text-sm">Select the plan that fits your store. You can upgrade anytime.</p>
+        <p className="text-slate-400 text-sm">Start with a 1 Month Free Trial. Monthly keeps the current rate. Yearly lowers the monthly equivalent.</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {plans.map(plan => (
-          <button key={plan.id} onClick={() => { setData(d => ({...d, plan: plan.id})); setError(""); }}
-            className={cx("relative text-left p-6 rounded-2xl border transition-all duration-200",
-              data.plan === plan.id
-                ? plan.color === "violet" ? "border-violet-400/60 bg-violet-500/15"
-                : plan.color === "gold" ? "border-yellow-400/60 bg-yellow-500/10"
-                : "border-white/30 bg-white/8"
-                : "border-white/10 bg-white/3 hover:border-white/25")}>
-            {plan.badge && (
-              <div className={cx("absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap",
-                plan.color === "gold" ? "bg-gradient-to-r from-yellow-500 to-orange-400" : "bg-gradient-to-r from-violet-600 to-fuchsia-500"
-              )}>{plan.badge}</div>
-            )}
-            <div className={cx("text-xs font-bold uppercase tracking-widest mb-2",
-              plan.color === "violet" ? "text-violet-400" : plan.color === "gold" ? "text-yellow-400" : "text-slate-400"
-            )}>{plan.name}</div>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-4xl font-extrabold text-white">{plan.price}</span>
-              <span className="text-slate-500 text-sm">/mo</span>
-              {plan.oldPrice && <span className="text-slate-600 text-xs line-through">{plan.oldPrice}</span>}
-            </div>
-            <p className="text-slate-400 text-xs mb-4">{plan.desc}</p>
-            <div className="space-y-2">
-              {plan.features.map((f, i) => (
-                <div key={f} className={cx("flex items-center gap-2 text-xs",
-                  i === 0 && plan.color === "violet" ? "text-violet-300 font-semibold" :
-                  i === 0 && plan.color === "gold" ? "text-yellow-300 font-semibold" : "text-slate-400")}>
-                  <Icon path={icons.check} size={11} className={
-                    plan.color === "violet" ? "text-violet-400" :
-                    plan.color === "gold" ? "text-yellow-400" : "text-emerald-400"
-                  } />{f}
-                </div>
-              ))}
-            </div>
-            {data.plan === plan.id && (
-              <div className={cx("mt-4 flex items-center gap-1.5 text-xs font-bold",
-                plan.color === "violet" ? "text-violet-300" :
-                plan.color === "gold" ? "text-yellow-300" : "text-white")}>
-                <Icon path={icons.check} size={12} /> Selected
+      <div className="flex justify-center">
+        <div className="inline-flex rounded-2xl border border-white/10 bg-white/5 p-1">
+          <button onClick={() => setData((d) => ({ ...d, billingCycle: "monthly" }))} className={cx("rounded-xl px-4 py-2 text-sm font-semibold transition-colors", billingCycle === "monthly" ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white")}>Monthly</button>
+          <button onClick={() => setData((d) => ({ ...d, billingCycle: "yearly" }))} className={cx("rounded-xl px-4 py-2 text-sm font-semibold transition-colors", billingCycle === "yearly" ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white")}>Yearly</button>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {plans.map((plan) => {
+          const price = billingCycle === "yearly" ? plan.yearly : plan.monthly;
+          const savings = Math.max(0, Math.round(((plan.monthly - plan.yearly) / plan.monthly) * 100));
+          return (
+            <button key={plan.id} onClick={() => { setData((d) => ({ ...d, plan: plan.id })); setError(""); }} className={cx("relative rounded-2xl border p-6 text-left transition-all duration-200", data.plan === plan.id ? plan.color === "violet" ? "border-violet-400/60 bg-violet-500/15" : plan.color === "gold" ? "border-yellow-400/60 bg-yellow-500/10" : "border-white/30 bg-white/8" : "border-white/10 bg-white/3 hover:border-white/25")}>
+              {plan.badge ? <div className={cx("absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold text-white", plan.color === "gold" ? "bg-gradient-to-r from-yellow-500 to-orange-400" : "bg-gradient-to-r from-violet-600 to-fuchsia-500")}>{plan.badge}</div> : null}
+              <div className={cx("mb-2 text-xs font-bold uppercase tracking-widest", plan.color === "violet" ? "text-violet-400" : plan.color === "gold" ? "text-yellow-400" : "text-slate-400")}>{plan.name}</div>
+              <div className="mb-1 flex items-baseline gap-2">
+                <span className="text-4xl font-extrabold text-white">${price}</span>
+                <span className="text-sm text-slate-500">/{billingCycle === "yearly" ? "mo billed yearly" : "mo"}</span>
               </div>
-            )}
-          </button>
-        ))}
+              {billingCycle === "yearly" ? <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">Save {savings}%</div> : null}
+              <p className="mb-4 text-xs text-slate-400">{plan.desc}</p>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-xs text-violet-200">1 Month Free Trial</div>
+              <div className="space-y-2">
+                {plan.features.map((feature) => (
+                  <div key={feature} className="flex items-center gap-2 text-xs text-slate-300">
+                    <Icon path={icons.check} size={11} className={plan.color === "gold" ? "text-yellow-400" : plan.color === "violet" ? "text-violet-400" : "text-emerald-400"} />
+                    {feature}
+                  </div>
+                ))}
+              </div>
+              {data.plan === plan.id ? <div className={cx("mt-4 flex items-center gap-1.5 text-xs font-bold", plan.color === "gold" ? "text-yellow-300" : plan.color === "violet" ? "text-violet-300" : "text-white")}><Icon path={icons.check} size={12} /> Selected</div> : null}
+            </button>
+          );
+        })}
       </div>
-      <div className="p-4 rounded-xl bg-violet-500/8 border border-violet-500/20">
-        <p className="text-xs text-slate-400">💡 <strong className="text-white">Pro tip:</strong> Most store owners recover <strong className="text-violet-300">$200-500/month</strong> in abandoned carts alone with the Pro plan — making it pay for itself instantly.</p>
-      </div>
-      {error && <p className="text-xs text-red-400 font-semibold flex items-center gap-1"><Icon path={icons.info} size={12} /> {error}</p>}
-      <div className="flex justify-end pt-2">
-        <Btn onClick={() => {
-          if (!data.plan || data.plan === "") {
-            setError("⚠️ Please select a plan before continuing!");
+      {error ? <p className="flex items-center gap-1 text-xs font-semibold text-red-400"><Icon path={icons.info} size={12} /> {error}</p> : null}
+      <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
+        <Btn className="w-full justify-center sm:w-auto" onClick={() => {
+          if (!data.plan) {
+            setError("Please select a plan before continuing.");
             return;
           }
           setError("");
           onNext();
         }}>
-          Continue <Icon path={icons.arrow} size={16} />
+          Start Trial <Icon path={icons.arrow} size={16} />
         </Btn>
       </div>
     </div>
@@ -332,9 +296,9 @@ function Step1({ data, setData, onNext, onBack }) {
         </div>
         {errors.platform && <p className="text-xs text-red-400 mt-2">{errors.platform}</p>}
       </div>
-      <div className="flex items-center justify-between pt-2">
-        <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <Btn onClick={() => validate() && onNext()}>Continue <Icon path={icons.arrow} size={16} /></Btn>
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+        <Btn variant="ghost" className="w-full justify-center sm:w-auto" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
+        <Btn className="w-full justify-center sm:w-auto" onClick={() => validate() && onNext()}>Continue <Icon path={icons.arrow} size={16} /></Btn>
       </div>
     </div>
   );
@@ -477,9 +441,9 @@ function Step2({ data, setData, onNext, onBack }) {
         <Icon path={icons.shield} size={16} className="text-violet-400 flex-shrink-0 mt-0.5" />
         <p className="text-xs text-slate-400 leading-relaxed">Your credentials are encrypted with AES-256 before storage and never exposed in our frontend.</p>
       </div>
-      <div className="flex items-center justify-between pt-2">
-        <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <Btn onClick={handleValidate} loading={validating}><Icon path={icons.zap} size={16} /> Verify & Continue</Btn>
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+        <Btn variant="ghost" className="w-full justify-center sm:w-auto" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
+        <Btn className="w-full justify-center sm:w-auto" onClick={handleValidate} loading={validating}><Icon path={icons.zap} size={16} /> Verify & Continue</Btn>
       </div>
     </div>
   );
@@ -500,284 +464,148 @@ function Step3({ data, setData, onNext, onBack }) {
   const validate = () => {
     const e = {};
     if (!data.storeName?.trim()) e.storeName = "Store name is required";
-    if (!data.contactEmail?.trim()) e.contactEmail = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(data.contactEmail)) e.contactEmail = "Invalid email";
-    if (!data.accountPassword?.trim()) e.accountPassword = "Password is required";
-    else if (data.accountPassword.trim().length < 8) e.accountPassword = "Password must be at least 8 characters";
+    if (!data.storeContactEmail?.trim()) e.storeContactEmail = "Store contact email is required";
+    else if (!/\S+@\S+\.\S+/.test(data.storeContactEmail)) e.storeContactEmail = "Invalid email";
+    if (!data.phoneNumber?.trim()) e.phoneNumber = "Phone number is required";
     if (!data.categories?.length) e.categories = "Please select at least one category";
     if (!data.deliveryMethods?.length) e.deliveryMethods = "Please select at least one delivery method";
     if (!data.returnPolicy?.trim()) e.returnPolicy = "Return/refund policy is required";
-    // FAQs are handled in Train AI step — not required here
-    // if (!data.faqs?.trim()) e.faqs = "Please add at least one FAQ";
     STORE_QUESTIONS.forEach(({ id }) => {
       if (!data.storeAnswers?.[id]) e[id] = "Please answer this question";
     });
-    setErrors(e); return Object.keys(e).length === 0;
+    if (data.storeAnswers?.physicalStore === "yes" && !data.storeAddress?.trim()) {
+      e.storeAddress = "Address is required when you have a physical store";
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
+
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Tell Us About Your Store</h2>
-        <p className="text-slate-400 text-sm">All fields are required to properly train your AI agent.</p>
+        <p className="text-slate-400 text-sm">This information trains the assistant on your store operations. Dashboard login is set in the final step, not here.</p>
       </div>
       <Field label="Store Name *" id="storeName" error={errors.storeName}>
-        <input id="storeName" type="text" placeholder="My Awesome Store" value={data.storeName || ""} onChange={e => setData(d => ({ ...d, storeName: e.target.value }))}
-          className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.storeName ? "border-red-500/60" : "border-white/10")} />
-        {errors.storeName && <p className="text-xs text-red-400">{errors.storeName}</p>}
+        <input id="storeName" type="text" placeholder="My Awesome Store" value={data.storeName || ""} onChange={(e) => setData((d) => ({ ...d, storeName: e.target.value }))} className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.storeName ? "border-red-500/60" : "border-white/10")} />
+        {errors.storeName ? <p className="text-xs text-red-400">{errors.storeName}</p> : null}
       </Field>
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-        <div className="mb-4">
-          <h3 className="text-base font-bold text-white">Client Login Details</h3>
-          <p className="text-sm text-slate-400 mt-1">These credentials are for the client account setup. They are separate from your store API access.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Email *" id="contactEmail" error={errors.contactEmail}>
-            <input id="contactEmail" type="email" placeholder="hello@yourstore.com" value={data.contactEmail || ""} onChange={e => setData(d => ({ ...d, contactEmail: e.target.value }))}
-              className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.contactEmail ? "border-red-500/60" : "border-white/10")} />
-            {errors.contactEmail && <p className="text-xs text-red-400">{errors.contactEmail}</p>}
-          </Field>
-          <Field label="Password *" id="accountPassword" error={errors.accountPassword} helper="Minimum 8 characters">
-            <input id="accountPassword" type="password" placeholder="Create a client password" value={data.accountPassword || ""} onChange={e => setData(d => ({ ...d, accountPassword: e.target.value }))}
-              className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.accountPassword ? "border-red-500/60" : "border-white/10")} />
-            {errors.accountPassword && <p className="text-xs text-red-400">{errors.accountPassword}</p>}
-          </Field>
-        </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Field label="Store Contact Email *" id="storeContactEmail" error={errors.storeContactEmail}>
+          <input id="storeContactEmail" type="email" placeholder="hello@yourstore.com" value={data.storeContactEmail || ""} onChange={(e) => setData((d) => ({ ...d, storeContactEmail: e.target.value }))} className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.storeContactEmail ? "border-red-500/60" : "border-white/10")} />
+          {errors.storeContactEmail ? <p className="text-xs text-red-400">{errors.storeContactEmail}</p> : null}
+        </Field>
+        <Field label="Phone Number *" id="phoneNumber" error={errors.phoneNumber}>
+          <input id="phoneNumber" type="text" placeholder="+92 300 1234567" value={data.phoneNumber || ""} onChange={(e) => setData((d) => ({ ...d, phoneNumber: e.target.value }))} className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.phoneNumber ? "border-red-500/60" : "border-white/10")} />
+          {errors.phoneNumber ? <p className="text-xs text-red-400">{errors.phoneNumber}</p> : null}
+        </Field>
       </div>
-      <Field label="Product Categories *" id="categories" helper="Select all that apply">
-        <MultiSelect options={CATEGORY_OPTIONS} selected={data.categories || []} onChange={v => setData(d => ({ ...d, categories: v }))} />
-        {errors.categories && <p className="text-xs text-red-400 mt-1">{errors.categories}</p>}
-      </Field>
-      <Field label="Delivery Methods *" id="delivery" helper="Select all that apply">
-        <MultiSelect options={DELIVERY_OPTIONS} selected={data.deliveryMethods || []} onChange={v => setData(d => ({ ...d, deliveryMethods: v }))} />
-        {errors.deliveryMethods && <p className="text-xs text-red-400 mt-1">{errors.deliveryMethods}</p>}
-      </Field>
-      <Field label="Return / Refund Policy *" id="returnPolicy" error={errors.returnPolicy}>
-        <Textarea id="returnPolicy" placeholder="e.g. 30-day returns, unused items in original packaging..." value={data.returnPolicy || ""} onChange={e => setData(d => ({ ...d, returnPolicy: e.target.value }))} />
-        {errors.returnPolicy && <p className="text-xs text-red-400 mt-1">{errors.returnPolicy}</p>}
-      </Field>
-      {/* FAQs handled in Train AI step */}
+      <Field label="Product Categories *" id="categories" helper="Select all that apply"><MultiSelect options={CATEGORY_OPTIONS} selected={data.categories || []} onChange={(v) => setData((d) => ({ ...d, categories: v }))} />{errors.categories ? <p className="mt-1 text-xs text-red-400">{errors.categories}</p> : null}</Field>
+      <Field label="Delivery Methods *" id="delivery" helper="Select all that apply"><MultiSelect options={DELIVERY_OPTIONS} selected={data.deliveryMethods || []} onChange={(v) => setData((d) => ({ ...d, deliveryMethods: v }))} />{errors.deliveryMethods ? <p className="mt-1 text-xs text-red-400">{errors.deliveryMethods}</p> : null}</Field>
+      <Field label="Return / Refund Policy *" id="returnPolicy" error={errors.returnPolicy}><Textarea id="returnPolicy" placeholder="e.g. 30-day returns, unused items in original packaging..." value={data.returnPolicy || ""} onChange={(e) => setData((d) => ({ ...d, returnPolicy: e.target.value }))} />{errors.returnPolicy ? <p className="mt-1 text-xs text-red-400">{errors.returnPolicy}</p> : null}</Field>
       <div>
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Store Questions <span className="text-red-400">*</span></p>
-        <p className="text-xs text-slate-500 mb-4">All questions must be answered to train your AI agent properly.</p>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-400">Store Questions <span className="text-red-400">*</span></p>
         <div className="space-y-3">
           {STORE_QUESTIONS.map(({ id, q }) => (
-            <div key={id} className={cx("p-4 rounded-xl border transition-all", errors[id] ? "border-red-500/40 bg-red-500/5" : "border-white/10 bg-white/3")}>
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-sm text-slate-200 flex-1">{q}</p>
-                <div className="flex gap-2 flex-shrink-0">
-                  <button onClick={() => setData(d => ({ ...d, storeAnswers: { ...d.storeAnswers, [id]: "yes" } }))}
-                    className={cx("px-4 py-1.5 rounded-lg text-xs font-bold border transition-all",
-                      data.storeAnswers?.[id] === "yes"
-                        ? "bg-emerald-500/25 border-emerald-400/50 text-emerald-300"
-                        : "bg-white/5 border-white/10 text-slate-400 hover:border-emerald-400/30 hover:text-emerald-300")}>
-                    ✓ Yes
-                  </button>
-                  <button onClick={() => setData(d => ({ ...d, storeAnswers: { ...d.storeAnswers, [id]: "no" } }))}
-                    className={cx("px-4 py-1.5 rounded-lg text-xs font-bold border transition-all",
-                      data.storeAnswers?.[id] === "no"
-                        ? "bg-red-500/25 border-red-400/50 text-red-300"
-                        : "bg-white/5 border-white/10 text-slate-400 hover:border-red-400/30 hover:text-red-300")}>
-                    ✗ No
-                  </button>
+            <div key={id} className={cx("rounded-xl border p-4 transition-all", errors[id] ? "border-red-500/40 bg-red-500/5" : "border-white/10 bg-white/3")}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="flex-1 text-sm text-slate-200">{q}</p>
+                <div className="flex gap-2">
+                  <button onClick={() => setData((d) => ({ ...d, storeAnswers: { ...d.storeAnswers, [id]: "yes" } }))} className={cx("rounded-lg border px-4 py-2 text-xs font-bold transition-all", data.storeAnswers?.[id] === "yes" ? "border-emerald-400/50 bg-emerald-500/25 text-emerald-300" : "border-white/10 bg-white/5 text-slate-400 hover:border-emerald-400/30 hover:text-emerald-300")}>Yes</button>
+                  <button onClick={() => setData((d) => ({ ...d, storeAnswers: { ...d.storeAnswers, [id]: "no" } }))} className={cx("rounded-lg border px-4 py-2 text-xs font-bold transition-all", data.storeAnswers?.[id] === "no" ? "border-red-400/50 bg-red-500/25 text-red-300" : "border-white/10 bg-white/5 text-slate-400 hover:border-red-400/30 hover:text-red-300")}>No</button>
                 </div>
               </div>
-              {errors[id] && <p className="text-xs text-red-400 mt-2">{errors[id]}</p>}
+              {id === "physicalStore" && data.storeAnswers?.physicalStore === "yes" ? <div className="mt-3"><input type="text" placeholder="Store address" value={data.storeAddress || ""} onChange={(e) => setData((d) => ({ ...d, storeAddress: e.target.value }))} className={cx("w-full rounded-xl border bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.storeAddress ? "border-red-500/60" : "border-white/10")} />{errors.storeAddress ? <p className="mt-1 text-xs text-red-400">{errors.storeAddress}</p> : null}</div> : null}
+              {errors[id] ? <p className="mt-2 text-xs text-red-400">{errors[id]}</p> : null}
             </div>
           ))}
         </div>
       </div>
-
-      <Field label="Special Notes" id="notes" helper="Optional">
-        <Textarea id="notes" placeholder="Anything the AI should know about your store..." value={data.notes || ""} onChange={e => setData(d => ({ ...d, notes: e.target.value }))} />
-      </Field>
-      <div className="flex items-center justify-between pt-2">
-        <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <Btn onClick={() => validate() && onNext()}>Next: Train AI <Icon path={icons.arrow} size={16} /></Btn>
-      </div>
+      <Field label="Special Notes" id="notes" helper="Optional"><Textarea id="notes" placeholder="Anything the AI should know about your store..." value={data.notes || ""} onChange={(e) => setData((d) => ({ ...d, notes: e.target.value }))} /></Field>
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between"><Btn variant="ghost" className="w-full justify-center sm:w-auto" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn><Btn className="w-full justify-center sm:w-auto" onClick={() => validate() && onNext()}>Next: Train AI <Icon path={icons.arrow} size={16} /></Btn></div>
     </div>
   );
 }
 
 function StepQnA({ data, setData, onNext, onBack }) {
   const emptyPair = { question: "", answer: "" };
-  const [pairs, setPairs] = useState(
-    data.qnaPairs?.length ? data.qnaPairs : [
-      { question: "What is your contact phone number?", answer: "" },
-      { ...emptyPair },
-      { ...emptyPair }
-    ]
-  );
-  const [error, setError] = useState("");
-
-  const updatePair = (index, field, value) => {
-    setPairs(prev => prev.map((p, i) => i === index ? { ...p, [field]: value } : p));
-  };
-
-  const addPair = () => {
-    if (pairs.length >= 10) return;
-    setPairs(prev => [...prev, { ...emptyPair }]);
-  };
-
-  const removePair = (index) => {
-    if (pairs.length <= 3) return;
-    setPairs(prev => prev.filter((_, i) => i !== index));
-  };
-
+  const [pairs, setPairs] = useState(data.qnaPairs?.length ? data.qnaPairs : []);
+  const updatePair = (index, field, value) => setPairs((prev) => prev.map((p, i) => (i === index ? { ...p, [field]: value } : p)));
+  const addPair = () => { if (pairs.length < 10) setPairs((prev) => [...prev, { ...emptyPair }]); };
+  const removePair = (index) => setPairs((prev) => prev.filter((_, i) => i !== index));
   const handleNext = () => {
-    // Pair[0] is optional phone number — skip it in validation
-    // Require pairs[1] onwards: at least 2 fully filled (question + answer)
-    const nonPhoneFilled = pairs.slice(1).filter(p => p.question.trim() && p.answer.trim());
-    if (nonPhoneFilled.length < 2) {
-      setError("Please fill at least 2 Q&As completely — both question and answer.");
-      return;
-    }
-    setError("");
-    // Save all filled pairs (phone included if answered)
-    const toSave = pairs.filter(p => p.answer.trim());
-    setData(d => ({ ...d, qnaPairs: toSave }));
+    const toSave = pairs.filter((p) => p.question.trim() && p.answer.trim());
+    setData((d) => ({ ...d, qnaPairs: toSave }));
     onNext();
   };
-
-  const suggestions = [
-    "What are your delivery charges?",
-    "How long does delivery take?",
-    "Do you offer cash on delivery?",
-    "What is your return policy?",
-    "Can I exchange an item?",
-    "What sizes do you have?",
-    "Do you have a physical store?",
-    "What payment methods do you accept?",
-    "Do you offer any discounts?",
-    "How do I track my order?",
-  ];
-
-  const fillSuggestion = (q) => {
-    const emptyIndex = pairs.findIndex(p => !p.question.trim());
-    if (emptyIndex !== -1) {
-      updatePair(emptyIndex, "question", q);
-    } else if (pairs.length < 10) {
-      setPairs(prev => [...prev, { question: q, answer: "" }]);
-    }
-  };
-
-  const usedQuestions = pairs.map(p => p.question.trim());
+  const suggestions = ["What are your delivery charges?", "How long does delivery take?", "Do you offer cash on delivery?", "What is your return policy?", "Can I exchange an item?", "How do I track my order?"];
+  const usedQuestions = pairs.map((p) => p.question.trim());
 
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Train Your AI 🧠</h2>
-        <p className="text-slate-400 text-sm">Add questions your customers ask most. Fill at least 2 Q&As completely. The phone number is optional. The more you add, the smarter your AI gets.</p>
+        <h2 className="text-2xl font-bold text-white mb-2">Train Your AI</h2>
+        <p className="text-slate-400 text-sm">This section starts empty. Add your own Q&A entries manually. You can also skip it and fill it later from the dashboard.</p>
       </div>
-
-      {/* Suggestion chips */}
       <div>
-        <p className="text-xs text-slate-500 uppercase tracking-widest mb-2 font-semibold">Quick add common questions</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-slate-500">Quick add common questions</p>
         <div className="flex flex-wrap gap-2">
-          {suggestions.filter(s => !usedQuestions.includes(s)).slice(0, 6).map(s => (
-            <button
-              key={s}
-              onClick={() => fillSuggestion(s)}
-              className="text-xs px-3 py-1.5 rounded-full border border-violet-500/30 text-violet-300 bg-violet-500/10 hover:bg-violet-500/20 transition-colors text-left"
-            >
+          {suggestions.filter((s) => !usedQuestions.includes(s)).map((s) => (
+            <button key={s} onClick={() => setPairs((prev) => [...prev, { question: s, answer: "" }])} className="rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-left text-xs text-violet-300 transition-colors hover:bg-violet-500/20">
               + {s}
             </button>
           ))}
         </div>
       </div>
-
-      {/* Q&A pairs */}
-      <div className="flex flex-col gap-3">
-        {pairs.map((pair, index) => (
-          <div key={index} className="rounded-xl border border-white/10 bg-white/3 p-4 flex flex-col gap-3">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Q&A #{index + 1}</span>
-                {index === 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-400 border border-slate-500/20">Optional</span>}
+      {pairs.length ? (
+        <div className="flex flex-col gap-3">
+          {pairs.map((pair, index) => (
+            <div key={index} className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/3 p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Q&A #{index + 1}</span>
+                <button onClick={() => removePair(index)} className="text-xs text-red-400/70 transition-colors hover:text-red-400">Remove</button>
               </div>
-              {pairs.length > 3 && index !== 0 && (
-                <button onClick={() => removePair(index)} className="text-xs text-red-400/60 hover:text-red-400 transition-colors">✕ Remove</button>
-              )}
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold text-slate-400">Question</label>
+                <input value={pair.question} onChange={(e) => updatePair(index, "question", e.target.value)} placeholder="e.g. What are your delivery charges?" className="w-full rounded-lg border border-white/10 bg-slate-900/60 px-3 py-2.5 text-sm text-white placeholder-slate-600 transition-colors focus:border-violet-500/50 focus:outline-none" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold text-slate-400">Answer</label>
+                <textarea value={pair.answer} onChange={(e) => updatePair(index, "answer", e.target.value)} placeholder="Add the answer your assistant should use." rows={2} className="w-full resize-none rounded-lg border border-white/10 bg-slate-900/60 px-3 py-2.5 text-sm text-white placeholder-slate-600 transition-colors focus:border-violet-500/50 focus:outline-none" />
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Question</label>
-              <input
-                value={pair.question}
-                onChange={e => updatePair(index, "question", e.target.value)}
-                placeholder="e.g. What are your delivery charges?"
-                className="w-full bg-slate-900/60 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-violet-500/50 transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Answer</label>
-              <textarea
-                value={pair.answer}
-                onChange={e => updatePair(index, "answer", e.target.value)}
-                placeholder={index === 0 ? "e.g. +92 300 1234567 (leave blank to skip)" : "e.g. Free delivery above Rs.5000, otherwise Rs.200 flat charge."}
-                rows={2}
-                className="w-full bg-slate-900/60 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-violet-500/50 transition-colors resize-none"
-              />
-              {index === 0 && <p className="text-xs text-slate-600 mt-1">Leave blank if you prefer not to share your phone number.</p>}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Add more button */}
-      <button
-          onClick={addPair}
-          className="w-full py-3 rounded-xl border border-dashed border-white/20 text-slate-400 hover:border-violet-500/40 hover:text-violet-300 transition-colors text-sm font-medium"
-        >
-          + Add Another Q&A ({pairs.length} added)
-        </button>
-
-      {error && (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm">
-          <Icon path={icons.info} size={16} /> {error}
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-dashed border-white/15 bg-white/[0.02] p-6 text-center text-sm text-slate-400">
+          No Q&A added yet. Add your own entries when you are ready.
         </div>
       )}
-
-      <div className="flex items-center justify-between pt-2">
-        <Btn variant="ghost" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <Btn onClick={handleNext}>Review & Submit <Icon path={icons.arrow} size={16} /></Btn>
-      </div>
+      <button onClick={addPair} className="w-full rounded-xl border border-dashed border-white/20 py-3 text-sm font-medium text-slate-400 transition-colors hover:border-violet-500/40 hover:text-violet-300">+ Add Another Q&A</button>
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between"><Btn variant="ghost" className="w-full justify-center sm:w-auto" onClick={onBack}><Icon path={icons.arrowL} size={16} /> Back</Btn><Btn className="w-full justify-center sm:w-auto" onClick={handleNext}>Review & Submit <Icon path={icons.arrow} size={16} /></Btn></div>
     </div>
   );
 }
 
-function Step4({ data, onBack }) {
+function Step4({ data, setData, onBack }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(null);
   const [error, setError] = useState(null);
+  const planLabel = data.plan === "pro" ? "Pro" : data.plan === "enterprise" ? "Enterprise" : "Starter";
+  const monthlyPrice = data.plan === "pro" ? 29 : data.plan === "enterprise" ? 49 : 19;
+  const yearlyPrice = data.plan === "pro" ? 25 : data.plan === "enterprise" ? 35 : 15;
+  const selectedPrice = (data.billingCycle || "monthly") === "yearly" ? yearlyPrice : monthlyPrice;
 
   const handleSubmit = async () => {
-    if (!data.storeName?.trim()) {
-      setError("Store name is required before submitting.");
-      return;
-    }
-    if (!data.contactEmail?.trim()) {
-      setError("Client email is required before submitting.");
-      return;
-    }
-    if (!data.accountPassword?.trim()) {
-      setError("Client password is required before submitting.");
-      return;
-    }
-    if (data.accountPassword.trim().length < 8) {
-      setError("Client password must be at least 8 characters.");
-      return;
-    }
-    if (!data.categories?.length) {
-      setError("Please select at least one product category before submitting.");
-      return;
-    }
-    if (!data.deliveryMethods?.length) {
-      setError("Please select at least one delivery method before submitting.");
-      return;
-    }
-    if (!data.returnPolicy?.trim()) {
-      setError("Return policy is required before submitting.");
-      return;
-    }
+    if (!data.storeName?.trim()) return setError("Store name is required before submitting.");
+    if (!data.storeContactEmail?.trim()) return setError("Store contact email is required before submitting.");
+    if (!data.loginEmail?.trim()) return setError("Dashboard login email is required before submitting.");
+    if (!/\S+@\S+\.\S+/.test(data.loginEmail)) return setError("Enter a valid dashboard login email.");
+    if (!data.accountPassword?.trim()) return setError("Dashboard password is required before submitting.");
+    if (data.accountPassword.trim().length < 8) return setError("Dashboard password must be at least 8 characters.");
+    if (!data.categories?.length) return setError("Please select at least one product category before submitting.");
+    if (!data.deliveryMethods?.length) return setError("Please select at least one delivery method before submitting.");
+    if (!data.returnPolicy?.trim()) return setError("Return policy is required before submitting.");
 
     setSubmitting(true);
     setError(null);
@@ -790,15 +618,20 @@ function Step4({ data, onBack }) {
         "NEW STORE SUBMISSION - AGENTCOMERCE",
         "",
         "PLAN",
-        `Plan: ${data.plan === "pro" ? "Pro - $29/mo" : data.plan === "enterprise" ? "Enterprise - $49/mo" : "Starter - $19/mo"}`,
-        `Message Limit: ${data.plan === "pro" ? "13,000 / month" : data.plan === "enterprise" ? "Unlimited" : "5,000 / month"}`,
+        `Plan: ${planLabel} - $${selectedPrice}/${(data.billingCycle || "monthly") === "yearly" ? "mo billed yearly" : "mo"}`,
+        `Billing Cycle: ${data.billingCycle || "monthly"}`,
         "",
         "STORE DETAILS",
         `Store Name: ${data.storeName || "-"}`,
         `Store URL: ${data.storeUrl || "-"}`,
         `Platform: ${data.platform?.toUpperCase() || "-"}`,
-        `Client Email: ${data.contactEmail || "-"}`,
-        `Phone: ${(data.qnaPairs || []).find((p) => p.question.toLowerCase().includes("phone"))?.answer || "-"}`,
+        `Store Contact Email: ${data.storeContactEmail || "-"}`,
+        `Phone Number: ${data.phoneNumber || "-"}`,
+        `Physical Store: ${yn(answers.physicalStore)}`,
+        `Address: ${data.storeAddress || "-"}`,
+        "",
+        "DASHBOARD LOGIN",
+        `Login Email: ${data.loginEmail || "-"}`,
         "",
         "CREDENTIALS",
         isShopify ? `Client ID: ${data.apiKey || "-"}` : `Consumer Key: ${data.consumerKey || "-"}`,
@@ -815,7 +648,6 @@ function Step4({ data, onBack }) {
         `International Shipping: ${yn(answers.internationalShipping)}`,
         `Accept Returns: ${yn(answers.acceptReturns)}`,
         `Cash on Delivery: ${yn(answers.cashOnDelivery)}`,
-        `Physical Store: ${yn(answers.physicalStore)}`,
         `Promo / Discounts: ${yn(answers.promoDiscounts)}`,
         "",
         "TRAINED Q&A PAIRS",
@@ -824,10 +656,15 @@ function Step4({ data, onBack }) {
 
       const payload = {
         plan: data.plan || "starter",
+        billingCycle: data.billingCycle || "monthly",
         storeUrl: data.storeUrl,
         platform: data.platform,
         storeName: data.storeName,
-        contactEmail: data.contactEmail,
+        storeContactEmail: data.storeContactEmail,
+        phoneNumber: data.phoneNumber,
+        hasPhysicalStore: data.storeAnswers?.physicalStore === "yes",
+        storeAddress: data.storeAddress || "",
+        loginEmail: data.loginEmail,
         accountPassword: data.accountPassword,
         apiKey: data.apiKey,
         accessToken: data.accessToken,
@@ -844,10 +681,7 @@ function Step4({ data, onBack }) {
       };
 
       const response = await apiPost("/submit", payload);
-      setSubmitted({
-        storeId: response.storeId,
-        loginEmail: response.loginEmail || data.contactEmail,
-      });
+      setSubmitted({ storeId: response.storeId, loginEmail: response.loginEmail || data.loginEmail });
     } catch (e) {
       setError(e?.message || "Failed to submit. Please try again.");
     } finally {
@@ -858,13 +692,13 @@ function Step4({ data, onBack }) {
   if (submitted) {
     return (
       <div className="flex flex-col items-center text-center gap-6 py-4">
-        <div className="w-24 h-24 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-400/30 shadow-xl shadow-emerald-500/20 animate-pulse">
+        <div className="w-24 h-24 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-400/30 shadow-xl shadow-emerald-500/20">
           <Icon path={icons.check} size={40} className="text-emerald-400" />
         </div>
         <div>
           <h2 className="text-3xl font-bold text-white mb-3">Submission Received</h2>
           <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">
-            Your store is now saved in the admin dashboard. You can log in with the email and password you just submitted.
+            Your store is saved. Admin review happens first. Once approved, the customer dashboard login will use the email and password you set here.
           </p>
         </div>
         <div className="w-full max-w-sm p-4 rounded-xl bg-emerald-500/8 border border-emerald-500/20 text-left space-y-2">
@@ -878,11 +712,8 @@ function Step4({ data, onBack }) {
           </div>
         </div>
         <Btn onClick={() => window.location.assign("/login")} className="w-full max-w-sm justify-center">
-          <Icon path={icons.arrow} size={16} /> Go to Client Login
+          <Icon path={icons.arrow} size={16} /> Go to Customer Login
         </Btn>
-        <button onClick={() => window.location.reload()} className="text-xs text-slate-600 hover:text-slate-400 transition-colors">
-          Submit another store
-        </button>
       </div>
     );
   }
@@ -892,24 +723,39 @@ function Step4({ data, onBack }) {
     <div className="flex flex-col gap-6">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Review & Submit</h2>
-        <p className="text-slate-400 text-sm">Review your information before submitting.</p>
+        <p className="text-slate-400 text-sm">Review the store details, then create the dashboard login right before submit.</p>
       </div>
       <div className="rounded-xl border border-white/10 overflow-hidden">
-        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{data.plan === "pro" ? "Pro - $29/mo" : data.plan === "enterprise" ? "Enterprise - $49/mo" : "Starter - $19/mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Client Email", data.contactEmail], ["Client Password", data.accountPassword ? "********" : "-"], ["Categories", (data.categories || []).join(", ") || "-"]].map(([label, value], i) => (
+        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{planLabel} - ${selectedPrice}/{(data.billingCycle || "monthly") === "yearly" ? "mo billed yearly" : "mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Store Contact Email", data.storeContactEmail], ["Phone Number", data.phoneNumber], ["Physical Store", data.storeAnswers?.physicalStore === "yes" ? "Yes" : "No"], ["Address", data.storeAddress || "-"], ["Categories", (data.categories || []).join(", ") || "-"]].map(([label, value], i) => (
           <div key={label} className={cx("grid grid-cols-1 sm:grid-cols-[170px_minmax(0,1fr)] items-start gap-3 px-5 py-4", i % 2 === 0 ? "bg-white/3" : "bg-transparent")}>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest pt-0.5">{label}</span>
             <div className="text-sm text-slate-200 break-words sm:text-right">{value || "-"}</div>
           </div>
         ))}
       </div>
-      {error && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> {error}</div>}
-      <div className="flex items-center justify-between pt-2">
-        <Btn variant="ghost" onClick={onBack} disabled={submitting}><Icon path={icons.arrowL} size={16} /> Back</Btn>
-        <Btn onClick={handleSubmit} loading={submitting}><Icon path={icons.zap} size={16} /> Create Store Account</Btn>
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+        <div className="mb-4">
+          <h3 className="text-base font-bold text-white">Dashboard Login Credentials</h3>
+          <p className="text-sm text-slate-400 mt-1">These credentials are for the customer dashboard only. They are separate from your store API credentials.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Email *" id="loginEmail">
+            <input id="loginEmail" type="email" placeholder="dashboard@yourstore.com" value={data.loginEmail || ""} onChange={(e) => setData((d) => ({ ...d, loginEmail: e.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60 focus:border-violet-500/40" />
+          </Field>
+          <Field label="Password *" id="accountPassword" helper="Minimum 8 characters">
+            <input id="accountPassword" type="password" placeholder="Create a dashboard password" value={data.accountPassword || ""} onChange={(e) => setData((d) => ({ ...d, accountPassword: e.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60 focus:border-violet-500/40" />
+          </Field>
+        </div>
+      </div>
+      {error ? <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> {error}</div> : null}
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+        <Btn variant="ghost" className="w-full justify-center sm:w-auto" onClick={onBack} disabled={submitting}><Icon path={icons.arrowL} size={16} /> Back</Btn>
+        <Btn className="w-full justify-center sm:w-auto" onClick={handleSubmit} loading={submitting}><Icon path={icons.zap} size={16} /> Submit & Start Trial</Btn>
       </div>
     </div>
   );
 }
+
 function LandingPage({ onStart, onLogin }) {
   const [activeFaq, setActiveFaq] = useState(null);
   const [pricingOpen, setPricingOpen] = useState(false);
@@ -1005,7 +851,7 @@ function LandingPage({ onStart, onLogin }) {
           <button onClick={() => setContactOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Contact</button>
           <div className="flex items-center gap-3">
             <Btn onClick={onLogin} className="text-sm px-4 py-2">Login</Btn>
-            <Btn onClick={onStart} className="text-sm px-4 py-2">Get Started</Btn>
+            <Btn onClick={onStart} className="text-sm px-4 py-2">Start Trial</Btn>
           </div>
         </div>
       </nav>
@@ -1022,7 +868,7 @@ function LandingPage({ onStart, onLogin }) {
         <p className="text-lg sm:text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed">
           Deploy an AI sales agent to your Shopify or WooCommerce store in 1–2 days. Answer questions, recommend products, handle FAQs — automatically, 24/7.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 items-center mb-8">
+        <div className="flex flex-col sm:flex-row gap-4 items-center mb-4">
           <Btn onClick={onStart} className="text-base px-8 py-4">
             <Icon path={icons.zap} size={18} /> Connect Your Store — Free Setup
           </Btn>
@@ -1031,7 +877,7 @@ function LandingPage({ onStart, onLogin }) {
           </button>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500">
-          {["No credit card required", "1–2 day setup", "Cancel anytime", "AES-256 encrypted"].map(t => (
+          {["1 Month Free Trial", "1–2 day setup", "Cancel anytime", "AES-256 encrypted"].map(t => (
             <div key={t} className="flex items-center gap-1.5"><Icon path={icons.check} size={11} className="text-emerald-400" />{t}</div>
           ))}
         </div>
@@ -1143,7 +989,7 @@ function LandingPage({ onStart, onLogin }) {
                 </div>
               ))}
             </div>
-            <Btn variant="ghost" onClick={onStart} className="w-full justify-center text-base py-4 border-white/20">Get Started — $19/month</Btn>
+            <Btn variant="ghost" onClick={onStart} className="w-full justify-center text-base py-4 border-white/20">Start Trial — $19/month</Btn>
             <p className="text-xs text-slate-500 mt-3">No contracts · Cancel anytime</p>
           </Card>
           {/* PRO */}
@@ -1476,8 +1322,9 @@ export default function App() {
   const [step, setStep] = useState(1);
   const [data, setData] = useState({
     storeUrl: "", platform: "", apiKey: "", accessToken: "", consumerKey: "", consumerSecret: "",
-    plan: "", storeAnswers: {},
-    storeName: "", contactEmail: "", accountPassword: "", categories: [], deliveryMethods: [], returnPolicy: "", faqs: "", notes: "",
+    plan: "", billingCycle: "monthly", storeAnswers: {},
+    storeName: "", storeContactEmail: "", phoneNumber: "", storeAddress: "", loginEmail: "", accountPassword: "",
+    categories: [], deliveryMethods: [], returnPolicy: "", faqs: "", notes: "", qnaPairs: [],
   });
   const next = () => setStep((s) => Math.min(s + 1, 6));
   const back = () => setStep((s) => Math.max(s - 1, 1));
@@ -1564,7 +1411,7 @@ export default function App() {
               {step === 3 && <Step2 data={data} setData={setData} onNext={next} onBack={back} />}
               {step === 4 && <Step3 data={data} setData={setData} onNext={next} onBack={back} />}
               {step === 5 && <StepQnA data={data} setData={setData} onNext={next} onBack={back} />}
-              {step === 6 && <Step4 data={data} onBack={back} />}
+              {step === 6 && <Step4 data={data} setData={setData} onBack={back} />}
             </Card>
             {step < 4 && (
               <div className="flex items-center justify-center gap-6 mt-6">
