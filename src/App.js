@@ -470,6 +470,7 @@ function Step3({ data, setData, onNext, onBack }) {
     if (!data.categories?.length) e.categories = "Please select at least one category";
     if (!data.deliveryMethods?.length) e.deliveryMethods = "Please select at least one delivery method";
     if (!data.returnPolicy?.trim()) e.returnPolicy = "Return/refund policy is required";
+    if (!data.storeAnswers?.receiveLeads) e.receiveLeads = "Please choose whether you want lead capture";
     STORE_QUESTIONS.forEach(({ id }) => {
       if (!data.storeAnswers?.[id]) e[id] = "Please answer this question";
     });
@@ -503,6 +504,24 @@ function Step3({ data, setData, onNext, onBack }) {
       <Field label="Product Categories *" id="categories" helper="Select all that apply"><MultiSelect options={CATEGORY_OPTIONS} selected={data.categories || []} onChange={(v) => setData((d) => ({ ...d, categories: v }))} />{errors.categories ? <p className="mt-1 text-xs text-red-400">{errors.categories}</p> : null}</Field>
       <Field label="Delivery Methods *" id="delivery" helper="Select all that apply"><MultiSelect options={DELIVERY_OPTIONS} selected={data.deliveryMethods || []} onChange={(v) => setData((d) => ({ ...d, deliveryMethods: v }))} />{errors.deliveryMethods ? <p className="mt-1 text-xs text-red-400">{errors.deliveryMethods}</p> : null}</Field>
       <Field label="Return / Refund Policy *" id="returnPolicy" error={errors.returnPolicy}><Textarea id="returnPolicy" placeholder="e.g. 30-day returns, unused items in original packaging..." value={data.returnPolicy || ""} onChange={(e) => setData((d) => ({ ...d, returnPolicy: e.target.value }))} />{errors.returnPolicy ? <p className="mt-1 text-xs text-red-400">{errors.returnPolicy}</p> : null}</Field>
+      <div className={cx("rounded-2xl border p-5", errors.receiveLeads ? "border-red-500/40 bg-red-500/5" : "border-violet-500/20 bg-violet-500/8")}>
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/20 text-violet-300">
+            <Icon path={icons.users} size={18} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-white">Do you want lead capture enabled?</p>
+            <p className="mt-1 text-sm leading-relaxed text-slate-400">
+              If enabled, your assistant can collect shopper details from chat so you can follow up with interested customers from your dashboard.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button onClick={() => setData((d) => ({ ...d, storeAnswers: { ...d.storeAnswers, receiveLeads: "yes" } }))} className={cx("rounded-lg border px-4 py-2 text-xs font-bold transition-all", data.storeAnswers?.receiveLeads === "yes" ? "border-emerald-400/50 bg-emerald-500/25 text-emerald-300" : "border-white/10 bg-white/5 text-slate-400 hover:border-emerald-400/30 hover:text-emerald-300")}>Yes, capture leads</button>
+              <button onClick={() => setData((d) => ({ ...d, storeAnswers: { ...d.storeAnswers, receiveLeads: "no" } }))} className={cx("rounded-lg border px-4 py-2 text-xs font-bold transition-all", data.storeAnswers?.receiveLeads === "no" ? "border-red-400/50 bg-red-500/25 text-red-300" : "border-white/10 bg-white/5 text-slate-400 hover:border-red-400/30 hover:text-red-300")}>No, chat only</button>
+            </div>
+            {errors.receiveLeads ? <p className="mt-3 text-xs text-red-400">{errors.receiveLeads}</p> : null}
+          </div>
+        </div>
+      </div>
       <div>
         <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-400">Store Questions <span className="text-red-400">*</span></p>
         <div className="space-y-3">
@@ -629,6 +648,7 @@ function Step4({ data, setData, onBack }) {
         `Phone Number: ${data.phoneNumber || "-"}`,
         `Physical Store: ${yn(answers.physicalStore)}`,
         `Address: ${data.storeAddress || "-"}`,
+        `Lead Capture: ${yn(answers.receiveLeads)}`,
         "",
         "DASHBOARD LOGIN",
         `Login Email: ${data.loginEmail || "-"}`,
@@ -726,7 +746,7 @@ function Step4({ data, setData, onBack }) {
         <p className="text-slate-400 text-sm">Review the store details, then create the dashboard login right before submit.</p>
       </div>
       <div className="rounded-xl border border-white/10 overflow-hidden">
-        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{planLabel} - ${selectedPrice}/{(data.billingCycle || "monthly") === "yearly" ? "mo billed yearly" : "mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Store Contact Email", data.storeContactEmail], ["Phone Number", data.phoneNumber], ["Physical Store", data.storeAnswers?.physicalStore === "yes" ? "Yes" : "No"], ["Address", data.storeAddress || "-"], ["Categories", (data.categories || []).join(", ") || "-"]].map(([label, value], i) => (
+        {[["Plan", <span className="capitalize px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-500/15 text-violet-300 border-violet-500/25">{planLabel} - ${selectedPrice}/{(data.billingCycle || "monthly") === "yearly" ? "mo billed yearly" : "mo"}</span>], ["Store URL", data.storeUrl], ["Platform", <span className={cx("capitalize px-2 py-0.5 rounded-full text-xs font-semibold border", isShopify ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25" : "bg-blue-500/15 text-blue-300 border-blue-500/25")}>{data.platform}</span>], ["Store Name", data.storeName], ["Store Contact Email", data.storeContactEmail], ["Phone Number", data.phoneNumber], ["Physical Store", data.storeAnswers?.physicalStore === "yes" ? "Yes" : "No"], ["Address", data.storeAddress || "-"], ["Lead Capture", data.storeAnswers?.receiveLeads === "yes" ? "Enabled" : data.storeAnswers?.receiveLeads === "no" ? "Disabled" : "-"], ["Categories", (data.categories || []).join(", ") || "-"]].map(([label, value], i) => (
           <div key={label} className={cx("grid grid-cols-1 sm:grid-cols-[170px_minmax(0,1fr)] items-start gap-3 px-5 py-4", i % 2 === 0 ? "bg-white/3" : "bg-transparent")}>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest pt-0.5">{label}</span>
             <div className="text-sm text-slate-200 break-words sm:text-right">{value || "-"}</div>
@@ -759,12 +779,47 @@ function Step4({ data, setData, onBack }) {
 function LandingPage({ onStart, onLogin }) {
   const [activeFaq, setActiveFaq] = useState(null);
   const [pricingOpen, setPricingOpen] = useState(false);
+  const [pricingCycle, setPricingCycle] = useState("monthly");
   const [demoOpen, setDemoOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [contactSent, setContactSent] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+  const pricingPlans = [
+    {
+      id: "starter",
+      name: "Starter",
+      monthly: 19,
+      yearly: 15,
+      messages: "5,000 msg/mo",
+      description: "Perfect for small stores getting started with AI.",
+      color: "slate",
+      features: ["AI chat assistant", "5,000 messages", "Basic store details", "Email support"],
+    },
+    {
+      id: "pro",
+      name: "Pro",
+      monthly: 29,
+      yearly: 25,
+      messages: "13,000 msg/mo",
+      description: "For growing stores that want stronger product selling automation.",
+      color: "violet",
+      badge: "Most Popular",
+      features: ["Everything in Starter", "Product cards", "Memory", "Some reports"],
+    },
+    {
+      id: "enterprise",
+      name: "Enterprise",
+      monthly: 49,
+      yearly: 35,
+      messages: "Unlimited msg/mo",
+      description: "For stores that need advanced analytics, reports, and support.",
+      color: "gold",
+      badge: "Best Value",
+      features: ["Everything in Pro", "Advanced analytics", "Advanced reports", "Full support"],
+    },
+  ];
 
   const stats = [
     { value: "500+", label: "Stores Connected", icon: icons.store },
@@ -836,22 +891,22 @@ function LandingPage({ onStart, onLogin }) {
     <div className="min-h-screen text-white" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
 
       {/* ── NAVBAR ── */}
-      <nav className="relative z-10 flex items-center justify-between px-6 py-5 max-w-6xl mx-auto w-full sticky top-0 backdrop-blur-xl bg-slate-950/80 border-b border-white/5">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center">
-            <Icon path={icons.bot} size={16} className="text-white" />
+      <nav className="relative z-10 sticky top-0 mx-auto w-full max-w-6xl border-b border-white/5 bg-slate-950/80 px-4 py-4 backdrop-blur-xl sm:px-6 sm:py-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-violet-600">
+              <Icon path={icons.bot} size={18} className="text-white" />
+            </div>
+            <span className="truncate text-base font-bold tracking-tight text-white sm:text-lg">AgentComerce</span>
+            <span className="hidden rounded-full border border-violet-500/25 bg-violet-500/20 px-2 py-0.5 text-xs font-medium text-violet-300 sm:block">AI Powered</span>
           </div>
-          <span className="font-bold text-white text-lg tracking-tight">AgentComerce</span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/25 font-medium hidden sm:block">AI Powered</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <button onClick={() => document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' })} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Features</button>
-          <button onClick={() => setPricingOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Pricing</button>
-          <button onClick={() => document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' })} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">FAQ</button>
-          <button onClick={() => setContactOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:block">Contact</button>
-          <div className="flex items-center gap-3">
-            <Btn onClick={onLogin} className="text-sm px-4 py-2">Login</Btn>
-            <Btn onClick={onStart} className="text-sm px-4 py-2">Start Trial</Btn>
+          <div className="flex flex-wrap items-center justify-end gap-2 sm:flex-nowrap sm:gap-4">
+            <button onClick={() => document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' })} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">Features</button>
+            <button onClick={() => setPricingOpen(true)} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">Pricing</button>
+            <button onClick={() => document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' })} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">FAQ</button>
+            <button onClick={() => setContactOpen(true)} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">Contact</button>
+            <Btn onClick={onLogin} className="px-4 py-2 text-sm sm:px-5">Login</Btn>
+            <Btn onClick={onStart} className="px-4 py-2 text-sm sm:px-5">Start Trial</Btn>
           </div>
         </div>
       </nav>
@@ -968,85 +1023,54 @@ function LandingPage({ onStart, onLogin }) {
       </section>
 
       {/* ── PRICING ── */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6 pb-24 text-center">
+            <section className="relative z-10 max-w-6xl mx-auto px-6 pb-24 text-center">
         <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 font-medium mb-4">Pricing</div>
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
         <p className="text-slate-400 mb-10">Three plans, no hidden fees, no surprises. Cancel anytime.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {/* STARTER */}
-          <Card className="p-8 relative overflow-hidden flex flex-col">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-500 to-slate-400 rounded-t-2xl" />
-            <div className="mb-6">
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Starter</div>
-              <div className="text-5xl font-extrabold text-white mb-1">$19<span className="text-lg font-normal text-slate-500">/mo</span></div>
-              <div className="inline-flex items-center gap-1 bg-slate-500/20 border border-slate-400/30 text-slate-300 text-xs font-bold px-2.5 py-1 rounded-full mt-2">💬 5,000 msg/mo</div>
-              <p className="text-slate-400 text-sm mt-2">Perfect for small stores getting started with AI</p>
-            </div>
-            <div className="space-y-3 text-left mb-8 flex-1">
-              {["🤖 AI Chat Agent 24/7","💬 5,000 messages/month","📦 Live product data & recommendations","🧠 Memory — last 20 messages","❓ FAQ automation","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup by our team","🔒 AES-256 secure integration","📧 Email support"].map(f => (
-                <div key={f} className="flex items-center gap-3 text-sm text-slate-300">
-                  <Icon path={icons.check} size={14} className="text-emerald-400 flex-shrink-0" />{f}
+        <div className="mb-10 flex justify-center">
+          <div className="inline-flex rounded-2xl border border-white/10 bg-white/5 p-1">
+            <button onClick={() => setPricingCycle("monthly")} className={cx("rounded-xl px-4 py-2 text-sm font-semibold transition-colors", pricingCycle === "monthly" ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white")}>Monthly</button>
+            <button onClick={() => setPricingCycle("yearly")} className={cx("rounded-xl px-4 py-2 text-sm font-semibold transition-colors", pricingCycle === "yearly" ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white")}>Yearly</button>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-6 max-w-5xl mx-auto sm:grid-cols-3">
+          {pricingPlans.map((plan) => {
+            const price = pricingCycle === "yearly" ? plan.yearly : plan.monthly;
+            const savings = Math.max(0, Math.round(((plan.monthly - plan.yearly) / plan.monthly) * 100));
+            const tone = plan.color === "violet" ? "border-violet-500/40 bg-[linear-gradient(135deg,rgba(124,58,237,0.15),rgba(168,85,247,0.08))]" : plan.color === "gold" ? "border-yellow-500/30 bg-[linear-gradient(135deg,rgba(234,179,8,0.08),rgba(251,146,60,0.05))]" : "border-white/10 bg-white/5";
+            const accent = plan.color === "violet" ? "text-violet-400" : plan.color === "gold" ? "text-yellow-400" : "text-slate-400";
+            const pill = plan.color === "violet" ? "border-violet-400/30 bg-violet-500/25 text-violet-300" : plan.color === "gold" ? "border-yellow-400/25 bg-yellow-500/15 text-yellow-200" : "border-slate-400/30 bg-slate-500/20 text-slate-300";
+            const checkTone = plan.color === "violet" ? "text-violet-300" : plan.color === "gold" ? "text-yellow-300" : "text-emerald-400";
+            return (
+              <Card key={plan.id} className={cx("relative flex flex-col overflow-hidden p-8", tone)}>
+                <div className={cx("absolute top-0 left-0 right-0 h-1 rounded-t-2xl", plan.color === "violet" ? "bg-gradient-to-r from-violet-500 to-fuchsia-500" : plan.color === "gold" ? "bg-gradient-to-r from-yellow-500 to-orange-500" : "bg-gradient-to-r from-slate-500 to-slate-400")} />
+                {plan.badge ? <div className={cx("absolute top-4 right-4 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold", plan.color === "gold" ? "border-yellow-400/40 bg-yellow-500/20 text-yellow-100" : "border-violet-400/40 bg-violet-500/25 text-violet-200")}>{plan.badge}</div> : null}
+                <div className="mb-6">
+                  <div className={cx("mb-3 text-xs font-bold uppercase tracking-widest", accent)}>{plan.name}</div>
+                  <div className="text-5xl font-extrabold text-white mb-1">${price}<span className="text-lg font-normal text-slate-500">/{pricingCycle === "yearly" ? "mo billed yearly" : "mo"}</span></div>
+                  {pricingCycle === "yearly" ? <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">Save {savings}%</div> : null}
+                  <div className={cx("mt-3 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold", pill)}>{plan.messages}</div>
+                  <p className="mt-2 text-sm text-slate-300">{plan.description}</p>
+                  <p className="mt-2 text-xs text-violet-200">1 Month Free Trial</p>
                 </div>
-              ))}
-            </div>
-            <Btn variant="ghost" onClick={onStart} className="w-full justify-center text-base py-4 border-white/20">Start Trial — $19/month</Btn>
-            <p className="text-xs text-slate-500 mt-3">No contracts · Cancel anytime</p>
-          </Card>
-          {/* PRO */}
-          <Card className="p-8 relative overflow-hidden flex flex-col border-violet-500/40" style={{background:'linear-gradient(135deg,rgba(124,58,237,0.15),rgba(168,85,247,0.08))'}}>
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-t-2xl" />
-            <div className="absolute top-4 right-4">
-              <div className="inline-flex items-center gap-1 bg-violet-500/25 border border-violet-400/40 text-violet-200 text-xs font-bold px-2.5 py-1 rounded-full">⭐ Most Popular</div>
-            </div>
-            <div className="mb-6">
-              <div className="text-xs font-bold text-violet-400 uppercase tracking-widest mb-3">Pro</div>
-              <div className="flex items-baseline gap-2">
-                <div className="text-5xl font-extrabold text-white mb-1">$29<span className="text-lg font-normal text-slate-500">/mo</span></div>
-                <div className="text-xs text-slate-500 line-through">$49</div>
-              </div>
-              <div className="inline-flex items-center gap-1 bg-violet-500/25 border border-violet-400/30 text-violet-300 text-xs font-bold px-2.5 py-1 rounded-full mt-2">💬 13,000 msg/mo</div>
-              <p className="text-slate-300 text-sm mt-2">For growing stores that want maximum sales</p>
-            </div>
-            <div className="space-y-3 text-left mb-8 flex-1">
-              {["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","🛒 Abandoned cart recovery","📊 Monthly performance report","🔥 Smart AI model routing","🚀 Priority 24hr support","🎯 Upsell & cross-sell AI"].map((f, i) => (
-                <div key={f} className={`flex items-center gap-3 text-sm ${i === 0 ? "text-violet-300 font-semibold" : "text-slate-300"}`}>
-                  <Icon path={icons.check} size={14} className="text-violet-400 flex-shrink-0" />{f}
+                <div className="space-y-3 text-left mb-8 flex-1">
+                  {plan.features.map((feature) => (
+                    <div key={feature} className="flex items-center gap-3 text-sm text-slate-300">
+                      <Icon path={icons.check} size={14} className={cx("flex-shrink-0", checkTone)} />
+                      {feature}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <Btn onClick={onStart} className="w-full justify-center text-base py-4">Get Pro — $29/month</Btn>
-            <p className="text-xs text-slate-500 mt-3">No contracts · 14-day money back guarantee</p>
-          </Card>
-          {/* ENTERPRISE */}
-          <Card className="p-8 relative overflow-hidden flex flex-col border-yellow-500/40" style={{background:'linear-gradient(135deg,rgba(234,179,8,0.12),rgba(251,146,60,0.06))'}}>
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-t-2xl" />
-            <div className="absolute top-4 right-4">
-              <div className="inline-flex items-center gap-1 bg-yellow-500/20 border border-yellow-400/40 text-yellow-200 text-xs font-bold px-2.5 py-1 rounded-full">👑 Unlimited</div>
-            </div>
-            <div className="mb-6">
-              <div className="text-xs font-bold text-yellow-400 uppercase tracking-widest mb-3">Enterprise</div>
-              <div className="text-5xl font-extrabold text-white mb-1">$49<span className="text-lg font-normal text-slate-500">/mo</span></div>
-              <div className="inline-flex items-center gap-1 bg-yellow-500/20 border border-yellow-400/30 text-yellow-300 text-xs font-bold px-2.5 py-1 rounded-full mt-2">💬 Unlimited messages</div>
-              <p className="text-slate-300 text-sm mt-2">For high-volume stores with no limits</p>
-            </div>
-            <div className="space-y-3 text-left mb-8 flex-1">
-              {["✅ Everything in Pro","💬 Unlimited messages/month","🧠 Unlimited memory","🎯 Custom AI personality","🔥 Best AI models","📊 Monthly performance report","👑 Dedicated account manager","📞 Phone & priority support"].map((f, i) => (
-                <div key={f} className={`flex items-center gap-3 text-sm ${i === 0 ? "text-yellow-300 font-semibold" : "text-slate-300"}`}>
-                  <Icon path={icons.check} size={14} className="text-yellow-400 flex-shrink-0" />{f}
-                </div>
-              ))}
-            </div>
-            <Btn onClick={onStart} className="w-full justify-center text-base py-4" style={{background:'linear-gradient(135deg,#d97706,#ea580c)'}}>Get Enterprise — $49/month</Btn>
-            <p className="text-xs text-slate-500 mt-3">No contracts · 14-day money back guarantee</p>
-          </Card>
+                <Btn onClick={onStart} variant={plan.color === "slate" ? "ghost" : "primary"} className={cx("w-full justify-center text-base py-4", plan.color === "gold" ? "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 shadow-yellow-500/20" : "")}>Start Trial - ${price}/{pricingCycle === "yearly" ? "mo billed yearly" : "month"}</Btn>
+                <p className="text-xs text-slate-500 mt-3">No contracts. Cancel anytime.</p>
+              </Card>
+            );
+          })}
         </div>
         <div className="mt-8 p-4 rounded-xl bg-violet-500/8 border border-violet-500/20 max-w-2xl mx-auto">
-          <p className="text-sm text-slate-300">💡 <strong className="text-white">Most store owners choose Pro</strong> — the abandoned cart recovery alone typically recovers <strong className="text-violet-300">$200-500/month</strong> in lost sales, making it pay for itself instantly.</p>
+          <p className="text-sm text-slate-300">Most store owners choose <strong className="text-white">Pro</strong>. It balances product cards, memory, and reporting without jumping to Enterprise.</p>
         </div>
-      </section>
-
-      {/* ── FAQ ── */}
-      <section id="faq-section" className="relative z-10 max-w-3xl mx-auto px-6 pb-24">
+      </section><section id="faq-section" className="relative z-10 max-w-3xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 font-medium mb-4">FAQ</div>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Frequently Asked Questions</h2>
@@ -1132,70 +1156,49 @@ function LandingPage({ onStart, onLogin }) {
       </footer>
 
       {/* ── PRICING MODAL ── */}
-      {pricingOpen && (
+            {pricingOpen && (
         <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.85)',display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}}>
           <div style={{background:'#0f0f18',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'20px',padding:'32px',width:'100%',maxWidth:'960px',position:'relative',maxHeight:'90vh',overflowY:'auto'}}>
-            <button style={{position:'absolute',top:'16px',right:'16px',background:'rgba(255,255,255,0.1)',border:'none',borderRadius:'50%',width:'32px',height:'32px',color:'white',fontSize:'16px',cursor:'pointer'}} onClick={() => setPricingOpen(false)}>✕</button>
+            <button style={{position:'absolute',top:'16px',right:'16px',background:'rgba(255,255,255,0.1)',border:'none',borderRadius:'50%',width:'32px',height:'32px',color:'white',fontSize:'16px',cursor:'pointer'}} onClick={() => setPricingOpen(false)}>?</button>
             <h3 style={{color:'white',fontSize:'22px',fontWeight:'800',textAlign:'center',marginBottom:'6px'}}>Choose Your Plan</h3>
-            <p style={{color:'#64748b',fontSize:'13px',textAlign:'center',marginBottom:'24px'}}>No contracts · Cancel anytime</p>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'16px'}}>
-              {/* STARTER */}
-              <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'16px',padding:'24px'}}>
-                <div style={{fontSize:'11px',fontWeight:'700',color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px'}}>Starter</div>
-                <div style={{fontSize:'36px',fontWeight:'800',color:'white',marginBottom:'4px'}}>$19<span style={{fontSize:'14px',fontWeight:'400',color:'#64748b'}}>/mo</span></div>
-                <div style={{display:'inline-flex',alignItems:'center',background:'rgba(100,116,139,0.2)',border:'1px solid rgba(100,116,139,0.3)',borderRadius:'99px',padding:'2px 10px',fontSize:'11px',fontWeight:'700',color:'#94a3b8',marginBottom:'8px'}}>💬 5,000 msg/mo</div>
-                <p style={{color:'#64748b',fontSize:'12px',marginBottom:'16px'}}>Perfect for small stores</p>
-                <div style={{marginBottom:'20px'}}>
-                  {["🤖 AI Chat Agent 24/7","💬 5,000 messages/month","📦 Live product data & recommendations","🧠 Memory — last 20 messages","❓ FAQ automation","🛍️ Shopify & WooCommerce","⚡ 1–2 day setup","🔒 Secure encryption"].map(f => (
-                    <div key={f} style={{display:'flex',alignItems:'center',gap:'8px',color:'#cbd5e1',fontSize:'12px',marginBottom:'8px'}}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>{f}
-                    </div>
-                  ))}
-                </div>
-                <button onClick={() => { setPricingOpen(false); onStart(); }} style={{width:'100%',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.2)',borderRadius:'10px',padding:'11px',color:'white',fontSize:'13px',fontWeight:'700',cursor:'pointer'}}>Get Starter — $19/mo</button>
+            <p style={{color:'#64748b',fontSize:'13px',textAlign:'center',marginBottom:'16px'}}>No contracts ? Cancel anytime</p>
+            <div style={{display:'flex',justifyContent:'center',marginBottom:'24px'}}>
+              <div style={{display:'inline-flex',padding:'4px',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.1)',background:'rgba(255,255,255,0.05)'}}>
+                <button onClick={() => setPricingCycle('monthly')} style={{border:'none',borderRadius:'12px',padding:'10px 16px',background: pricingCycle === 'monthly' ? '#7c3aed' : 'transparent',color:'white',fontSize:'13px',fontWeight:'700',cursor:'pointer'}}>Monthly</button>
+                <button onClick={() => setPricingCycle('yearly')} style={{border:'none',borderRadius:'12px',padding:'10px 16px',background: pricingCycle === 'yearly' ? '#7c3aed' : 'transparent',color:'white',fontSize:'13px',fontWeight:'700',cursor:'pointer'}}>Yearly</button>
               </div>
-              {/* PRO */}
-              <div style={{background:'linear-gradient(135deg,rgba(124,58,237,0.2),rgba(168,85,247,0.1))',border:'1px solid rgba(139,92,246,0.5)',borderRadius:'16px',padding:'24px',position:'relative'}}>
-                <div style={{position:'absolute',top:'-10px',left:'50%',transform:'translateX(-50%)',background:'linear-gradient(135deg,#7c3aed,#a855f7)',borderRadius:'99px',padding:'3px 12px',fontSize:'10px',fontWeight:'800',color:'white',whiteSpace:'nowrap'}}>⭐ MOST POPULAR</div>
-                <div style={{fontSize:'11px',fontWeight:'700',color:'#a78bfa',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px'}}>Pro</div>
-                <div style={{display:'flex',alignItems:'baseline',gap:'8px',marginBottom:'4px'}}>
-                  <div style={{fontSize:'36px',fontWeight:'800',color:'white'}}>$29<span style={{fontSize:'14px',fontWeight:'400',color:'#64748b'}}>/mo</span></div>
-                  <div style={{fontSize:'12px',color:'#64748b',textDecoration:'line-through'}}>$49</div>
-                </div>
-                <div style={{display:'inline-flex',alignItems:'center',background:'rgba(139,92,246,0.2)',border:'1px solid rgba(139,92,246,0.3)',borderRadius:'99px',padding:'2px 10px',fontSize:'11px',fontWeight:'700',color:'#c4b5fd',marginBottom:'8px'}}>💬 13,000 msg/mo</div>
-                <p style={{color:'#c4b5fd',fontSize:'12px',marginBottom:'16px'}}>For stores that want max sales</p>
-                <div style={{marginBottom:'20px'}}>
-                  {["✅ Everything in Starter","💬 13,000 messages/month","🧠 Full conversation memory","🛒 Abandoned cart recovery","📊 Monthly report","🎯 Upsell & cross-sell AI","🔥 Smart AI model routing","🚀 Priority 24hr support"].map((f, i) => (
-                    <div key={f} style={{display:'flex',alignItems:'center',gap:'8px',color: i===0 ? '#c4b5fd' : '#cbd5e1',fontSize:'12px',marginBottom:'8px',fontWeight: i===0 ? '600' : '400'}}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>{f}
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:'16px'}}>
+              {pricingPlans.map((plan) => {
+                const price = pricingCycle === 'yearly' ? plan.yearly : plan.monthly;
+                const savings = Math.max(0, Math.round(((plan.monthly - plan.yearly) / plan.monthly) * 100));
+                const border = plan.color === 'violet' ? '1px solid rgba(139,92,246,0.5)' : plan.color === 'gold' ? '1px solid rgba(234,179,8,0.4)' : '1px solid rgba(255,255,255,0.1)';
+                const background = plan.color === 'violet' ? 'linear-gradient(135deg,rgba(124,58,237,0.2),rgba(168,85,247,0.1))' : plan.color === 'gold' ? 'linear-gradient(135deg,rgba(234,179,8,0.15),rgba(251,146,60,0.08))' : 'rgba(255,255,255,0.03)';
+                const accent = plan.color === 'violet' ? '#c4b5fd' : plan.color === 'gold' ? '#fde68a' : '#cbd5e1';
+                const stroke = plan.color === 'violet' ? '#a78bfa' : plan.color === 'gold' ? '#fbbf24' : '#10b981';
+                return (
+                  <div key={plan.id} style={{background, border, borderRadius:'16px', padding:'24px', position:'relative'}}>
+                    {plan.badge ? <div style={{position:'absolute',top:'-10px',left:'50%',transform:'translateX(-50%)',background: plan.color === 'gold' ? 'linear-gradient(135deg,#d97706,#ea580c)' : 'linear-gradient(135deg,#7c3aed,#a855f7)',borderRadius:'99px',padding:'3px 12px',fontSize:'10px',fontWeight:'800',color:'white',whiteSpace:'nowrap'}}>{plan.badge.toUpperCase()}</div> : null}
+                    <div style={{fontSize:'11px',fontWeight:'700',color: accent,textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px'}}>{plan.name}</div>
+                    <div style={{fontSize:'36px',fontWeight:'800',color:'white',marginBottom:'4px'}}>${price}<span style={{fontSize:'14px',fontWeight:'400',color:'#64748b'}}>{pricingCycle === 'yearly' ? '/mo billed yearly' : '/mo'}</span></div>
+                    {pricingCycle === 'yearly' ? <div style={{display:'inline-flex',alignItems:'center',background:'rgba(16,185,129,0.12)',border:'1px solid rgba(16,185,129,0.25)',borderRadius:'99px',padding:'2px 10px',fontSize:'11px',fontWeight:'700',color:'#6ee7b7',marginBottom:'8px'}}>Save {savings}%</div> : null}
+                    <div style={{display:'inline-flex',alignItems:'center',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'99px',padding:'2px 10px',fontSize:'11px',fontWeight:'700',color:accent,marginBottom:'8px'}}>{plan.messages}</div>
+                    <p style={{color:accent,fontSize:'12px',marginBottom:'16px'}}>{plan.description}</p>
+                    <div style={{marginBottom:'20px'}}>
+                      {plan.features.map((f, i) => (
+                        <div key={f} style={{display:'flex',alignItems:'center',gap:'8px',color: i === 0 && plan.color !== 'slate' ? accent : '#cbd5e1',fontSize:'12px',marginBottom:'8px',fontWeight: i === 0 && plan.color !== 'slate' ? '600' : '400'}}>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>{f}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                <button onClick={() => { setPricingOpen(false); onStart(); }} style={{width:'100%',background:'linear-gradient(135deg,#7c3aed,#a855f7)',border:'none',borderRadius:'10px',padding:'11px',color:'white',fontSize:'13px',fontWeight:'700',cursor:'pointer'}}>Get Pro — $49/mo</button>
-              </div>
-              {/* ENTERPRISE */}
-              <div style={{background:'linear-gradient(135deg,rgba(234,179,8,0.15),rgba(251,146,60,0.08))',border:'1px solid rgba(234,179,8,0.4)',borderRadius:'16px',padding:'24px',position:'relative'}}>
-                <div style={{position:'absolute',top:'-10px',left:'50%',transform:'translateX(-50%)',background:'linear-gradient(135deg,#d97706,#ea580c)',borderRadius:'99px',padding:'3px 12px',fontSize:'10px',fontWeight:'800',color:'white',whiteSpace:'nowrap'}}>👑 UNLIMITED</div>
-                <div style={{fontSize:'11px',fontWeight:'700',color:'#fbbf24',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px'}}>Enterprise</div>
-                <div style={{fontSize:'36px',fontWeight:'800',color:'white',marginBottom:'4px'}}>$49<span style={{fontSize:'14px',fontWeight:'400',color:'#64748b'}}>/mo</span></div>
-                <div style={{display:'inline-flex',alignItems:'center',background:'rgba(234,179,8,0.15)',border:'1px solid rgba(234,179,8,0.3)',borderRadius:'99px',padding:'2px 10px',fontSize:'11px',fontWeight:'700',color:'#fde68a',marginBottom:'8px'}}>💬 Unlimited msg/mo</div>
-                <p style={{color:'#fde68a',fontSize:'12px',marginBottom:'16px'}}>For high-volume stores</p>
-                <div style={{marginBottom:'20px'}}>
-                  {["✅ Everything in Pro","💬 Unlimited messages","🧠 Unlimited memory","🎯 Custom AI personality","🔥 Best AI models","📊 Monthly performance report","👑 Dedicated account manager","📞 Phone & priority support"].map((f, i) => (
-                    <div key={f} style={{display:'flex',alignItems:'center',gap:'8px',color: i===0 ? '#fde68a' : '#cbd5e1',fontSize:'12px',marginBottom:'8px',fontWeight: i===0 ? '600' : '400'}}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>{f}
-                    </div>
-                  ))}
-                </div>
-                <button onClick={() => { setPricingOpen(false); onStart(); }} style={{width:'100%',background:'linear-gradient(135deg,#d97706,#ea580c)',border:'none',borderRadius:'10px',padding:'11px',color:'white',fontSize:'13px',fontWeight:'700',cursor:'pointer'}}>Get Enterprise — $79/mo</button>
-              </div>
+                    <button onClick={() => { setPricingOpen(false); onStart(); }} style={{width:'100%',background: plan.color === 'gold' ? 'linear-gradient(135deg,#d97706,#ea580c)' : plan.color === 'violet' ? 'linear-gradient(135deg,#7c3aed,#a855f7)' : 'rgba(255,255,255,0.08)',border: plan.color === 'slate' ? '1px solid rgba(255,255,255,0.2)' : 'none',borderRadius:'10px',padding:'11px',color:'white',fontSize:'13px',fontWeight:'700',cursor:'pointer'}}>Start Trial - ${price}{pricingCycle === 'yearly' ? '/mo billed yearly' : '/mo'}</button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
-      )}
-
-      {/* ── DEMO MODAL ── */}
-      {demoOpen && (
+      )}{demoOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" onClick={() => setDemoOpen(false)}>
           <div className="relative w-full max-w-5xl h-[85vh] rounded-2xl overflow-hidden border border-white/10" onClick={e => e.stopPropagation()}>
             <button onClick={() => setDemoOpen(false)} className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-black/80 flex items-center justify-center text-white text-lg border border-white/20">✕</button>
@@ -1402,7 +1405,7 @@ export default function App() {
             <div className="flex items-center gap-2 mb-10">
               <div className="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center"><Icon path={icons.bot} size={14} className="text-white" /></div>
               <span className="font-bold text-white">AgentComerce</span>
-              <button onClick={() => setShowFlow(false)} className="ml-auto text-xs text-slate-500 hover:text-white transition-colors">? Back to home</button>
+              <button onClick={() => setShowFlow(false)} className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:border-white/20 hover:text-white"><Icon path={icons.arrowL} size={12} /> Back to Home</button>
             </div>
             <Progress step={step} />
             <Card className="p-6 sm:p-8">
@@ -1426,5 +1429,8 @@ export default function App() {
     </div>
   );
 }
+
+
+
 
 
