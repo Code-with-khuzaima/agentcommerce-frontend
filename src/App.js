@@ -206,6 +206,7 @@ function StepPlan({ data, setData, onNext }) {
     { id: "pro", name: "Pro", monthly: 29, yearly: 25, desc: "Product cards, memory, and stronger sales automation.", color: "violet", badge: "Most Popular", features: ["Everything in Starter", "13,000 messages", "Product cards", "Memory", "Some reports"] },
     { id: "enterprise", name: "Enterprise", monthly: 49, yearly: 35, desc: "Advanced analytics, reports, and full support.", color: "slatePro", badge: "Best Value", features: ["Everything in Pro", "Advanced analytics", "Advanced reports", "Full support"] },
   ];
+  const maxSavings = Math.max(...plans.map((plan) => Math.max(0, Math.round(((plan.monthly - plan.yearly) / plan.monthly) * 100))));
 
   return (
     <div className="flex flex-col gap-6">
@@ -214,9 +215,17 @@ function StepPlan({ data, setData, onNext }) {
         <p className="text-slate-400 text-sm">Start with a 1 Month Free Trial. Monthly keeps the current rate. Yearly lowers the monthly equivalent.</p>
       </div>
       <div className="flex justify-center">
-        <div className="inline-flex rounded-2xl border border-white/10 bg-white/5 p-1">
+        <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-1">
           <button onClick={() => setData((d) => ({ ...d, billingCycle: "monthly" }))} className={cx("rounded-xl px-4 py-2 text-sm font-semibold transition-colors", billingCycle === "monthly" ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white")}>Monthly</button>
           <button onClick={() => setData((d) => ({ ...d, billingCycle: "yearly" }))} className={cx("rounded-xl px-4 py-2 text-sm font-semibold transition-colors", billingCycle === "yearly" ? "bg-violet-600 text-white" : "text-slate-400 hover:text-white")}>Yearly</button>
+          <div className="hidden sm:inline-flex items-center rounded-xl border border-emerald-400/20 bg-emerald-500/12 px-3 py-2 text-xs font-semibold text-emerald-300">
+            Save up to {maxSavings}%
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-center sm:hidden">
+        <div className="inline-flex items-center rounded-xl border border-emerald-400/20 bg-emerald-500/12 px-3 py-2 text-xs font-semibold text-emerald-300">
+          Save up to {maxSavings}% on yearly
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -231,7 +240,7 @@ function StepPlan({ data, setData, onNext }) {
                 <span className="text-4xl font-extrabold text-white">${price}</span>
                 <span className="text-sm text-slate-500">/{billingCycle === "yearly" ? "mo billed yearly" : "mo"}</span>
               </div>
-              {billingCycle === "yearly" ? <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-sky-500/25 bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-200">Yearly savings: {savings}%</div> : null}
+              {billingCycle === "yearly" ? <div className="mb-3 inline-flex items-center border-l-2 border-emerald-400 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-200">Save {savings}% with yearly billing</div> : null}
               <p className="mb-4 text-xs text-slate-400">{plan.desc}</p>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-xs text-violet-200">1 Month Free Trial</div>
               <div className="space-y-2">
