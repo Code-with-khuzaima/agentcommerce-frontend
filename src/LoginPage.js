@@ -130,7 +130,7 @@ export default function LoginPage({ onLogin, onBack }) {
           </button>
 
           <h1 className="text-xl font-bold text-white mb-1">Welcome back</h1>
-          <p className="text-sm text-slate-400 mb-6">Sign in to your client dashboard</p>
+          <p className="text-sm text-slate-400 mb-6">Sign in to your dashboard</p>
 
           {error && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm mb-5">
