@@ -148,6 +148,10 @@ export default function AdminDashboard() {
   const [success, setSuccess] = useState("");
   const [logMessage, setLogMessage] = useState("");
   const [activityFilter, setActivityFilter] = useState("all");
+  const [accountEmail, setAccountEmail] = useState("");
+  const [accountLookup, setAccountLookup] = useState(null);
+  const [accountLoading, setAccountLoading] = useState(false);
+  const [tempPassword, setTempPassword] = useState("");
 
   function handleLogout() {
     clearAdminSession();
@@ -158,10 +162,13 @@ export default function AdminDashboard() {
   async function openStore(id) {
     setSelectedId(id);
     setError("");
+    setTempPassword("");
     try {
       const detail = await apiGet(`/admin/stores/${id}`);
       setSelectedStore(detail.store);
       setForm(mapForm(detail.store));
+      setAccountEmail(detail.store?.loginEmail || "");
+      setAccountLookup(null);
     } catch (err) {
       setError(err.message || "Failed to load store.");
     }
@@ -228,6 +235,53 @@ export default function AdminDashboard() {
       setError(err.message || "Failed to log activity.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function lookupClientAccount() {
+    if (!accountEmail.trim()) {
+      setError("Enter an email to check the client account.");
+      return;
+    }
+
+    setAccountLoading(true);
+    setError("");
+    setSuccess("");
+    setTempPassword("");
+    try {
+      const result = await apiGet(`/admin/client-user?email=${encodeURIComponent(accountEmail.trim().toLowerCase())}`);
+      setAccountLookup(result);
+      if (!result.exists) {
+        setSuccess("No client account found for that email.");
+      }
+    } catch (err) {
+      setError(err.message || "Failed to look up client account.");
+    } finally {
+      setAccountLoading(false);
+    }
+  }
+
+  async function resetClientPassword() {
+    if (!accountEmail.trim()) {
+      setError("Enter an email first.");
+      return;
+    }
+
+    setAccountLoading(true);
+    setError("");
+    setSuccess("");
+    setTempPassword("");
+    try {
+      const result = await apiPost("/admin/client-user/reset-password", {
+        email: accountEmail.trim().toLowerCase(),
+      });
+      setTempPassword(result.temporaryPassword || "");
+      setSuccess("Temporary password generated.");
+      await lookupClientAccount();
+    } catch (err) {
+      setError(err.message || "Failed to reset client password.");
+    } finally {
+      setAccountLoading(false);
     }
   }
 
@@ -482,6 +536,53 @@ export default function AdminDashboard() {
                         </div>
                       </SectionCard>
                     </div>
+
+                    <SectionCard title="Client access" description="Check whether a dashboard login exists for an email and generate a temporary password if needed.">
+                      <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto]">
+                        <InputField label="Client Email" value={accountEmail} onChange={setAccountEmail} placeholder="client@store.com" />
+                        <div className="flex items-end">
+                          <button onClick={lookupClientAccount} disabled={accountLoading} className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
+                            {accountLoading ? "Checking..." : "Check Account"}
+                          </button>
+                        </div>
+                        <div className="flex items-end">
+                          <button onClick={resetClientPassword} disabled={accountLoading} className="w-full rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
+                            Generate Temp Password
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="mt-5 grid gap-4 xl:grid-cols-2">
+                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Account Status</div>
+                          {!accountLookup ? <div className="mt-2 text-sm text-slate-400">No lookup yet.</div> : null}
+                          {accountLookup && !accountLookup.exists ? <div className="mt-2 text-sm text-amber-300">No client account found for this email.</div> : null}
+                          {accountLookup?.exists ? (
+                            <div className="mt-3 space-y-2 text-sm text-slate-300">
+                              <div><span className="text-slate-500">Email:</span> {accountLookup.user?.email}</div>
+                              <div><span className="text-slate-500">Store ID:</span> {accountLookup.user?.store_id}</div>
+                              <div><span className="text-slate-500">Active:</span> {accountLookup.user?.is_active ? "Yes" : "No"}</div>
+                              <div><span className="text-slate-500">Created:</span> {formatDate(accountLookup.user?.created_at)}</div>
+                              {accountLookup.store ? (
+                                <div><span className="text-slate-500">Store:</span> {accountLookup.store.storeName} ({accountLookup.store.storeId})</div>
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </div>
+
+                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Temporary Password</div>
+                          {tempPassword ? (
+                            <div className="mt-3">
+                              <div className="rounded-xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 font-mono text-sm text-violet-100">{tempPassword}</div>
+                              <p className="mt-3 text-xs text-slate-400">This replaces the old password. Copy it and send it to the client manually.</p>
+                            </div>
+                          ) : (
+                            <div className="mt-2 text-sm text-slate-400">No temporary password generated yet.</div>
+                          )}
+                        </div>
+                      </div>
+                    </SectionCard>
 
                     <div className="flex flex-col gap-4 rounded-[28px] border border-slate-800 bg-slate-950/70 p-5 xl:flex-row xl:items-center xl:justify-between">
                       <div className="text-sm text-slate-400">Last active: {formatDate(selectedStore.lastActiveAt)} · Last synced: {formatDate(selectedStore.lastSyncedAt)}</div>
