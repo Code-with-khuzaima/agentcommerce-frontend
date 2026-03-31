@@ -80,7 +80,7 @@ export default function LoginPage({ onLogin, onBack }) {
 
     try {
       const res = await apiForgotPassword(forgotEmail.trim().toLowerCase());
-      setForgotNotice(res.message || "Temporary password sent to your email.");
+      setForgotNotice(res.message || "Our team checks if your email exists. If it exists, we send a password reset email to your inbox.");
     } catch (err) {
       setForgotError(err.message || "Failed to process forgot password request.");
     } finally {
@@ -212,7 +212,7 @@ export default function LoginPage({ onLogin, onBack }) {
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-lg font-bold text-white">Forgot Password</h2>
-                <p className="mt-1 text-sm text-slate-400">Enter your dashboard email. If it exists, a temporary password will be sent to your email.</p>
+                <p className="mt-1 text-sm text-slate-400">Enter your dashboard email. Our team checks if your email exists. If it exists, we send a password reset email to your inbox.</p>
               </div>
               <button
                 onClick={() => {
