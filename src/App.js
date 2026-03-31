@@ -1159,9 +1159,9 @@ function LandingPage({ onStart, onLogin }) {
             {pricingOpen && (
         <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.85)',display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}}>
           <div style={{background:'#0f0f18',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'20px',padding:'32px',width:'100%',maxWidth:'960px',position:'relative',maxHeight:'90vh',overflowY:'auto'}}>
-            <button style={{position:'absolute',top:'16px',right:'16px',background:'rgba(255,255,255,0.1)',border:'none',borderRadius:'50%',width:'32px',height:'32px',color:'white',fontSize:'16px',cursor:'pointer'}} onClick={() => setPricingOpen(false)}>?</button>
+            <button style={{position:'absolute',top:'16px',right:'16px',display:'inline-flex',alignItems:'center',gap:'6px',background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'999px',padding:'8px 12px',color:'#cbd5e1',fontSize:'12px',fontWeight:'600',cursor:'pointer'}} onClick={() => setPricingOpen(false)}><Icon path={icons.arrowL} size={12} /> Back to Home</button>
             <h3 style={{color:'white',fontSize:'22px',fontWeight:'800',textAlign:'center',marginBottom:'6px'}}>Choose Your Plan</h3>
-            <p style={{color:'#64748b',fontSize:'13px',textAlign:'center',marginBottom:'16px'}}>No contracts ? Cancel anytime</p>
+            <p style={{color:'#64748b',fontSize:'13px',textAlign:'center',marginBottom:'16px'}}>No contracts. Cancel anytime.</p>
             <div style={{display:'flex',justifyContent:'center',marginBottom:'24px'}}>
               <div style={{display:'inline-flex',padding:'4px',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.1)',background:'rgba(255,255,255,0.05)'}}>
                 <button onClick={() => setPricingCycle('monthly')} style={{border:'none',borderRadius:'12px',padding:'10px 16px',background: pricingCycle === 'monthly' ? '#7c3aed' : 'transparent',color:'white',fontSize:'13px',fontWeight:'700',cursor:'pointer'}}>Monthly</button>
