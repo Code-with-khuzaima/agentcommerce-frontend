@@ -204,7 +204,7 @@ function StepPlan({ data, setData, onNext }) {
   const plans = [
     { id: "starter", name: "Starter", monthly: 19, yearly: 15, desc: "Chat-only assistant for stores getting started.", color: "slate", features: ["AI chat assistant", "5,000 messages", "Basic store details", "Email support"] },
     { id: "pro", name: "Pro", monthly: 29, yearly: 25, desc: "Product cards, memory, and stronger sales automation.", color: "violet", badge: "Most Popular", features: ["Everything in Starter", "13,000 messages", "Product cards", "Memory", "Some reports"] },
-    { id: "enterprise", name: "Enterprise", monthly: 49, yearly: 35, desc: "Advanced analytics, reports, and full support.", color: "gold", badge: "Best Value", features: ["Everything in Pro", "Advanced analytics", "Advanced reports", "Full support"] },
+    { id: "enterprise", name: "Enterprise", monthly: 49, yearly: 35, desc: "Advanced analytics, reports, and full support.", color: "slatePro", badge: "Best Value", features: ["Everything in Pro", "Advanced analytics", "Advanced reports", "Full support"] },
   ];
 
   return (
@@ -224,25 +224,25 @@ function StepPlan({ data, setData, onNext }) {
           const price = billingCycle === "yearly" ? plan.yearly : plan.monthly;
           const savings = Math.max(0, Math.round(((plan.monthly - plan.yearly) / plan.monthly) * 100));
           return (
-            <button key={plan.id} onClick={() => { setData((d) => ({ ...d, plan: plan.id })); setError(""); }} className={cx("relative rounded-2xl border p-6 text-left transition-all duration-200", data.plan === plan.id ? plan.color === "violet" ? "border-violet-400/60 bg-violet-500/15" : plan.color === "gold" ? "border-yellow-400/60 bg-yellow-500/10" : "border-white/30 bg-white/8" : "border-white/10 bg-white/3 hover:border-white/25")}>
-              {plan.badge ? <div className={cx("absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold text-white", plan.color === "gold" ? "bg-gradient-to-r from-yellow-500 to-orange-400" : "bg-gradient-to-r from-violet-600 to-fuchsia-500")}>{plan.badge}</div> : null}
-              <div className={cx("mb-2 text-xs font-bold uppercase tracking-widest", plan.color === "violet" ? "text-violet-400" : plan.color === "gold" ? "text-yellow-400" : "text-slate-400")}>{plan.name}</div>
+            <button key={plan.id} onClick={() => { setData((d) => ({ ...d, plan: plan.id })); setError(""); }} className={cx("relative rounded-2xl border p-6 text-left transition-all duration-200", data.plan === plan.id ? plan.color === "violet" ? "border-violet-400/60 bg-violet-500/15" : plan.color === "slatePro" ? "border-slate-400/50 bg-slate-500/10" : "border-white/30 bg-white/8" : "border-white/10 bg-white/3 hover:border-white/25")}>
+              {plan.badge ? <div className={cx("absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border px-3 py-1 text-xs font-semibold", plan.color === "slatePro" ? "border-slate-500/40 bg-slate-800 text-slate-200" : "border-violet-500/40 bg-violet-950 text-violet-200")}>{plan.badge}</div> : null}
+              <div className={cx("mb-2 text-xs font-bold uppercase tracking-widest", plan.color === "violet" ? "text-violet-400" : plan.color === "slatePro" ? "text-slate-300" : "text-slate-400")}>{plan.name}</div>
               <div className="mb-1 flex items-baseline gap-2">
                 <span className="text-4xl font-extrabold text-white">${price}</span>
                 <span className="text-sm text-slate-500">/{billingCycle === "yearly" ? "mo billed yearly" : "mo"}</span>
               </div>
-              {billingCycle === "yearly" ? <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">Save {savings}%</div> : null}
+              {billingCycle === "yearly" ? <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-sky-500/25 bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-200">Yearly savings: {savings}%</div> : null}
               <p className="mb-4 text-xs text-slate-400">{plan.desc}</p>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-xs text-violet-200">1 Month Free Trial</div>
               <div className="space-y-2">
                 {plan.features.map((feature) => (
                   <div key={feature} className="flex items-center gap-2 text-xs text-slate-300">
-                    <Icon path={icons.check} size={11} className={plan.color === "gold" ? "text-yellow-400" : plan.color === "violet" ? "text-violet-400" : "text-emerald-400"} />
+                    <Icon path={icons.check} size={11} className={plan.color === "slatePro" ? "text-slate-300" : plan.color === "violet" ? "text-violet-400" : "text-emerald-400"} />
                     {feature}
                   </div>
                 ))}
               </div>
-              {data.plan === plan.id ? <div className={cx("mt-4 flex items-center gap-1.5 text-xs font-bold", plan.color === "gold" ? "text-yellow-300" : plan.color === "violet" ? "text-violet-300" : "text-white")}><Icon path={icons.check} size={12} /> Selected</div> : null}
+              {data.plan === plan.id ? <div className={cx("mt-4 flex items-center gap-1.5 text-xs font-bold", plan.color === "slatePro" ? "text-slate-200" : plan.color === "violet" ? "text-violet-300" : "text-white")}><Icon path={icons.check} size={12} /> Selected</div> : null}
             </button>
           );
         })}
