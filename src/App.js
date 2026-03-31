@@ -185,7 +185,7 @@ const CATEGORY_OPTIONS = ["Clothing & Apparel", "Electronics", "Home & Garden", 
 const PHONE_VALIDATION_REGEX = /^[+\d][\d\s().-]{6,}$/;
 const EMAILJS_SERVICE_ID = "service_26d0u9m";
 const EMAILJS_PUBLIC_KEY = "Nvak4g2MT8AuvKpb6";
-const EMAILJS_CONTACT_TEMPLATE_ID = "template_contact_request";
+const EMAILJS_CONTACT_TEMPLATE_ID = "template_3s3hffj";
 
 function MultiSelect({ options, selected, onChange }) {
   const toggle = (o) => onChange(selected.includes(o) ? selected.filter(x => x !== o) : [...selected, o]);
