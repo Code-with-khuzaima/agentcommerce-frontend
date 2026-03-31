@@ -919,17 +919,7 @@ function LandingPage({ onStart, onLogin }) {
             <button onClick={() => document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' })} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">FAQ</button>
             <button onClick={() => setContactOpen(true)} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">Contact</button>
             <Btn onClick={onLogin} className="px-4 py-2 text-sm sm:px-5">Login</Btn>
-            <div className="relative">
-              <button
-                onClick={onStart}
-                className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-violet-500 hover:shadow-violet-500/40 sm:px-5"
-              >
-                Start Trial
-              </button>
-              <div className="absolute -right-2 -top-2 border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-300">
-                1 Month Free Trial
-              </div>
-            </div>
+            <Btn onClick={onStart} className="px-4 py-2 text-sm sm:px-5">Start 1 Month Free Trial</Btn>
           </div>
         </div>
       </nav>
