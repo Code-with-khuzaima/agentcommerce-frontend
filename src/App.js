@@ -881,15 +881,29 @@ function LandingPage({ onStart, onLogin }) {
 
   const handleContactSubmit = () => {
     if (!contactForm.name || !contactForm.email || !contactForm.message) return;
+    const formattedMessage = [
+      "CONTACT FORM MESSAGE",
+      "",
+      `Name: ${contactForm.name}`,
+      `Email: ${contactForm.email}`,
+      "",
+      "Message:",
+      contactForm.message,
+    ].join("\n");
     window.emailjs.send(
       "service_26d0u9m",
       "template_3s3hffj",
       { 
         title: "Contact Form Message",
-        from_name: contactForm.name, 
-        from_email: contactForm.email, 
-        message: contactForm.message,
-        name: contactForm.name
+        subject: "Contact Form Message",
+        from_name: contactForm.name,
+        name: contactForm.name,
+        from_email: contactForm.email,
+        email: contactForm.email,
+        reply_to: contactForm.email,
+        message: formattedMessage,
+        content: formattedMessage,
+        details: formattedMessage,
       },
       "Nvak4g2MT8AuvKpb6"
     ).then(() => {
