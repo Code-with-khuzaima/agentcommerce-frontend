@@ -1,6 +1,6 @@
 // LoginPage.js
 import React, { useState } from "react";
-import { apiForgotPassword, apiLogin } from "./api";
+import { apiLogin } from "./api";
 
 const Icon = ({ path, size = 20, className = "" }) => (
   <svg
@@ -33,6 +33,7 @@ export default function LoginPage({ onLogin, onBack }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotMessage, setForgotMessage] = useState("I forgot my password. Please help me recover my dashboard access.");
   const [forgotOpen, setForgotOpen] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -74,15 +75,31 @@ export default function LoginPage({ onLogin, onBack }) {
       return;
     }
 
+    if (!forgotMessage.trim()) {
+      setForgotError("Enter your message.");
+      return;
+    }
+
     setForgotLoading(true);
     setForgotError("");
     setForgotNotice("");
 
     try {
-      const res = await apiForgotPassword(forgotEmail.trim().toLowerCase());
-      setForgotNotice(res.message || "Our team checks if your email exists. If it exists, we send a password reset email to your inbox.");
+      await window.emailjs.send(
+        "service_26d0u9m",
+        "template_3s3hffj",
+        {
+          title: "Forgot Password Request",
+          from_name: "Dashboard User",
+          from_email: forgotEmail.trim().toLowerCase(),
+          message: `${forgotMessage.trim()}\n\nDashboard email: ${forgotEmail.trim().toLowerCase()}`,
+          name: "Dashboard User",
+        },
+        "Nvak4g2MT8AuvKpb6"
+      );
+      setForgotNotice("Your forgot password request has been sent. Check your email after our team reviews it.");
     } catch (err) {
-      setForgotError(err.message || "Failed to process forgot password request.");
+      setForgotError("Failed to send request. Please email us directly at agentcomrce@gmail.com");
     } finally {
       setForgotLoading(false);
     }
@@ -181,6 +198,7 @@ export default function LoginPage({ onLogin, onBack }) {
               onClick={() => {
                 setForgotOpen(true);
                 setForgotEmail(email || "");
+                setForgotMessage("I forgot my password. Please help me recover my dashboard access.");
                 setForgotError("");
                 setForgotNotice("");
               }}
@@ -212,7 +230,7 @@ export default function LoginPage({ onLogin, onBack }) {
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-lg font-bold text-white">Forgot Password</h2>
-                <p className="mt-1 text-sm text-slate-400">Enter your dashboard email. Our team checks if your email exists. If it exists, we send a password reset email to your inbox.</p>
+                <p className="mt-1 text-sm text-slate-400">Send us your dashboard email and message. We receive the request and follow up by email.</p>
               </div>
               <button
                 onClick={() => {
@@ -254,6 +272,16 @@ export default function LoginPage({ onLogin, onBack }) {
                   className="w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/60"
                 />
               </div>
+            </div>
+
+            <div className="mt-4">
+              <label className="mb-1.5 block text-xs font-medium text-slate-400">Message</label>
+              <textarea
+                rows={4}
+                value={forgotMessage}
+                onChange={e => setForgotMessage(e.target.value)}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/60"
+              />
             </div>
 
             <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
