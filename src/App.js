@@ -233,8 +233,8 @@ function StepPlan({ data, setData, onNext }) {
           const price = billingCycle === "yearly" ? plan.yearly : plan.monthly;
           const savings = Math.max(0, Math.round(((plan.monthly - plan.yearly) / plan.monthly) * 100));
           return (
-            <button key={plan.id} onClick={() => { setData((d) => ({ ...d, plan: plan.id })); setError(""); }} className={cx("relative rounded-2xl border p-6 text-left transition-all duration-200", data.plan === plan.id ? plan.color === "violet" ? "border-violet-400/60 bg-violet-500/15" : plan.color === "slatePro" ? "border-slate-400/50 bg-slate-500/10" : "border-white/30 bg-white/8" : "border-white/10 bg-white/3 hover:border-white/25")}>
-              {plan.badge ? <div className={cx("absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border px-3 py-1 text-xs font-semibold", plan.color === "slatePro" ? "border-slate-500/40 bg-slate-800 text-slate-200" : "border-violet-500/40 bg-violet-950 text-violet-200")}>{plan.badge}</div> : null}
+            <button key={plan.id} onClick={() => { setData((d) => ({ ...d, plan: plan.id })); setError(""); }} className={cx("relative rounded-2xl border p-6 pt-8 text-left transition-all duration-200", data.plan === plan.id ? plan.color === "violet" ? "border-violet-400/60 bg-violet-500/15" : plan.color === "slatePro" ? "border-slate-400/50 bg-slate-500/10" : "border-white/30 bg-white/8" : "border-white/10 bg-white/3 hover:border-white/25")}>
+              {plan.badge ? <div className={cx("absolute left-5 top-0 border-b border-x px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]", plan.color === "slatePro" ? "border-slate-500/40 bg-slate-800 text-slate-200" : "border-violet-500/40 bg-violet-950 text-violet-200")}>{plan.badge}</div> : null}
               <div className={cx("mb-2 text-xs font-bold uppercase tracking-widest", plan.color === "violet" ? "text-violet-400" : plan.color === "slatePro" ? "text-slate-300" : "text-slate-400")}>{plan.name}</div>
               <div className="mb-1 flex items-baseline gap-2">
                 <span className="text-4xl font-extrabold text-white">${price}</span>
@@ -242,7 +242,7 @@ function StepPlan({ data, setData, onNext }) {
               </div>
               {billingCycle === "yearly" ? <div className="mb-3 inline-flex items-center border-l-2 border-emerald-400 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-200">Save {savings}% with yearly billing</div> : null}
               <p className="mb-4 text-xs text-slate-400">{plan.desc}</p>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-xs text-violet-200">1 Month Free Trial</div>
+              <div className="mb-4 inline-flex items-center border-l-2 border-violet-400 bg-violet-500/10 px-3 py-2 text-xs font-semibold text-violet-200">1 Month Free Trial</div>
               <div className="space-y-2">
                 {plan.features.map((feature) => (
                   <div key={feature} className="flex items-center gap-2 text-xs text-slate-300">
