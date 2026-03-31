@@ -185,7 +185,7 @@ const CATEGORY_OPTIONS = ["Clothing & Apparel", "Electronics", "Home & Garden", 
 const PHONE_VALIDATION_REGEX = /^[+\d][\d\s().-]{6,}$/;
 const EMAILJS_SERVICE_ID = "service_26d0u9m";
 const EMAILJS_PUBLIC_KEY = "Nvak4g2MT8AuvKpb6";
-const EMAILJS_CONTACT_TEMPLATE_ID = "template_3s3hffj";
+const EMAILJS_CONTACT_TEMPLATE_ID = "template_contact_request";
 
 function MultiSelect({ options, selected, onChange }) {
   const toggle = (o) => onChange(selected.includes(o) ? selected.filter(x => x !== o) : [...selected, o]);
@@ -884,29 +884,16 @@ function LandingPage({ onStart, onLogin }) {
 
   const handleContactSubmit = () => {
     if (!contactForm.name || !contactForm.email || !contactForm.message) return;
-    const formattedMessage = [
-      "CONTACT FORM MESSAGE",
-      "",
-      `Name: ${contactForm.name}`,
-      `Email: ${contactForm.email}`,
-      "",
-      "Message:",
-      contactForm.message,
-    ].join("\n");
     window.emailjs.send(
       EMAILJS_SERVICE_ID,
       EMAILJS_CONTACT_TEMPLATE_ID,
-      { 
+      {
         title: "Contact Form Message",
         subject: "Contact Form Message",
         from_name: contactForm.name,
-        name: contactForm.name,
         from_email: contactForm.email,
-        email: contactForm.email,
         reply_to: contactForm.email,
-        message: formattedMessage,
-        content: formattedMessage,
-        details: formattedMessage,
+        message: contactForm.message,
       },
       EMAILJS_PUBLIC_KEY
     ).then(() => {

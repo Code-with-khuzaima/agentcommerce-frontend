@@ -89,15 +89,6 @@ export default function LoginPage({ onLogin, onBack }) {
     setForgotNotice("");
 
     try {
-      const formattedMessage = [
-        "FORGOT PASSWORD REQUEST",
-        "",
-        `Dashboard Email: ${forgotEmail.trim().toLowerCase()}`,
-        "",
-        "Message:",
-        forgotMessage.trim(),
-      ].join("\n");
-
       await window.emailjs.send(
         EMAILJS_SERVICE_ID,
         EMAILJS_FORGOT_TEMPLATE_ID,
@@ -105,13 +96,9 @@ export default function LoginPage({ onLogin, onBack }) {
           title: "Forgot Password Request",
           subject: "Forgot Password Request",
           from_name: "Dashboard User",
-          name: "Dashboard User",
           from_email: forgotEmail.trim().toLowerCase(),
-          email: forgotEmail.trim().toLowerCase(),
           reply_to: forgotEmail.trim().toLowerCase(),
-          message: formattedMessage,
-          content: formattedMessage,
-          details: formattedMessage,
+          message: forgotMessage.trim(),
         },
         EMAILJS_PUBLIC_KEY
       );
