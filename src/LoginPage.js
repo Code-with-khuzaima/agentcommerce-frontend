@@ -32,11 +32,15 @@ const icons = {
 export default function LoginPage({ onLogin, onBack }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotOpen, setForgotOpen] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [forgotError, setForgotError] = useState("");
+  const [forgotNotice, setForgotNotice] = useState("");
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -65,20 +69,20 @@ export default function LoginPage({ onLogin, onBack }) {
   };
 
   const handleForgotPassword = async () => {
-    if (!email.trim()) {
-      setError("Enter your email first.");
+    if (!forgotEmail.trim()) {
+      setForgotError("Enter your email address.");
       return;
     }
 
     setForgotLoading(true);
-    setError("");
-    setNotice("");
+    setForgotError("");
+    setForgotNotice("");
 
     try {
-      const res = await apiForgotPassword(email.trim().toLowerCase());
-      setNotice(res.message || "If the email exists, reset details have been sent.");
+      const res = await apiForgotPassword(forgotEmail.trim().toLowerCase());
+      setForgotNotice(res.message || "Temporary password sent to your email.");
     } catch (err) {
-      setError(err.message || "Failed to process forgot password request.");
+      setForgotError(err.message || "Failed to process forgot password request.");
     } finally {
       setForgotLoading(false);
     }
@@ -174,11 +178,15 @@ export default function LoginPage({ onLogin, onBack }) {
             </button>
 
             <button
-              onClick={handleForgotPassword}
-              disabled={forgotLoading}
+              onClick={() => {
+                setForgotOpen(true);
+                setForgotEmail(email || "");
+                setForgotError("");
+                setForgotNotice("");
+              }}
               className="w-full rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-slate-300 transition-colors hover:border-violet-500/30 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {forgotLoading ? "Sending..." : "Forgot Password?"}
+              Forgot Password?
             </button>
           </div>
 
@@ -197,6 +205,80 @@ export default function LoginPage({ onLogin, onBack }) {
           </a>
         </p>
       </div>
+
+      {forgotOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-white">Forgot Password</h2>
+                <p className="mt-1 text-sm text-slate-400">Enter your dashboard email. If it exists, a temporary password will be sent to your email.</p>
+              </div>
+              <button
+                onClick={() => {
+                  setForgotOpen(false);
+                  setForgotLoading(false);
+                  setForgotError("");
+                  setForgotNotice("");
+                }}
+                className="text-sm font-medium text-slate-500 transition-colors hover:text-white"
+              >
+                Close
+              </button>
+            </div>
+
+            {forgotError && (
+              <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
+                <Icon path={icons.info} size={14} className="shrink-0" />
+                {forgotError}
+              </div>
+            )}
+
+            {forgotNotice && (
+              <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-300">
+                <Icon path={icons.info} size={14} className="shrink-0" />
+                {forgotNotice}
+              </div>
+            )}
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-slate-400">Email address</label>
+              <div className="relative">
+                <Icon path={icons.mail} size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" />
+                <input
+                  type="email"
+                  value={forgotEmail}
+                  onChange={e => setForgotEmail(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && handleForgotPassword()}
+                  placeholder="you@store.com"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/60"
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                onClick={() => {
+                  setForgotOpen(false);
+                  setForgotLoading(false);
+                  setForgotError("");
+                  setForgotNotice("");
+                }}
+                className="rounded-xl border border-white/10 px-4 py-3 text-sm font-medium text-slate-300 transition-colors hover:border-white/20 hover:text-white"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleForgotPassword}
+                disabled={forgotLoading}
+                className="rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {forgotLoading ? "Sending..." : "Send Password"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
