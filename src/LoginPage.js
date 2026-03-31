@@ -2,6 +2,10 @@
 import React, { useState } from "react";
 import { apiLogin } from "./api";
 
+const EMAILJS_SERVICE_ID = "service_26d0u9m";
+const EMAILJS_PUBLIC_KEY = "Nvak4g2MT8AuvKpb6";
+const EMAILJS_FORGOT_TEMPLATE_ID = "template_forgot_password";
+
 const Icon = ({ path, size = 20, className = "" }) => (
   <svg
     width={size}
@@ -95,8 +99,8 @@ export default function LoginPage({ onLogin, onBack }) {
       ].join("\n");
 
       await window.emailjs.send(
-        "service_26d0u9m",
-        "template_3s3hffj",
+        EMAILJS_SERVICE_ID,
+        EMAILJS_FORGOT_TEMPLATE_ID,
         {
           title: "Forgot Password Request",
           subject: "Forgot Password Request",
@@ -109,7 +113,7 @@ export default function LoginPage({ onLogin, onBack }) {
           content: formattedMessage,
           details: formattedMessage,
         },
-        "Nvak4g2MT8AuvKpb6"
+        EMAILJS_PUBLIC_KEY
       );
       setForgotNotice("Your forgot password request has been sent. Check your email after our team reviews it.");
     } catch (err) {

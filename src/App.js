@@ -183,6 +183,9 @@ function Textarea({ id, placeholder, value, onChange, rows = 3 }) {
 const DELIVERY_OPTIONS = ["Standard Shipping", "Express Shipping", "Same-Day Delivery", "Click & Collect", "Free Shipping"];
 const CATEGORY_OPTIONS = ["Clothing & Apparel", "Electronics", "Home & Garden", "Beauty & Health", "Sports & Outdoors", "Food & Beverage", "Toys & Games", "Books & Media", "Jewelry & Accessories", "Other"];
 const PHONE_VALIDATION_REGEX = /^[+\d][\d\s().-]{6,}$/;
+const EMAILJS_SERVICE_ID = "service_26d0u9m";
+const EMAILJS_PUBLIC_KEY = "Nvak4g2MT8AuvKpb6";
+const EMAILJS_CONTACT_TEMPLATE_ID = "template_3s3hffj";
 
 function MultiSelect({ options, selected, onChange }) {
   const toggle = (o) => onChange(selected.includes(o) ? selected.filter(x => x !== o) : [...selected, o]);
@@ -891,8 +894,8 @@ function LandingPage({ onStart, onLogin }) {
       contactForm.message,
     ].join("\n");
     window.emailjs.send(
-      "service_26d0u9m",
-      "template_3s3hffj",
+      EMAILJS_SERVICE_ID,
+      EMAILJS_CONTACT_TEMPLATE_ID,
       { 
         title: "Contact Form Message",
         subject: "Contact Form Message",
@@ -905,7 +908,7 @@ function LandingPage({ onStart, onLogin }) {
         content: formattedMessage,
         details: formattedMessage,
       },
-      "Nvak4g2MT8AuvKpb6"
+      EMAILJS_PUBLIC_KEY
     ).then(() => {
       setContactSent(true);
       setTimeout(() => { setContactOpen(false); setContactSent(false); setContactForm({ name: "", email: "", message: "" }); }, 3000);
