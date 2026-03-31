@@ -756,7 +756,7 @@ function Step4({ data, setData, onBack }) {
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
         <div className="mb-4">
           <h3 className="text-base font-bold text-white">Dashboard Login Credentials</h3>
-          <p className="text-sm text-slate-400 mt-1">These credentials are for the customer dashboard only. They are separate from your store API credentials.</p>
+          <p className="text-sm text-slate-400 mt-1">This is the email and password you will use to log in to your dashboard, where you can see usage, monitor activity, and manage your store.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Email *" id="loginEmail">
