@@ -182,6 +182,7 @@ function Textarea({ id, placeholder, value, onChange, rows = 3 }) {
 
 const DELIVERY_OPTIONS = ["Standard Shipping", "Express Shipping", "Same-Day Delivery", "Click & Collect", "Free Shipping"];
 const CATEGORY_OPTIONS = ["Clothing & Apparel", "Electronics", "Home & Garden", "Beauty & Health", "Sports & Outdoors", "Food & Beverage", "Toys & Games", "Books & Media", "Jewelry & Accessories", "Other"];
+const PHONE_VALIDATION_REGEX = /^[+\d][\d\s().-]{6,}$/;
 
 function MultiSelect({ options, selected, onChange }) {
   const toggle = (o) => onChange(selected.includes(o) ? selected.filter(x => x !== o) : [...selected, o]);
@@ -467,6 +468,7 @@ function Step3({ data, setData, onNext, onBack }) {
     if (!data.storeContactEmail?.trim()) e.storeContactEmail = "Store contact email is required";
     else if (!/\S+@\S+\.\S+/.test(data.storeContactEmail)) e.storeContactEmail = "Invalid email";
     if (!data.phoneNumber?.trim()) e.phoneNumber = "Phone number is required";
+    else if (!PHONE_VALIDATION_REGEX.test(data.phoneNumber.trim())) e.phoneNumber = "Enter a valid phone number";
     if (!data.categories?.length) e.categories = "Please select at least one category";
     if (!data.deliveryMethods?.length) e.deliveryMethods = "Please select at least one delivery method";
     if (!data.returnPolicy?.trim()) e.returnPolicy = "Return/refund policy is required";
@@ -618,6 +620,8 @@ function Step4({ data, setData, onBack }) {
   const handleSubmit = async () => {
     if (!data.storeName?.trim()) return setError("Store name is required before submitting.");
     if (!data.storeContactEmail?.trim()) return setError("Store contact email is required before submitting.");
+    if (!data.phoneNumber?.trim()) return setError("Phone number is required before submitting.");
+    if (!PHONE_VALIDATION_REGEX.test(data.phoneNumber.trim())) return setError("Enter a valid phone number in Store Info before submitting.");
     if (!data.loginEmail?.trim()) return setError("Dashboard login email is required before submitting.");
     if (!/\S+@\S+\.\S+/.test(data.loginEmail)) return setError("Enter a valid dashboard login email.");
     if (!data.accountPassword?.trim()) return setError("Dashboard password is required before submitting.");
