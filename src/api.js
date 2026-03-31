@@ -30,7 +30,15 @@ async function request(path, options = {}) {
   const data = await parseJsonSafe(res);
 
   if (!res.ok) {
-    throw new Error(data.message || "Request failed");
+    const firstError = Array.isArray(data.errors) && data.errors.length ? data.errors[0] : null;
+    const field = firstError?.path || firstError?.param;
+    const message = firstError?.msg && firstError.msg !== "Invalid value"
+      ? firstError.msg
+      : field
+        ? `Invalid value for ${field}`
+        : (data.message || "Request failed");
+
+    throw new Error(message);
   }
 
   return data;
