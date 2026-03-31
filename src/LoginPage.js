@@ -5,7 +5,6 @@ import { apiLogin } from "./api";
 const EMAILJS_SERVICE_ID = "service_26d0u9m";
 const EMAILJS_PUBLIC_KEY = "Nvak4g2MT8AuvKpb6";
 const EMAILJS_FORGOT_TEMPLATE_ID = "template_3s3hffj";
-
 const Icon = ({ path, size = 20, className = "" }) => (
   <svg
     width={size}
