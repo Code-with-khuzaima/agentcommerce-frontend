@@ -26,6 +26,7 @@ const icons = {
   eyeOff: "M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24 M1 1l22 22",
   info: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z M12 8h.01 M12 12v4",
   arrow: "M5 12h14 M12 5l7 7-7 7",
+  arrowL: "M19 12H5 M12 19l-7-7 7-7",
 };
 
 export default function LoginPage({ onLogin, onBack }) {
@@ -99,6 +100,14 @@ export default function LoginPage({ onLogin, onBack }) {
         </div>
 
         <div className="bg-slate-900 border border-white/8 rounded-2xl p-8">
+          <button
+            onClick={onBack}
+            className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition-colors hover:text-white"
+          >
+            <Icon path={icons.arrowL} size={15} />
+            Back to Home
+          </button>
+
           <h1 className="text-xl font-bold text-white mb-1">Welcome back</h1>
           <p className="text-sm text-slate-400 mb-6">Sign in to your client dashboard</p>
 
