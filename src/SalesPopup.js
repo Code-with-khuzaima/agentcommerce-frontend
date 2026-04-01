@@ -1,26 +1,19 @@
-// ─────────────────────────────────────────────────────────────
-// SalesPopup.js — Drop this file in your /src folder
-// Then import and add <SalesPopup /> anywhere inside your App
-// It auto-shows after 8 seconds on first visit (once per session)
-// ─────────────────────────────────────────────────────────────
-
 import { useEffect, useState } from "react";
 
-const PDF_URL = "https://your-cdn.com/AI_Chatbot_Sales_Research.pdf";
-// ↑ Upload the PDF to your Vercel /public folder and update this URL
+const PDF_URL = "/AI_Chatbot_Sales_Research.pdf";
 
 const STATS = [
-  { value: "67%", label: "Average sales increase", color: "#a855f7" },
-  { value: "40%", label: "Less cart abandonment", color: "#06d6a0" },
-  { value: "3×", label: "Higher conversion rate", color: "#f59e0b" },
-  { value: "24/7", label: "Automated support", color: "#38bdf8" },
+  { value: "67%", label: "Revenue lift seen in early AI-assisted stores" },
+  { value: "40%", label: "Cart abandonment recovery from live engagement" },
+  { value: "3x", label: "Higher conversion than stores without guided chat" },
+  { value: "24/7", label: "Coverage without adding manual support hours" },
 ];
 
 const FACTS = [
-  { icon: "📈", text: "AI chatbots recover up to 40% of abandoned carts through real-time engagement" },
-  { icon: "💰", text: "Stores using AI chat report 25–67% revenue growth within the first 60 days" },
-  { icon: "⚡", text: "Sales-focused chatbots achieve 12.3% conversion vs 3.1% without — that's 3× more sales" },
-  { icon: "🛒", text: "Average order value increases 10–25% through AI-powered upsells and recommendations" },
+  "AI chat can recover abandoned carts by answering objections before the visitor leaves.",
+  "Guided recommendations improve conversion when shoppers are comparing similar products.",
+  "Fast answers on shipping, returns, and sizing remove friction at the point of purchase.",
+  "A well-configured assistant increases response coverage without forcing the store owner online.",
 ];
 
 export default function SalesPopup({ enabled = true }) {
@@ -42,13 +35,14 @@ export default function SalesPopup({ enabled = true }) {
     return () => clearInterval(timer);
   }, [enabled]);
 
-  // Auto-rotate facts every 3 seconds
   useEffect(() => {
-    if (!visible) return;
-    const interval = setInterval(() => {
-      setActiveFact((f) => (f + 1) % FACTS.length);
-    }, 3000);
-    return () => clearInterval(interval);
+    if (!visible) return undefined;
+
+    const rotation = setInterval(() => {
+      setActiveFact((current) => (current + 1) % FACTS.length);
+    }, 4000);
+
+    return () => clearInterval(rotation);
   }, [visible]);
 
   const handleClose = () => {
@@ -56,7 +50,7 @@ export default function SalesPopup({ enabled = true }) {
     setTimeout(() => {
       setVisible(false);
       setClosing(false);
-    }, 300);
+    }, 220);
   };
 
   if (!visible) return null;
@@ -65,270 +59,339 @@ export default function SalesPopup({ enabled = true }) {
     <>
       <style>{`
         @keyframes ac-popup-in {
-          from { opacity: 0; transform: scale(0.92) translateY(20px); }
-          to   { opacity: 1; transform: scale(1)    translateY(0); }
+          from { opacity: 0; transform: translateY(20px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes ac-popup-out {
-          from { opacity: 1; transform: scale(1)    translateY(0); }
-          to   { opacity: 0; transform: scale(0.92) translateY(20px); }
+          from { opacity: 1; transform: translateY(0) scale(1); }
+          to { opacity: 0; transform: translateY(14px) scale(0.98); }
         }
-        @keyframes ac-shimmer {
-          0%   { background-position: -400px 0; }
-          100% { background-position: 400px 0; }
-        }
-        @keyframes ac-pulse-ring {
-          0%   { transform: scale(1);   opacity: 0.6; }
-          100% { transform: scale(1.5); opacity: 0; }
-        }
-        @keyframes ac-fact-in {
-          from { opacity: 0; transform: translateX(12px); }
-          to   { opacity: 1; transform: translateX(0); }
+        @keyframes ac-fact-fade {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         .ac-popup-overlay {
-          position: fixed; inset: 0; z-index: 9999;
-          background: rgba(0,0,0,0.65);
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+          background: rgba(2, 6, 23, 0.76);
           backdrop-filter: blur(6px);
-          display: flex; align-items: center; justify-content: center;
-          padding: 16px;
         }
         .ac-popup-box {
-          background: #0f0a1e;
-          border: 1px solid rgba(168,85,247,0.3);
-          border-radius: 20px;
-          width: 100%; max-width: 520px;
-          box-shadow: 0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6);
-          animation: ac-popup-in 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+          width: 100%;
+          max-width: 720px;
+          border: 1px solid rgba(148, 163, 184, 0.18);
+          border-radius: 22px;
           overflow: hidden;
-          position: relative;
+          background:
+            linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(7, 12, 26, 0.98));
+          box-shadow: 0 26px 80px rgba(2, 6, 23, 0.58);
+          animation: ac-popup-in 0.28s ease forwards;
         }
         .ac-popup-box.closing {
-          animation: ac-popup-out 0.3s ease forwards;
-        }
-        .ac-glow-top {
-          position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
-          width: 300px; height: 100px;
-          background: radial-gradient(ellipse at center, rgba(168,85,247,0.4) 0%, transparent 70%);
-          pointer-events: none;
+          animation: ac-popup-out 0.22s ease forwards;
         }
         .ac-header {
-          background: linear-gradient(135deg, #1a0533 0%, #0f0a1e 60%);
-          padding: 20px 24px 16px;
-          border-bottom: 1px solid rgba(168,85,247,0.2);
           position: relative;
+          padding: 34px 36px 28px;
+          border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+          background:
+            radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 34%),
+            radial-gradient(circle at top left, rgba(16, 185, 129, 0.10), transparent 36%);
         }
-        .ac-badge {
-          display: inline-flex; align-items: center; gap: 6px;
-          background: rgba(168,85,247,0.15);
-          border: 1px solid rgba(168,85,247,0.4);
+        .ac-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          padding: 6px 10px;
           border-radius: 999px;
-          padding: 4px 12px;
-          font-size: 11px; font-weight: 700;
-          color: #c084fc; letter-spacing: 0.04em;
-          margin-bottom: 10px;
-        }
-        .ac-badge-dot {
-          width: 6px; height: 6px; border-radius: 50%;
-          background: #a855f7; position: relative;
-        }
-        .ac-badge-dot::after {
-          content: ''; position: absolute; inset: -3px;
-          border-radius: 50%; background: #a855f7;
-          animation: ac-pulse-ring 1.5s ease-out infinite;
+          background: rgba(59, 130, 246, 0.12);
+          border: 1px solid rgba(59, 130, 246, 0.22);
+          color: #93c5fd;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
         }
         .ac-title {
-          font-size: 22px; font-weight: 800;
-          color: #fff; line-height: 1.25;
-          font-family: 'DM Sans', system-ui, sans-serif;
-          margin: 0 0 4px;
+          margin: 16px 0 10px;
+          color: #f8fafc;
+          font-size: 34px;
+          line-height: 1.08;
+          font-weight: 800;
+          max-width: 560px;
         }
-        .ac-title span { color: #a855f7; }
+        .ac-title-accent {
+          color: #c4b5fd;
+        }
         .ac-subtitle {
-          font-size: 13px; color: #94a3b8; margin: 0;
-          font-family: 'DM Sans', system-ui, sans-serif;
+          margin: 0;
+          max-width: 560px;
+          color: #94a3b8;
+          font-size: 15px;
+          line-height: 1.75;
         }
         .ac-close {
-          position: absolute; top: 16px; right: 16px;
-          width: 28px; height: 28px; border-radius: 8px;
-          background: rgba(255,255,255,0.06);
-          border: 1px solid rgba(255,255,255,0.1);
-          color: #94a3b8; font-size: 14px; cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          transition: all 0.15s;
+          position: absolute;
+          top: 22px;
+          right: 22px;
+          width: 38px;
+          height: 38px;
+          border: 1px solid rgba(148, 163, 184, 0.18);
+          border-radius: 10px;
+          background: rgba(15, 23, 42, 0.78);
+          color: #cbd5e1;
+          font-size: 18px;
+          cursor: pointer;
         }
-        .ac-close:hover { background: rgba(255,255,255,0.12); color: white; }
+        .ac-close:hover {
+          background: rgba(30, 41, 59, 0.96);
+        }
+        .ac-body {
+          padding: 30px 36px 36px;
+        }
         .ac-stats-grid {
-          display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
-          gap: 1px; background: rgba(255,255,255,0.06);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+          margin-bottom: 22px;
         }
         .ac-stat {
-          background: #0f0a1e;
-          padding: 14px 8px; text-align: center;
+          padding: 18px 18px 16px;
+          border: 1px solid rgba(148, 163, 184, 0.12);
+          border-radius: 16px;
+          background: rgba(15, 23, 42, 0.62);
         }
-        .ac-stat-val {
-          font-size: 22px; font-weight: 800;
-          font-family: 'DM Sans', system-ui, sans-serif;
+        .ac-stat-value {
+          color: #f8fafc;
+          font-size: 28px;
           line-height: 1;
+          font-weight: 800;
+          margin-bottom: 10px;
         }
-        .ac-stat-lbl {
-          font-size: 10px; color: #64748b; margin-top: 3px;
-          font-family: 'DM Sans', system-ui, sans-serif;
-          line-height: 1.3;
+        .ac-stat-label {
+          color: #94a3b8;
+          font-size: 13px;
+          line-height: 1.6;
         }
-        .ac-body { padding: 16px 24px 20px; }
         .ac-fact-box {
-          background: rgba(168,85,247,0.06);
-          border: 1px solid rgba(168,85,247,0.2);
-          border-radius: 12px;
-          padding: 12px 14px;
-          margin-bottom: 14px;
-          min-height: 52px;
-          display: flex; align-items: center; gap: 10px;
+          padding: 22px 22px 18px;
+          border: 1px solid rgba(59, 130, 246, 0.16);
+          border-radius: 18px;
+          background:
+            linear-gradient(180deg, rgba(30, 41, 59, 0.48), rgba(15, 23, 42, 0.68));
+          margin-bottom: 22px;
         }
-        .ac-fact-icon { font-size: 20px; flex-shrink: 0; }
+        .ac-fact-label {
+          color: #93c5fd;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin-bottom: 12px;
+        }
         .ac-fact-text {
-          font-size: 13px; color: #cbd5e1; line-height: 1.5;
-          font-family: 'DM Sans', system-ui, sans-serif;
-          animation: ac-fact-in 0.3s ease forwards;
+          margin: 0;
+          color: #e2e8f0;
+          font-size: 15px;
+          line-height: 1.8;
+          animation: ac-fact-fade 0.22s ease;
         }
         .ac-dots {
-          display: flex; gap: 5px; justify-content: center; margin-bottom: 14px;
+          display: flex;
+          gap: 8px;
+          margin-top: 16px;
         }
         .ac-dot {
-          width: 6px; height: 6px; border-radius: 50%;
-          background: rgba(168,85,247,0.25); transition: all 0.2s;
+          width: 10px;
+          height: 10px;
+          border: 0;
+          border-radius: 999px;
+          background: rgba(148, 163, 184, 0.28);
           cursor: pointer;
         }
-        .ac-dot.active { background: #a855f7; width: 18px; border-radius: 3px; }
+        .ac-dot.active {
+          width: 28px;
+          background: #60a5fa;
+        }
+        .ac-actions {
+          display: grid;
+          grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+          gap: 16px;
+          align-items: stretch;
+        }
         .ac-pdf-row {
-          display: flex; align-items: center; gap: 12px;
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 12px;
-          padding: 12px 14px;
-          margin-bottom: 14px;
+          display: block;
+          border: 1px solid rgba(148, 163, 184, 0.14);
+          border-radius: 18px;
+          padding: 18px 18px 20px;
+          background: rgba(15, 23, 42, 0.62);
           text-decoration: none;
-          transition: all 0.2s;
-          cursor: pointer;
         }
-        .ac-pdf-row:hover {
-          border-color: rgba(168,85,247,0.4);
-          background: rgba(168,85,247,0.06);
+        .ac-pdf-kicker {
+          color: #fca5a5;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin-bottom: 10px;
         }
-        .ac-pdf-icon {
-          width: 36px; height: 36px; border-radius: 8px;
-          background: linear-gradient(135deg, #dc2626, #ef4444);
-          display: flex; align-items: center; justify-content: center;
-          font-size: 16px; flex-shrink: 0;
-        }
-        .ac-pdf-info { flex: 1; }
         .ac-pdf-name {
-          font-size: 12px; font-weight: 700; color: #e2e8f0;
-          font-family: 'DM Sans', system-ui, sans-serif;
+          color: #f8fafc;
+          font-size: 18px;
+          font-weight: 700;
+          line-height: 1.45;
+          margin-bottom: 8px;
         }
         .ac-pdf-desc {
-          font-size: 11px; color: #64748b; margin-top: 1px;
-          font-family: 'DM Sans', system-ui, sans-serif;
+          color: #94a3b8;
+          font-size: 13px;
+          line-height: 1.7;
+          margin-bottom: 14px;
         }
-        .ac-pdf-arrow {
-          color: #a855f7; font-size: 16px; flex-shrink: 0;
+        .ac-pdf-meta {
+          color: #cbd5e1;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+        }
+        .ac-cta-panel {
+          border: 1px solid rgba(148, 163, 184, 0.14);
+          border-radius: 18px;
+          padding: 18px;
+          background: rgba(15, 23, 42, 0.62);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+        .ac-cta-title {
+          color: #f8fafc;
+          font-size: 17px;
+          font-weight: 700;
+          line-height: 1.5;
+          margin: 0 0 8px;
+        }
+        .ac-cta-copy {
+          color: #94a3b8;
+          font-size: 13px;
+          line-height: 1.7;
+          margin: 0 0 18px;
         }
         .ac-cta-btn {
-          width: 100%; padding: 13px;
-          background: linear-gradient(135deg, #7c3aed, #a855f7);
-          border: none; border-radius: 12px;
-          color: white; font-size: 14px; font-weight: 700;
-          font-family: 'DM Sans', system-ui, sans-serif;
-          cursor: pointer; transition: all 0.2s;
-          box-shadow: 0 4px 20px rgba(124,58,237,0.35);
-        }
-        .ac-cta-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 28px rgba(124,58,237,0.5);
+          width: 100%;
+          padding: 14px 16px;
+          border: 0;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #2563eb, #7c3aed);
+          color: #ffffff;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
         }
         .ac-footer {
-          font-size: 11px; color: #475569; text-align: center;
-          margin-top: 10px;
-          font-family: 'DM Sans', system-ui, sans-serif;
+          margin-top: 18px;
+          color: #64748b;
+          font-size: 12px;
+          line-height: 1.7;
+          text-align: center;
         }
-        @media (max-width: 480px) {
-          .ac-title { font-size: 18px; }
-          .ac-stat-val { font-size: 18px; }
-          .ac-stats-grid { grid-template-columns: 1fr 1fr; }
+        @media (max-width: 720px) {
+          .ac-popup-overlay {
+            padding: 14px;
+          }
+          .ac-header {
+            padding: 26px 20px 22px;
+          }
+          .ac-body {
+            padding: 22px 20px 24px;
+          }
+          .ac-title {
+            font-size: 26px;
+            max-width: none;
+          }
+          .ac-subtitle {
+            max-width: none;
+          }
+          .ac-stats-grid,
+          .ac-actions {
+            grid-template-columns: 1fr;
+          }
         }
       `}</style>
 
-      <div className="ac-popup-overlay" onClick={(e) => e.target === e.currentTarget && handleClose()}>
+      <div className="ac-popup-overlay" onClick={(event) => event.target === event.currentTarget && handleClose()}>
         <div className={`ac-popup-box${closing ? " closing" : ""}`}>
-          <div className="ac-glow-top" />
-
-          {/* Header */}
           <div className="ac-header">
-            <button className="ac-close" onClick={handleClose}>✕</button>
-            <div className="ac-badge">
-              <span className="ac-badge-dot" />
-              RESEARCH INSIGHT
-            </div>
+            <button className="ac-close" onClick={handleClose} aria-label="Close popup">
+              x
+            </button>
+            <div className="ac-eyebrow">AI commerce research</div>
             <h2 className="ac-title">
-              Did you know AI chatbots<br />
-              increase sales by <span>up to 67%</span>?
+              See the numbers behind <span className="ac-title-accent">AI-assisted sales growth</span>
             </h2>
             <p className="ac-subtitle">
-              Here's what the data says about AI agents on e-commerce stores
+              This short report explains where AI chat improves conversion, reduces drop-off, and gives
+              online stores better coverage without adding manual support load.
             </p>
           </div>
 
-          {/* Stats */}
-          <div className="ac-stats-grid">
-            {STATS.map((s) => (
-              <div className="ac-stat" key={s.value}>
-                <div className="ac-stat-val" style={{ color: s.color }}>{s.value}</div>
-                <div className="ac-stat-lbl">{s.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Body */}
           <div className="ac-body">
-            {/* Rotating fact */}
-            <div className="ac-fact-box">
-              <span className="ac-fact-icon">{FACTS[activeFact].icon}</span>
-              <p className="ac-fact-text" key={activeFact}>{FACTS[activeFact].text}</p>
-            </div>
-
-            {/* Dots */}
-            <div className="ac-dots">
-              {FACTS.map((_, i) => (
-                <div
-                  key={i}
-                  className={`ac-dot${i === activeFact ? " active" : ""}`}
-                  onClick={() => setActiveFact(i)}
-                />
+            <div className="ac-stats-grid">
+              {STATS.map((stat) => (
+                <div className="ac-stat" key={stat.value}>
+                  <div className="ac-stat-value">{stat.value}</div>
+                  <div className="ac-stat-label">{stat.label}</div>
+                </div>
               ))}
             </div>
 
-            {/* PDF Download */}
-            <a
-              href={PDF_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ac-pdf-row"
-            >
-              <div className="ac-pdf-icon">📄</div>
-              <div className="ac-pdf-info">
-                <div className="ac-pdf-name">AI Chatbot Sales Research Report — 5 Pages</div>
-                <div className="ac-pdf-desc">Full study: cart abandonment, conversion data &amp; case studies</div>
+            <div className="ac-fact-box">
+              <div className="ac-fact-label">Key finding</div>
+              <p className="ac-fact-text" key={activeFact}>
+                {FACTS[activeFact]}
+              </p>
+              <div className="ac-dots">
+                {FACTS.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className={`ac-dot${index === activeFact ? " active" : ""}`}
+                    onClick={() => setActiveFact(index)}
+                    aria-label={`Show fact ${index + 1}`}
+                  />
+                ))}
               </div>
-              <span className="ac-pdf-arrow">↓</span>
-            </a>
+            </div>
 
-            {/* CTA */}
-            <button className="ac-cta-btn" onClick={handleClose}>
-              Add AI Chat to My Store →
-            </button>
-            <p className="ac-footer">
-              No credit card required · Setup in 1–2 days · Cancel anytime
-            </p>
+            <div className="ac-actions">
+              <a href={PDF_URL} target="_blank" rel="noopener noreferrer" className="ac-pdf-row">
+                <div className="ac-pdf-kicker">Research report</div>
+                <div className="ac-pdf-name">AI Chatbot Sales Research Report</div>
+                <div className="ac-pdf-desc">
+                  Open the full PDF with conversion data, cart recovery insights, and practical implementation
+                  notes for e-commerce stores.
+                </div>
+                <div className="ac-pdf-meta">Open PDF in a new tab</div>
+              </a>
+
+              <div className="ac-cta-panel">
+                <div>
+                  <h3 className="ac-cta-title">Want this working on your store?</h3>
+                  <p className="ac-cta-copy">
+                    Start the setup flow and the team can prepare your AI sales assistant based on your store,
+                    platform, and plan.
+                  </p>
+                </div>
+                <button className="ac-cta-btn" onClick={handleClose}>
+                  Continue on site
+                </button>
+              </div>
+            </div>
+
+            <div className="ac-footer">Professional AI setup. One month free trial. Implementation in 1-2 days.</div>
           </div>
         </div>
       </div>
