@@ -4,7 +4,7 @@
 // It auto-shows after 8 seconds on first visit (once per session)
 // ─────────────────────────────────────────────────────────────
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const PDF_URL = "https://your-cdn.com/AI_Chatbot_Sales_Research.pdf";
 // ↑ Upload the PDF to your Vercel /public folder and update this URL
@@ -23,22 +23,24 @@ const FACTS = [
   { icon: "🛒", text: "Average order value increases 10–25% through AI-powered upsells and recommendations" },
 ];
 
-export default function SalesPopup() {
+export default function SalesPopup({ enabled = true }) {
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
   const [activeFact, setActiveFact] = useState(0);
 
   useEffect(() => {
-    // Only show once per session
-    if (sessionStorage.getItem("ac_popup_seen")) return;
+    if (!enabled) {
+      setVisible(false);
+      setClosing(false);
+      return undefined;
+    }
 
-    const timer = setTimeout(() => {
-      setVisible(true);
-      sessionStorage.setItem("ac_popup_seen", "1");
-    }, 8000);
+    const timer = setInterval(() => {
+      setVisible((current) => (current ? current : true));
+    }, 15000);
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => clearInterval(timer);
+  }, [enabled]);
 
   // Auto-rotate facts every 3 seconds
   useEffect(() => {

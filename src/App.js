@@ -1413,7 +1413,7 @@ export default function App() {
       `}</style>
       <ParticleBg />
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-violet-600/10 blur-3xl pointer-events-none z-0" />
-      <SalesPopup />
+      <SalesPopup enabled={!showFlow} />
 
       {!showFlow ? (
         <LandingPage onStart={() => setShowFlow(true)} onLogin={() => window.location.assign("/login")} />
