@@ -3,6 +3,7 @@ import AdminDashboard from "./AdminDashboard";
 import AdminLoginPage from "./AdminLoginPage";
 import ClientDashboard from "./ClientDashboard";
 import LoginPage from "./LoginPage";
+import SalesPopup from "./SalesPopup";
 import { apiPost } from "./api";
 
 const cx = (...args) => args.filter(Boolean).join(" ");
@@ -14,7 +15,6 @@ const Icon = ({ path, size = 20, className = "" }) => (
     <path d={path} />
   </svg>
 );
-
 const icons = {
   store:   "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z M9 22V12h6v10",
   shield:  "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
@@ -1413,6 +1413,7 @@ export default function App() {
       `}</style>
       <ParticleBg />
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-violet-600/10 blur-3xl pointer-events-none z-0" />
+      <SalesPopup />
 
       {!showFlow ? (
         <LandingPage onStart={() => setShowFlow(true)} onLogin={() => window.location.assign("/login")} />
