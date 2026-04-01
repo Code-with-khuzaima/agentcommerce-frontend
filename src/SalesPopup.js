@@ -83,7 +83,8 @@ export default function SalesPopup({ enabled = true }) {
         }
         .ac-popup-box {
           width: 100%;
-          max-width: 720px;
+          max-width: 620px;
+          max-height: min(88vh, 760px);
           border: 1px solid rgba(148, 163, 184, 0.18);
           border-radius: 22px;
           overflow: hidden;
@@ -91,17 +92,20 @@ export default function SalesPopup({ enabled = true }) {
             linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(7, 12, 26, 0.98));
           box-shadow: 0 26px 80px rgba(2, 6, 23, 0.58);
           animation: ac-popup-in 0.28s ease forwards;
+          display: flex;
+          flex-direction: column;
         }
         .ac-popup-box.closing {
           animation: ac-popup-out 0.22s ease forwards;
         }
         .ac-header {
           position: relative;
-          padding: 34px 36px 28px;
+          padding: 26px 28px 20px;
           border-bottom: 1px solid rgba(148, 163, 184, 0.12);
           background:
             radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 34%),
             radial-gradient(circle at top left, rgba(16, 185, 129, 0.10), transparent 36%);
+          flex-shrink: 0;
         }
         .ac-eyebrow {
           display: inline-flex;
@@ -119,20 +123,20 @@ export default function SalesPopup({ enabled = true }) {
         .ac-title {
           margin: 16px 0 10px;
           color: #f8fafc;
-          font-size: 34px;
-          line-height: 1.08;
+          font-size: 28px;
+          line-height: 1.12;
           font-weight: 800;
-          max-width: 560px;
+          max-width: 480px;
         }
         .ac-title-accent {
           color: #c4b5fd;
         }
         .ac-subtitle {
           margin: 0;
-          max-width: 560px;
+          max-width: 500px;
           color: #94a3b8;
-          font-size: 15px;
-          line-height: 1.75;
+          font-size: 14px;
+          line-height: 1.65;
         }
         .ac-close {
           position: absolute;
@@ -151,39 +155,40 @@ export default function SalesPopup({ enabled = true }) {
           background: rgba(30, 41, 59, 0.96);
         }
         .ac-body {
-          padding: 30px 36px 36px;
+          padding: 20px 28px 24px;
+          overflow-y: auto;
         }
         .ac-stats-grid {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 14px;
-          margin-bottom: 22px;
+          gap: 12px;
+          margin-bottom: 16px;
         }
         .ac-stat {
-          padding: 18px 18px 16px;
+          padding: 14px 14px 13px;
           border: 1px solid rgba(148, 163, 184, 0.12);
           border-radius: 16px;
           background: rgba(15, 23, 42, 0.62);
         }
         .ac-stat-value {
           color: #f8fafc;
-          font-size: 28px;
+          font-size: 24px;
           line-height: 1;
           font-weight: 800;
-          margin-bottom: 10px;
+          margin-bottom: 8px;
         }
         .ac-stat-label {
           color: #94a3b8;
-          font-size: 13px;
-          line-height: 1.6;
+          font-size: 12px;
+          line-height: 1.45;
         }
         .ac-fact-box {
-          padding: 22px 22px 18px;
+          padding: 18px 18px 16px;
           border: 1px solid rgba(59, 130, 246, 0.16);
           border-radius: 18px;
           background:
             linear-gradient(180deg, rgba(30, 41, 59, 0.48), rgba(15, 23, 42, 0.68));
-          margin-bottom: 22px;
+          margin-bottom: 16px;
         }
         .ac-fact-label {
           color: #93c5fd;
@@ -196,8 +201,8 @@ export default function SalesPopup({ enabled = true }) {
         .ac-fact-text {
           margin: 0;
           color: #e2e8f0;
-          font-size: 15px;
-          line-height: 1.8;
+          font-size: 14px;
+          line-height: 1.65;
           animation: ac-fact-fade 0.22s ease;
         }
         .ac-dots {
@@ -219,15 +224,15 @@ export default function SalesPopup({ enabled = true }) {
         }
         .ac-actions {
           display: grid;
-          grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-          gap: 16px;
+          grid-template-columns: 1fr;
+          gap: 12px;
           align-items: stretch;
         }
         .ac-pdf-row {
           display: block;
           border: 1px solid rgba(148, 163, 184, 0.14);
           border-radius: 18px;
-          padding: 18px 18px 20px;
+          padding: 16px;
           background: rgba(15, 23, 42, 0.62);
           text-decoration: none;
         }
@@ -241,16 +246,16 @@ export default function SalesPopup({ enabled = true }) {
         }
         .ac-pdf-name {
           color: #f8fafc;
-          font-size: 18px;
+          font-size: 16px;
           font-weight: 700;
           line-height: 1.45;
           margin-bottom: 8px;
         }
         .ac-pdf-desc {
           color: #94a3b8;
-          font-size: 13px;
-          line-height: 1.7;
-          margin-bottom: 14px;
+          font-size: 12px;
+          line-height: 1.6;
+          margin-bottom: 10px;
         }
         .ac-pdf-meta {
           color: #cbd5e1;
@@ -261,7 +266,7 @@ export default function SalesPopup({ enabled = true }) {
         .ac-cta-panel {
           border: 1px solid rgba(148, 163, 184, 0.14);
           border-radius: 18px;
-          padding: 18px;
+          padding: 16px;
           background: rgba(15, 23, 42, 0.62);
           display: flex;
           flex-direction: column;
@@ -269,16 +274,16 @@ export default function SalesPopup({ enabled = true }) {
         }
         .ac-cta-title {
           color: #f8fafc;
-          font-size: 17px;
+          font-size: 15px;
           font-weight: 700;
           line-height: 1.5;
           margin: 0 0 8px;
         }
         .ac-cta-copy {
           color: #94a3b8;
-          font-size: 13px;
-          line-height: 1.7;
-          margin: 0 0 18px;
+          font-size: 12px;
+          line-height: 1.6;
+          margin: 0 0 14px;
         }
         .ac-cta-btn {
           width: 100%;
@@ -292,10 +297,10 @@ export default function SalesPopup({ enabled = true }) {
           cursor: pointer;
         }
         .ac-footer {
-          margin-top: 18px;
+          margin-top: 14px;
           color: #64748b;
           font-size: 12px;
-          line-height: 1.7;
+          line-height: 1.5;
           text-align: center;
         }
         @media (max-width: 720px) {
@@ -303,13 +308,13 @@ export default function SalesPopup({ enabled = true }) {
             padding: 14px;
           }
           .ac-header {
-            padding: 26px 20px 22px;
+            padding: 22px 18px 18px;
           }
           .ac-body {
-            padding: 22px 20px 24px;
+            padding: 16px 18px 18px;
           }
           .ac-title {
-            font-size: 26px;
+            font-size: 22px;
             max-width: none;
           }
           .ac-subtitle {
