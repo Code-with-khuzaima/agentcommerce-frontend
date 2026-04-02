@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 const PDF_URL = "/AI_Chatbot_Sales_Research.pdf";
 
 const STATS = [
-  { value: "67%", label: "Revenue lift seen in early AI-assisted stores" },
-  { value: "40%", label: "Cart abandonment recovery from live engagement" },
-  { value: "3x", label: "Higher conversion than stores without guided chat" },
-  { value: "24/7", label: "Coverage without adding manual support hours" },
+  { value: "67%", label: "Sales lift" },
+  { value: "40%", label: "Cart recovery" },
+  { value: "3x", label: "Conversion gain" },
+  { value: "24/7", label: "Always on" },
 ];
 
 const FACTS = [
@@ -83,8 +83,8 @@ export default function SalesPopup({ enabled = true }) {
         }
         .ac-popup-box {
           width: 100%;
-          max-width: 620px;
-          max-height: min(88vh, 760px);
+          max-width: 560px;
+          max-height: min(84vh, 640px);
           border: 1px solid rgba(148, 163, 184, 0.18);
           border-radius: 22px;
           overflow: hidden;
@@ -100,7 +100,7 @@ export default function SalesPopup({ enabled = true }) {
         }
         .ac-header {
           position: relative;
-          padding: 26px 28px 20px;
+          padding: 20px 22px 16px;
           border-bottom: 1px solid rgba(148, 163, 184, 0.12);
           background:
             radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 34%),
@@ -123,27 +123,27 @@ export default function SalesPopup({ enabled = true }) {
         .ac-title {
           margin: 16px 0 10px;
           color: #f8fafc;
-          font-size: 28px;
+          font-size: 24px;
           line-height: 1.12;
           font-weight: 800;
-          max-width: 480px;
+          max-width: 420px;
         }
         .ac-title-accent {
           color: #c4b5fd;
         }
         .ac-subtitle {
           margin: 0;
-          max-width: 500px;
+          max-width: 430px;
           color: #94a3b8;
-          font-size: 14px;
-          line-height: 1.65;
+          font-size: 13px;
+          line-height: 1.55;
         }
         .ac-close {
           position: absolute;
-          top: 22px;
-          right: 22px;
-          width: 38px;
-          height: 38px;
+          top: 16px;
+          right: 16px;
+          width: 34px;
+          height: 34px;
           border: 1px solid rgba(148, 163, 184, 0.18);
           border-radius: 10px;
           background: rgba(15, 23, 42, 0.78);
@@ -155,40 +155,39 @@ export default function SalesPopup({ enabled = true }) {
           background: rgba(30, 41, 59, 0.96);
         }
         .ac-body {
-          padding: 20px 28px 24px;
-          overflow-y: auto;
+          padding: 14px 22px 18px;
         }
         .ac-stats-grid {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 12px;
-          margin-bottom: 16px;
+          gap: 10px;
+          margin-bottom: 12px;
         }
         .ac-stat {
-          padding: 14px 14px 13px;
+          padding: 12px 12px 10px;
           border: 1px solid rgba(148, 163, 184, 0.12);
           border-radius: 16px;
           background: rgba(15, 23, 42, 0.62);
         }
         .ac-stat-value {
           color: #f8fafc;
-          font-size: 24px;
+          font-size: 20px;
           line-height: 1;
           font-weight: 800;
-          margin-bottom: 8px;
+          margin-bottom: 6px;
         }
         .ac-stat-label {
           color: #94a3b8;
-          font-size: 12px;
-          line-height: 1.45;
+          font-size: 11px;
+          line-height: 1.35;
         }
         .ac-fact-box {
-          padding: 18px 18px 16px;
+          padding: 14px 14px 12px;
           border: 1px solid rgba(59, 130, 246, 0.16);
           border-radius: 18px;
           background:
             linear-gradient(180deg, rgba(30, 41, 59, 0.48), rgba(15, 23, 42, 0.68));
-          margin-bottom: 16px;
+          margin-bottom: 12px;
         }
         .ac-fact-label {
           color: #93c5fd;
@@ -196,19 +195,19 @@ export default function SalesPopup({ enabled = true }) {
           font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          margin-bottom: 12px;
+          margin-bottom: 8px;
         }
         .ac-fact-text {
           margin: 0;
           color: #e2e8f0;
-          font-size: 14px;
-          line-height: 1.65;
+          font-size: 13px;
+          line-height: 1.5;
           animation: ac-fact-fade 0.22s ease;
         }
         .ac-dots {
           display: flex;
           gap: 8px;
-          margin-top: 16px;
+          margin-top: 10px;
         }
         .ac-dot {
           width: 10px;
@@ -225,14 +224,14 @@ export default function SalesPopup({ enabled = true }) {
         .ac-actions {
           display: grid;
           grid-template-columns: 1fr;
-          gap: 12px;
+          gap: 10px;
           align-items: stretch;
         }
         .ac-pdf-row {
           display: block;
           border: 1px solid rgba(148, 163, 184, 0.14);
           border-radius: 18px;
-          padding: 16px;
+          padding: 14px;
           background: rgba(15, 23, 42, 0.62);
           text-decoration: none;
         }
@@ -242,20 +241,20 @@ export default function SalesPopup({ enabled = true }) {
           font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          margin-bottom: 10px;
+          margin-bottom: 8px;
         }
         .ac-pdf-name {
           color: #f8fafc;
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 700;
           line-height: 1.45;
-          margin-bottom: 8px;
+          margin-bottom: 6px;
         }
         .ac-pdf-desc {
           color: #94a3b8;
-          font-size: 12px;
-          line-height: 1.6;
-          margin-bottom: 10px;
+          font-size: 11px;
+          line-height: 1.45;
+          margin-bottom: 8px;
         }
         .ac-pdf-meta {
           color: #cbd5e1;
@@ -266,7 +265,7 @@ export default function SalesPopup({ enabled = true }) {
         .ac-cta-panel {
           border: 1px solid rgba(148, 163, 184, 0.14);
           border-radius: 18px;
-          padding: 16px;
+          padding: 14px;
           background: rgba(15, 23, 42, 0.62);
           display: flex;
           flex-direction: column;
@@ -274,33 +273,33 @@ export default function SalesPopup({ enabled = true }) {
         }
         .ac-cta-title {
           color: #f8fafc;
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 700;
           line-height: 1.5;
-          margin: 0 0 8px;
+          margin: 0 0 6px;
         }
         .ac-cta-copy {
           color: #94a3b8;
-          font-size: 12px;
-          line-height: 1.6;
-          margin: 0 0 14px;
+          font-size: 11px;
+          line-height: 1.45;
+          margin: 0 0 10px;
         }
         .ac-cta-btn {
           width: 100%;
-          padding: 14px 16px;
+          padding: 12px 14px;
           border: 0;
           border-radius: 12px;
           background: linear-gradient(135deg, #2563eb, #7c3aed);
           color: #ffffff;
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 700;
           cursor: pointer;
         }
         .ac-footer {
-          margin-top: 14px;
+          margin-top: 10px;
           color: #64748b;
-          font-size: 12px;
-          line-height: 1.5;
+          font-size: 11px;
+          line-height: 1.35;
           text-align: center;
         }
         @media (max-width: 720px) {
@@ -308,13 +307,13 @@ export default function SalesPopup({ enabled = true }) {
             padding: 14px;
           }
           .ac-header {
-            padding: 22px 18px 18px;
+            padding: 18px 16px 14px;
           }
           .ac-body {
-            padding: 16px 18px 18px;
+            padding: 12px 16px 16px;
           }
           .ac-title {
-            font-size: 22px;
+            font-size: 20px;
             max-width: none;
           }
           .ac-subtitle {
@@ -386,8 +385,7 @@ export default function SalesPopup({ enabled = true }) {
                 <div>
                   <h3 className="ac-cta-title">Want this working on your store?</h3>
                   <p className="ac-cta-copy">
-                    Start the setup flow and the team can prepare your AI sales assistant based on your store,
-                    platform, and plan.
+                    Start the setup flow to get your store configured for AI-assisted sales.
                   </p>
                 </div>
                 <button className="ac-cta-btn" onClick={handleClose}>
@@ -396,7 +394,7 @@ export default function SalesPopup({ enabled = true }) {
               </div>
             </div>
 
-            <div className="ac-footer">Professional AI setup. One month free trial. Implementation in 1-2 days.</div>
+            <div className="ac-footer">One month free trial. Setup in 1-2 days.</div>
           </div>
         </div>
       </div>
