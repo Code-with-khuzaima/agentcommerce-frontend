@@ -19,20 +19,23 @@ export default function SalesPopup({ enabled = true }) {
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
   const [activeFact, setActiveFact] = useState(0);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     if (!enabled) {
       setVisible(false);
       setClosing(false);
+      setDismissed(false);
       return undefined;
     }
+    if (dismissed) return undefined;
 
-    const timer = setInterval(() => {
-      setVisible((current) => (current ? current : true));
+    const timer = setTimeout(() => {
+      setVisible(true);
     }, 15000);
 
-    return () => clearInterval(timer);
-  }, [enabled]);
+    return () => clearTimeout(timer);
+  }, [enabled, dismissed]);
 
   useEffect(() => {
     if (!visible) return undefined;
@@ -49,6 +52,7 @@ export default function SalesPopup({ enabled = true }) {
     setTimeout(() => {
       setVisible(false);
       setClosing(false);
+      setDismissed(true);
     }, 220);
   };
 
