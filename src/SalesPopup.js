@@ -6,14 +6,13 @@ const STATS = [
   { value: "67%", label: "Sales lift" },
   { value: "40%", label: "Cart recovery" },
   { value: "3x", label: "Conversion gain" },
-  { value: "24/7", label: "Always on" },
+  { value: "24/7", label: "Coverage" },
 ];
 
 const FACTS = [
-  "AI chat can recover abandoned carts by answering objections before the visitor leaves.",
-  "Guided recommendations improve conversion when shoppers are comparing similar products.",
-  "Fast answers on shipping, returns, and sizing remove friction at the point of purchase.",
-  "A well-configured assistant increases response coverage without forcing the store owner online.",
+  "AI chat removes hesitation when shoppers need sizing, delivery, or return answers before checkout.",
+  "Product recommendations inside chat improve conversion when the buyer is comparing similar items.",
+  "Live assistance inside the store can recover revenue before the visitor abandons the cart.",
 ];
 
 export default function SalesPopup({ enabled = true }) {
@@ -40,7 +39,7 @@ export default function SalesPopup({ enabled = true }) {
 
     const rotation = setInterval(() => {
       setActiveFact((current) => (current + 1) % FACTS.length);
-    }, 4000);
+    }, 4500);
 
     return () => clearInterval(rotation);
   }, [visible]);
@@ -59,15 +58,15 @@ export default function SalesPopup({ enabled = true }) {
     <>
       <style>{`
         @keyframes ac-popup-in {
-          from { opacity: 0; transform: translateY(20px) scale(0.98); }
+          from { opacity: 0; transform: translateY(18px) scale(0.98); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes ac-popup-out {
           from { opacity: 1; transform: translateY(0) scale(1); }
-          to { opacity: 0; transform: translateY(14px) scale(0.98); }
+          to { opacity: 0; transform: translateY(10px) scale(0.98); }
         }
-        @keyframes ac-fact-fade {
-          from { opacity: 0; transform: translateY(6px); }
+        @keyframes ac-fade-up {
+          from { opacity: 0; transform: translateY(5px); }
           to { opacity: 1; transform: translateY(0); }
         }
         .ac-popup-overlay {
@@ -77,66 +76,29 @@ export default function SalesPopup({ enabled = true }) {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 24px;
-          background: rgba(2, 6, 23, 0.76);
-          backdrop-filter: blur(6px);
+          padding: 16px;
+          background: rgba(2, 6, 23, 0.74);
+          backdrop-filter: blur(7px);
         }
         .ac-popup-box {
           width: 100%;
-          max-width: 560px;
-          max-height: min(84vh, 640px);
-          border: 1px solid rgba(148, 163, 184, 0.18);
-          border-radius: 22px;
-          overflow: hidden;
+          max-width: 540px;
+          border-radius: 24px;
+          border: 1px solid rgba(148, 163, 184, 0.16);
           background:
-            linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(7, 12, 26, 0.98));
-          box-shadow: 0 26px 80px rgba(2, 6, 23, 0.58);
-          animation: ac-popup-in 0.28s ease forwards;
-          display: flex;
-          flex-direction: column;
+            radial-gradient(circle at top right, rgba(37, 99, 235, 0.14), transparent 30%),
+            linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(8, 15, 30, 0.98));
+          box-shadow: 0 28px 70px rgba(2, 6, 23, 0.56);
+          animation: ac-popup-in 0.24s ease forwards;
+          overflow: hidden;
         }
         .ac-popup-box.closing {
-          animation: ac-popup-out 0.22s ease forwards;
+          animation: ac-popup-out 0.2s ease forwards;
         }
         .ac-header {
           position: relative;
-          padding: 20px 22px 16px;
-          border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-          background:
-            radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 34%),
-            radial-gradient(circle at top left, rgba(16, 185, 129, 0.10), transparent 36%);
-          flex-shrink: 0;
-        }
-        .ac-eyebrow {
-          display: inline-flex;
-          align-items: center;
-          padding: 6px 10px;
-          border-radius: 999px;
-          background: rgba(59, 130, 246, 0.12);
-          border: 1px solid rgba(59, 130, 246, 0.22);
-          color: #93c5fd;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-        .ac-title {
-          margin: 16px 0 10px;
-          color: #f8fafc;
-          font-size: 24px;
-          line-height: 1.12;
-          font-weight: 800;
-          max-width: 420px;
-        }
-        .ac-title-accent {
-          color: #c4b5fd;
-        }
-        .ac-subtitle {
-          margin: 0;
-          max-width: 430px;
-          color: #94a3b8;
-          font-size: 13px;
-          line-height: 1.55;
+          padding: 22px 22px 16px;
+          border-bottom: 1px solid rgba(148, 163, 184, 0.1);
         }
         .ac-close {
           position: absolute;
@@ -144,52 +106,91 @@ export default function SalesPopup({ enabled = true }) {
           right: 16px;
           width: 34px;
           height: 34px;
-          border: 1px solid rgba(148, 163, 184, 0.18);
+          border: 1px solid rgba(148, 163, 184, 0.16);
           border-radius: 10px;
           background: rgba(15, 23, 42, 0.78);
           color: #cbd5e1;
-          font-size: 18px;
+          font-size: 16px;
           cursor: pointer;
         }
         .ac-close:hover {
-          background: rgba(30, 41, 59, 0.96);
+          background: rgba(30, 41, 59, 0.92);
+        }
+        .ac-kicker {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 10px;
+          border-radius: 999px;
+          background: rgba(59, 130, 246, 0.12);
+          color: #93c5fd;
+          border: 1px solid rgba(59, 130, 246, 0.2);
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+        .ac-kicker-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 999px;
+          background: #60a5fa;
+        }
+        .ac-title {
+          margin: 14px 0 8px;
+          color: #f8fafc;
+          font-size: 27px;
+          line-height: 1.08;
+          font-weight: 800;
+          max-width: 430px;
+        }
+        .ac-title-accent {
+          color: #c4b5fd;
+        }
+        .ac-subtitle {
+          margin: 0;
+          color: #94a3b8;
+          font-size: 13px;
+          line-height: 1.55;
+          max-width: 440px;
         }
         .ac-body {
-          padding: 14px 22px 18px;
+          padding: 16px 22px 20px;
         }
-        .ac-stats-grid {
+        .ac-stats {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 10px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 8px;
           margin-bottom: 12px;
         }
         .ac-stat {
-          padding: 12px 12px 10px;
           border: 1px solid rgba(148, 163, 184, 0.12);
           border-radius: 16px;
-          background: rgba(15, 23, 42, 0.62);
+          background: rgba(15, 23, 42, 0.64);
+          padding: 12px 10px 10px;
+          text-align: center;
         }
         .ac-stat-value {
           color: #f8fafc;
-          font-size: 20px;
-          line-height: 1;
+          font-size: 18px;
           font-weight: 800;
+          line-height: 1;
           margin-bottom: 6px;
         }
         .ac-stat-label {
           color: #94a3b8;
-          font-size: 11px;
-          line-height: 1.35;
+          font-size: 10px;
+          line-height: 1.25;
+          letter-spacing: 0.01em;
         }
-        .ac-fact-box {
-          padding: 14px 14px 12px;
+        .ac-insight {
           border: 1px solid rgba(59, 130, 246, 0.16);
           border-radius: 18px;
-          background:
-            linear-gradient(180deg, rgba(30, 41, 59, 0.48), rgba(15, 23, 42, 0.68));
+          background: linear-gradient(180deg, rgba(30, 41, 59, 0.44), rgba(15, 23, 42, 0.64));
+          padding: 14px 16px;
           margin-bottom: 12px;
         }
-        .ac-fact-label {
+        .ac-insight-label {
           color: #93c5fd;
           font-size: 11px;
           font-weight: 700;
@@ -197,45 +198,45 @@ export default function SalesPopup({ enabled = true }) {
           text-transform: uppercase;
           margin-bottom: 8px;
         }
-        .ac-fact-text {
+        .ac-insight-text {
           margin: 0;
           color: #e2e8f0;
           font-size: 13px;
-          line-height: 1.5;
-          animation: ac-fact-fade 0.22s ease;
+          line-height: 1.55;
+          animation: ac-fade-up 0.2s ease;
         }
         .ac-dots {
           display: flex;
-          gap: 8px;
+          gap: 7px;
           margin-top: 10px;
         }
         .ac-dot {
-          width: 10px;
-          height: 10px;
+          width: 8px;
+          height: 8px;
           border: 0;
           border-radius: 999px;
-          background: rgba(148, 163, 184, 0.28);
+          background: rgba(148, 163, 184, 0.26);
           cursor: pointer;
+          padding: 0;
         }
         .ac-dot.active {
-          width: 28px;
+          width: 24px;
           background: #60a5fa;
         }
-        .ac-actions {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 10px;
-          align-items: stretch;
-        }
-        .ac-pdf-row {
-          display: block;
-          border: 1px solid rgba(148, 163, 184, 0.14);
+        .ac-panel {
+          border: 1px solid rgba(148, 163, 184, 0.12);
           border-radius: 18px;
-          padding: 14px;
-          background: rgba(15, 23, 42, 0.62);
-          text-decoration: none;
+          background: rgba(15, 23, 42, 0.64);
+          padding: 16px;
         }
-        .ac-pdf-kicker {
+        .ac-panel-top {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+        .ac-panel-kicker {
           color: #fca5a5;
           font-size: 11px;
           font-weight: 700;
@@ -243,68 +244,70 @@ export default function SalesPopup({ enabled = true }) {
           text-transform: uppercase;
           margin-bottom: 8px;
         }
-        .ac-pdf-name {
+        .ac-panel-title {
           color: #f8fafc;
-          font-size: 14px;
+          font-size: 16px;
           font-weight: 700;
-          line-height: 1.45;
-          margin-bottom: 6px;
-        }
-        .ac-pdf-desc {
-          color: #94a3b8;
-          font-size: 11px;
-          line-height: 1.45;
-          margin-bottom: 8px;
-        }
-        .ac-pdf-meta {
-          color: #cbd5e1;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.02em;
-        }
-        .ac-cta-panel {
-          border: 1px solid rgba(148, 163, 184, 0.14);
-          border-radius: 18px;
-          padding: 14px;
-          background: rgba(15, 23, 42, 0.62);
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-        .ac-cta-title {
-          color: #f8fafc;
-          font-size: 14px;
-          font-weight: 700;
-          line-height: 1.5;
+          line-height: 1.35;
           margin: 0 0 6px;
         }
-        .ac-cta-copy {
+        .ac-panel-copy {
           color: #94a3b8;
-          font-size: 11px;
-          line-height: 1.45;
-          margin: 0 0 10px;
+          font-size: 12px;
+          line-height: 1.5;
+          margin: 0;
         }
-        .ac-cta-btn {
+        .ac-pdf-badge {
+          flex-shrink: 0;
+          min-width: 56px;
+          border-radius: 14px;
+          padding: 10px 8px;
+          text-align: center;
+          background: linear-gradient(135deg, #b91c1c, #ef4444);
+          color: #fff;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+        .ac-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+        .ac-link-btn,
+        .ac-primary-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           width: 100%;
-          padding: 12px 14px;
-          border: 0;
+          min-height: 44px;
           border-radius: 12px;
-          background: linear-gradient(135deg, #2563eb, #7c3aed);
-          color: #ffffff;
           font-size: 13px;
           font-weight: 700;
+          text-decoration: none;
           cursor: pointer;
         }
+        .ac-link-btn {
+          border: 1px solid rgba(148, 163, 184, 0.16);
+          background: rgba(255, 255, 255, 0.03);
+          color: #e2e8f0;
+        }
+        .ac-primary-btn {
+          border: 0;
+          background: linear-gradient(135deg, #2563eb, #7c3aed);
+          color: #ffffff;
+        }
         .ac-footer {
-          margin-top: 10px;
+          margin-top: 12px;
           color: #64748b;
           font-size: 11px;
           line-height: 1.35;
           text-align: center;
         }
-        @media (max-width: 720px) {
+        @media (max-width: 640px) {
           .ac-popup-overlay {
-            padding: 14px;
+            padding: 12px;
           }
           .ac-header {
             padding: 18px 16px 14px;
@@ -313,13 +316,15 @@ export default function SalesPopup({ enabled = true }) {
             padding: 12px 16px 16px;
           }
           .ac-title {
-            font-size: 20px;
+            font-size: 22px;
             max-width: none;
           }
           .ac-subtitle {
             max-width: none;
           }
-          .ac-stats-grid,
+          .ac-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
           .ac-actions {
             grid-template-columns: 1fr;
           }
@@ -330,20 +335,23 @@ export default function SalesPopup({ enabled = true }) {
         <div className={`ac-popup-box${closing ? " closing" : ""}`}>
           <div className="ac-header">
             <button className="ac-close" onClick={handleClose} aria-label="Close popup">
-              x
+              ×
             </button>
-            <div className="ac-eyebrow">AI commerce research</div>
+            <div className="ac-kicker">
+              <span className="ac-kicker-dot" />
+              AI commerce research
+            </div>
             <h2 className="ac-title">
-              See the numbers behind <span className="ac-title-accent">AI-assisted sales growth</span>
+              See how <span className="ac-title-accent">AI chat improves sales</span>
             </h2>
             <p className="ac-subtitle">
-              This short report explains where AI chat improves conversion, reduces drop-off, and gives
-              online stores better coverage without adding manual support load.
+              Open the short research report or continue to the setup flow. This popup stays compact and should fit
+              cleanly without scrolling.
             </p>
           </div>
 
           <div className="ac-body">
-            <div className="ac-stats-grid">
+            <div className="ac-stats">
               {STATS.map((stat) => (
                 <div className="ac-stat" key={stat.value}>
                   <div className="ac-stat-value">{stat.value}</div>
@@ -352,9 +360,9 @@ export default function SalesPopup({ enabled = true }) {
               ))}
             </div>
 
-            <div className="ac-fact-box">
-              <div className="ac-fact-label">Key finding</div>
-              <p className="ac-fact-text" key={activeFact}>
+            <div className="ac-insight">
+              <div className="ac-insight-label">Key finding</div>
+              <p className="ac-insight-text" key={activeFact}>
                 {FACTS[activeFact]}
               </p>
               <div className="ac-dots">
@@ -364,31 +372,29 @@ export default function SalesPopup({ enabled = true }) {
                     type="button"
                     className={`ac-dot${index === activeFact ? " active" : ""}`}
                     onClick={() => setActiveFact(index)}
-                    aria-label={`Show fact ${index + 1}`}
+                    aria-label={`Show finding ${index + 1}`}
                   />
                 ))}
               </div>
             </div>
 
-            <div className="ac-actions">
-              <a href={PDF_URL} target="_blank" rel="noopener noreferrer" className="ac-pdf-row">
-                <div className="ac-pdf-kicker">Research report</div>
-                <div className="ac-pdf-name">AI Chatbot Sales Research Report</div>
-                <div className="ac-pdf-desc">
-                  Open the full PDF with conversion data, cart recovery insights, and practical implementation
-                  notes for e-commerce stores.
-                </div>
-                <div className="ac-pdf-meta">Open PDF in a new tab</div>
-              </a>
-
-              <div className="ac-cta-panel">
+            <div className="ac-panel">
+              <div className="ac-panel-top">
                 <div>
-                  <h3 className="ac-cta-title">Want this working on your store?</h3>
-                  <p className="ac-cta-copy">
-                    Start the setup flow to get your store configured for AI-assisted sales.
+                  <div className="ac-panel-kicker">Research report</div>
+                  <h3 className="ac-panel-title">AI Chatbot Sales Research Report</h3>
+                  <p className="ac-panel-copy">
+                    Conversion data, cart recovery impact, and practical notes for Shopify and WooCommerce stores.
                   </p>
                 </div>
-                <button className="ac-cta-btn" onClick={handleClose}>
+                <div className="ac-pdf-badge">PDF</div>
+              </div>
+
+              <div className="ac-actions">
+                <a href={PDF_URL} target="_blank" rel="noopener noreferrer" className="ac-link-btn">
+                  Open report
+                </a>
+                <button className="ac-primary-btn" onClick={handleClose}>
                   Continue on site
                 </button>
               </div>
