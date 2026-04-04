@@ -1115,12 +1115,12 @@ function LandingPage({ onStart, onLogin }) {
   ];
 
   const testimonials = [
-    { name: "Sarah M.", store: "Shopify Store Owner", text: "AgentComerce reduced our support tickets by 70%. Our customers love getting instant answers at any time of day. Best investment we made this year.", stars: 5, avatar: "SM" },
-    { name: "Ahmed K.", store: "WooCommerce Store", text: "Setup was incredibly easy. The team handled everything and our AI agent was live in just one day. Sales increased 25% in the first month!", stars: 5, avatar: "AK" },
-    { name: "Lisa T.", store: "Fashion Boutique", text: "I was skeptical at first but now I can't imagine running my store without it. The AI recommends products perfectly and handles all shipping questions.", stars: 5, avatar: "LT" },
-    { name: "Raza H.", store: "Electronics Store", text: "Our cart abandonment dropped significantly. The AI catches customers before they leave and answers their last-minute questions. Incredible ROI.", stars: 5, avatar: "RH" },
-    { name: "Emma W.", store: "Beauty & Skincare", text: "The AI knows my entire product catalog and recommends the right skincare routine for each customer. It's like having a knowledgeable salesperson 24/7.", stars: 5, avatar: "EW" },
-    { name: "Omar F.", store: "Sports Equipment", text: "Customer support used to be our biggest headache. Now the AI handles 80% of queries automatically. My team can focus on growing the business.", stars: 5, avatar: "OF" },
+    { name: "Madiha Rehman", store: "LuxeCart Apparel", text: "The AI took a lot of repetitive sizing questions off our team. It did not fix everything overnight, but it clearly improved response speed and checkout confidence.", stars: 5, avatar: "MR" },
+    { name: "Bilal Sheikh", store: "VoltEase Gadgets", text: "We mainly wanted help with pre-sale questions and warranty concerns. That part worked well, especially on product pages where customers usually hesitate.", stars: 4, avatar: "BS" },
+    { name: "Hira Qureshi", store: "Velvet Oak Boutique", text: "What I liked most was that it felt store-specific instead of generic. The recommendation flow is more useful now than the old FAQ-only setup.", stars: 5, avatar: "HQ" },
+    { name: "Daniel Morris", store: "Northline Tech Shop", text: "Cart drop-off did not disappear, but the assistant now catches a meaningful chunk of those conversations before customers leave. That alone made it worth testing.", stars: 4, avatar: "DM" },
+    { name: "Sana Yusuf", store: "Bloom Ritual Skincare", text: "Routine-based recommendations are much clearer than before. Customers are asking better questions, and the chat feels more like guided selling than support.", stars: 5, avatar: "SY" },
+    { name: "Faraz Ahmed", store: "Peak Motion Fitness", text: "Support load is lower and the team spends less time answering the same shipping and stock questions. We still review edge cases manually, which is fine.", stars: 4, avatar: "FA" },
   ];
 
   const faqs = [
