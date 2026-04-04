@@ -869,6 +869,33 @@ function LandingPage({ onStart, onLogin }) {
     { name: "Omar F.", store: "Sports Equipment", text: "Customer support used to be our biggest headache. Now the AI handles 80% of queries automatically. My team can focus on growing the business.", stars: 5, avatar: "OF" },
   ];
 
+  const caseStudies = [
+    {
+      title: "Fashion store with constant sizing questions",
+      store: "DTC apparel brand",
+      challenge: "The store was losing buyers on product pages because customers kept asking about fit, exchanges, and delivery timing before checkout.",
+      solution: "We trained the assistant on size guidance, return policy, delivery methods, and top-selling outfit recommendations so shoppers got an answer without leaving the session.",
+      result: "Support pressure dropped, conversion improved on high-intent traffic, and the team stopped repeating the same pre-sale answers every day.",
+      metric: "Less hesitation before checkout",
+    },
+    {
+      title: "Electronics store with abandoned-cart objections",
+      store: "WooCommerce electronics retailer",
+      challenge: "Visitors added items to cart but hesitated around warranty, compatibility, and cash-on-delivery questions at the final step.",
+      solution: "We configured the AI to answer objection-heavy purchase questions, surface compatible alternatives, and guide buyers back to the right product instead of losing them.",
+      result: "The store recovered more high-intent conversations and used the assistant as a conversion tool instead of treating chat as support only.",
+      metric: "Better cart recovery flow",
+    },
+    {
+      title: "Beauty catalog with recommendation overload",
+      store: "Skincare and beauty store",
+      challenge: "Customers were unsure which products matched their routine, and broad manual recommendations were overwhelming rather than helpful.",
+      solution: "We structured the assistant to recommend only the most relevant products based on the shopper's need, while also handling policy and shipping questions in the same conversation.",
+      result: "Recommendations became clearer, average conversation quality improved, and the store had a cleaner path from product discovery to purchase.",
+      metric: "Stronger recommendation quality",
+    },
+  ];
+
   const faqs = [
     { q: "How long does the setup take?", a: "Our team typically completes the full integration within 1–2 business days. Once you submit your store details and credentials, we handle everything — no technical work required from your side." },
     { q: "Does it work with my Shopify or WooCommerce store?", a: "Yes! AgentComerce is purpose-built for both Shopify and WooCommerce stores. We connect via your store's official REST API to access live products, orders, prices, and stock in real time." },
@@ -1032,6 +1059,45 @@ function LandingPage({ onStart, onLogin }) {
                 <div>
                   <div className="text-sm font-semibold text-white">{name}</div>
                   <div className="text-xs text-slate-500">{store}</div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* ── CASE STUDIES ── */}
+      <section className="relative z-10 max-w-6xl mx-auto px-6 pb-24">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 font-medium mb-4">Case Studies</div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Three Common Store Problems We Solve</h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">These are the practical use cases behind the product: repeated buyer objections, weak recommendation quality, and support-heavy checkout friction.</p>
+        </div>
+        <div className="space-y-6">
+          {caseStudies.map(({ title, store, challenge, solution, result, metric }) => (
+            <Card key={title} className="p-6 sm:p-8">
+              <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8">
+                <div className="rounded-2xl border border-violet-500/20 bg-violet-500/10 p-5">
+                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-300 mb-3">Store Story</div>
+                  <h3 className="text-xl font-bold text-white leading-tight mb-2">{title}</h3>
+                  <p className="text-sm text-slate-400 mb-5">{store}</p>
+                  <div className="inline-flex items-center rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-300">
+                    {metric}
+                  </div>
+                </div>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 mb-3">Problem</div>
+                    <p className="text-sm leading-7 text-slate-300">{challenge}</p>
+                  </div>
+                  <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-5">
+                    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-300 mb-3">Our Solution</div>
+                    <p className="text-sm leading-7 text-slate-200">{solution}</p>
+                  </div>
+                  <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
+                    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300 mb-3">Outcome</div>
+                    <p className="text-sm leading-7 text-slate-200">{result}</p>
+                  </div>
                 </div>
               </div>
             </Card>
