@@ -1048,6 +1048,8 @@ function LandingPage({ onStart, onLogin }) {
   const [pricingOpen, setPricingOpen] = useState(false);
   const [pricingCycle, setPricingCycle] = useState("monthly");
   const [demoOpen, setDemoOpen] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
+  const [demoFailed, setDemoFailed] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [contactSent, setContactSent] = useState(false);
@@ -1056,6 +1058,19 @@ function LandingPage({ onStart, onLogin }) {
   const [bookDemoSending, setBookDemoSending] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+  const demoUrl = `${process.env.PUBLIC_URL || ""}/demo.html`;
+
+  function openDemo() {
+    setDemoFailed(false);
+    setDemoLoading(true);
+    setDemoOpen(true);
+  }
+
+  function closeDemo() {
+    setDemoOpen(false);
+    setDemoLoading(false);
+    setDemoFailed(false);
+  }
   const pricingPlans = [
     {
       id: "starter",
@@ -1230,7 +1245,7 @@ function LandingPage({ onStart, onLogin }) {
           <Btn onClick={onStart} className="text-base px-8 py-4">
             <Icon path={icons.zap} size={18} /> Connect Your Store — Free Setup
           </Btn>
-          <button onClick={() => setDemoOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
+          <button onClick={openDemo} className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
             See live demo <Icon path={icons.arrow} size={14} />
           </button>
           <button onClick={() => document.getElementById('book-demo-section').scrollIntoView({ behavior: 'smooth' })} className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
@@ -1563,7 +1578,7 @@ function LandingPage({ onStart, onLogin }) {
               {["Features", "Pricing", "How It Works", "Demo"].map(l => (
                 <button key={l} onClick={() => {
                   if (l === "Pricing") setPricingOpen(true);
-                  else if (l === "Demo") setDemoOpen(true);
+                  else if (l === "Demo") openDemo();
                   else if (l === "Features") document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' });
                   else if (l === "How It Works") document.getElementById('howit-section').scrollIntoView({ behavior: 'smooth' });
                 }} className="block text-sm text-slate-500 hover:text-white transition-colors">{l}</button>
@@ -1637,10 +1652,35 @@ function LandingPage({ onStart, onLogin }) {
           </div>
         </div>
       )}{demoOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" onClick={() => setDemoOpen(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" onClick={closeDemo}>
           <div className="relative w-full max-w-5xl h-[85vh] rounded-2xl overflow-hidden border border-white/10" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setDemoOpen(false)} className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-black/80 flex items-center justify-center text-white text-lg border border-white/20">✕</button>
-            <iframe src="/demo.html" className="w-full h-full border-none" title="AgentComerce Demo" />
+            <button onClick={closeDemo} className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-black/80 flex items-center justify-center text-white text-lg border border-white/20">✕</button>
+            {demoLoading && !demoFailed ? (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black text-slate-300 text-sm">
+                Loading demo...
+              </div>
+            ) : null}
+            {demoFailed ? (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black px-6 text-center">
+                <div>
+                  <p className="text-white text-lg font-semibold mb-2">Demo failed to load</p>
+                  <p className="text-slate-400 text-sm mb-4">The demo page could not be opened from <span className="font-mono">{demoUrl}</span>.</p>
+                  <button onClick={openDemo} className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black">
+                    Retry
+                  </button>
+                </div>
+              </div>
+            ) : null}
+            <iframe
+              src={demoUrl}
+              className="w-full h-full border-none"
+              title="AgentComerce Demo"
+              onLoad={() => setDemoLoading(false)}
+              onError={() => {
+                setDemoLoading(false);
+                setDemoFailed(true);
+              }}
+            />
           </div>
         </div>
       )}
