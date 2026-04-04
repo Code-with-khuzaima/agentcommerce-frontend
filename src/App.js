@@ -1164,7 +1164,7 @@ function LandingPage({ onStart, onLogin }) {
               className="text-left transition-all duration-200 hover:translate-y-[-2px]"
             >
               <Card className="h-full p-6 sm:p-7 hover:border-violet-400/35 hover:bg-violet-500/10">
-                <div className="mb-4 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+                <div className="mb-4 inline-flex items-center rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
                   {store}
                 </div>
                 <h3 className="text-2xl font-bold leading-tight text-white mb-3">{title}</h3>
@@ -1581,17 +1581,19 @@ function CaseStudyPage({ study, onBack, onStart }) {
 // ── ROOT APP ──────────────────────────────────────────────────
 export default function App() {
   const path = window.location.pathname;
+  const search = window.location.search;
   const isAdminPath = path === "/admin" || path === "/admin/";
   const isAdminDashPath = path === "/admin/dashboard" || path === "/admin/dashboard/";
   const isLoginPath = path === "/login" || path === "/login/";
   const isDashPath = path === "/dashboard" || path === "/dashboard/";
   const caseStudyMatch = path.match(/^\/case-studies\/([^/]+)\/?$/);
   const selectedCaseStudy = caseStudyMatch ? CASE_STUDIES.find((study) => study.id === caseStudyMatch[1]) : null;
+  const shouldAutoStartFlow = !caseStudyMatch && new URLSearchParams(search).get("start") === "1";
 
   const [authUser, setAuthUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("ac_user") || "null"); } catch { return null; }
   });
-  const [showFlow, setShowFlow] = useState(false);
+  const [showFlow, setShowFlow] = useState(shouldAutoStartFlow);
   const [step, setStep] = useState(1);
   const [data, setData] = useState({
     storeUrl: "", platform: "", apiKey: "", accessToken: "", consumerKey: "", consumerSecret: "",
@@ -1601,6 +1603,12 @@ export default function App() {
   });
   const next = () => setStep((s) => Math.min(s + 1, 6));
   const back = () => setStep((s) => Math.max(s - 1, 1));
+
+  useEffect(() => {
+    if (shouldAutoStartFlow && window.location.pathname === "/") {
+      window.history.replaceState({}, "", "/");
+    }
+  }, [shouldAutoStartFlow]);
 
   const handleAdminLogout = () => {
     localStorage.removeItem("ac_admin_token");
@@ -1640,7 +1648,7 @@ export default function App() {
       window.location.replace("/");
       return null;
     }
-    return <CaseStudyPage study={selectedCaseStudy} onBack={() => window.location.replace("/")} onStart={() => window.location.replace("/")} />;
+    return <CaseStudyPage study={selectedCaseStudy} onBack={() => window.location.replace("/")} onStart={() => window.location.assign("/?start=1")} />;
   }
 
   if (isAdminDashPath) {
