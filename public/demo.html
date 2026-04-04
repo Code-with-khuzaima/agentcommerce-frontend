@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>YOUR STORE — Loafer Shoes for Men</title>
+<title>YOUR STORE - Loafer Shoes for Men</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -15,7 +15,7 @@
 html,body{height:100%;overflow:hidden;background:#fff;}
 body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 
-/* ═══════════════ INTRO ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• INTRO â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #intro{
   position:fixed;inset:0;z-index:9999;background:#000;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
@@ -33,13 +33,13 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 @keyframes barFill{to{width:100%;}}
 @keyframes riseUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-/* ═══════════════ SCAN ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SCAN â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #scan{position:fixed;left:0;width:100%;height:2px;z-index:8000;top:0;opacity:0;pointer-events:none;background:linear-gradient(90deg,transparent,#000,#000,transparent);box-shadow:0 0 12px rgba(0,0,0,.6);}
 
-/* ═══════════════ LAYOUT ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• LAYOUT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #wrapper{display:flex;height:100vh;width:100%;overflow:hidden;}
 
-/* ═══════════════ SITE ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SITE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #site{
   flex:1;min-width:0;height:100%;overflow-y:scroll;overflow-x:hidden;
   transition:filter .7s ease,opacity .7s ease;
@@ -48,7 +48,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 #site::-webkit-scrollbar{width:0;}
 #site.dimmed{filter:brightness(.2) blur(1px);pointer-events:none;}
 
-/* ═══════════════ CHAT PANE — desktop side panel ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CHAT PANE â€” desktop side panel â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #chatpane{
   width:0;flex-shrink:0;height:100%;overflow:hidden;
   background:#fff;border-left:1px solid #e0e0e0;
@@ -58,7 +58,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 }
 #chatpane.open{width:var(--chat-w);box-shadow:-4px 0 40px rgba(0,0,0,.12);}
 
-/* ═══════════════ MOBILE — chat as full-screen overlay ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• MOBILE â€” chat as full-screen overlay â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 @media(max-width:640px){
   :root{ --chat-w: 100vw; }
 
@@ -82,7 +82,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
   #chat-label{ display:none; }
 }
 
-/* ═══════════════ YOUR STORE NAV ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• NDURE NAV â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .ndure-nav{
   position:sticky;top:0;z-index:200;background:#fff;
   border-bottom:1px solid var(--border);
@@ -116,7 +116,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 .ndure-cart{cursor:pointer;position:relative;}
 .ndure-cart svg{width:22px;height:22px;}
 
-/* ═══════════════ CATEGORY PILLS ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CATEGORY PILLS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .ndure-cats{
   padding:12px 16px;
   display:flex;gap:8px;
@@ -141,7 +141,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 }
 .cat-pill:hover,.cat-pill.active{background:#000;color:#fff;}
 
-/* ═══════════════ FILTER BAR ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• FILTER BAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .ndure-filter-bar{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 16px;border-bottom:1px solid var(--border);
@@ -158,7 +158,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
   .filter-left,.filter-count,.filter-sort{font-size:13px;}
 }
 
-/* ═══════════════ PRODUCT GRID ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PRODUCT GRID â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .ndure-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -222,7 +222,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
   .price-orig,.price-now,.price-only{font-size:13px;}
 }
 
-/* ═══════════════ FOOTER SECTIONS ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• FOOTER SECTIONS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .no-more{text-align:center;padding:32px 16px;border-top:1px solid var(--border);}
 @media(min-width:641px){.no-more{padding:48px;}}
 .no-more-btn{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:12px 32px;background:#000;color:#fff;border:none;cursor:pointer;}
@@ -249,7 +249,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 .foot-copy{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mid);text-align:center;padding-top:20px;border-top:1px solid var(--border);}
 @media(min-width:641px){.foot-copy{text-align:right;font-size:11px;padding-top:24px;}}
 
-/* ═══════════════ CHAT BUTTON ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CHAT BUTTON â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #chat-btn{
   position:fixed;bottom:20px;right:20px;z-index:600;
   width:56px;height:56px;border-radius:50%;
@@ -285,7 +285,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 #chat-label::after{content:'';position:absolute;right:-7px;top:50%;transform:translateY(-50%);border:6px solid transparent;border-left-color:#000;}
 @media(max-width:640px){#chat-label{display:none;}}
 
-/* ═══════════════ CHAT PANEL ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CHAT PANEL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .chat-hd{padding:18px 20px 14px;background:#000;flex-shrink:0;}
 .chat-hd-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .chat-hd-agent{display:flex;align-items:center;gap:12px;}
@@ -338,7 +338,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 .chat-note{text-align:center;font-size:10px;color:#bbb;letter-spacing:.3px;}
 .chat-note strong{color:#000;}
 
-/* ═══════════════ ASK ANYTHING BANNER ═══════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• ASK ANYTHING BANNER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #ask-banner{
   position:fixed;inset:0;z-index:9500;
   background:rgba(0,0,0,.96);backdrop-filter:blur(16px);
@@ -386,7 +386,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 <!-- INTRO -->
 <div id="intro">
   <div class="intro-logo">YOUR STORE</div>
-  <div class="intro-sub">Men's Loafers · AI Chat Demo</div>
+  <div class="intro-sub">Men's Loafers Â· AI Chat Demo</div>
   <div class="intro-bar"><div class="intro-fill"></div></div>
 </div>
 
@@ -394,22 +394,22 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 <div id="scan"></div>
 
 <!-- REPLAY -->
-<button id="replay" onclick="replayDemo()">↺ Replay Demo</button>
+<button id="replay" onclick="replayDemo()">â†º Replay Demo</button>
 
 <!-- ASK ANYTHING -->
 <div id="ask-banner">
   <div class="ask-wrap">
     <div class="ask-tag"><span class="ask-dot"></span>AI Chat for Your Store</div>
     <div class="ask-h">Ask <em>Anything</em><br>from Your AI Agent</div>
-    <div class="ask-sub">Add instant AI chat to any e-commerce store. Answer every size, stock, and shipping question automatically — 24 hours a day.</div>
+    <div class="ask-sub">Add instant AI chat to any e-commerce store. Answer every size, stock, and shipping question automatically â€” 24 hours a day.</div>
     <div class="ask-feats">
-      <div class="ask-feat">⚡ Instant answers</div>
-      <div class="ask-feat">📦 Order tracking</div>
-      <div class="ask-feat">👟 Size advice</div>
-      <div class="ask-feat">🔌 5-min setup</div>
+      <div class="ask-feat">âš¡ Instant answers</div>
+      <div class="ask-feat">ðŸ“¦ Order tracking</div>
+      <div class="ask-feat">ðŸ‘Ÿ Size advice</div>
+      <div class="ask-feat">ðŸ”Œ 5-min setup</div>
     </div>
     <div class="ask-ctas">
-      <button class="ask-main-btn" onclick="closeBanner()">Add Chat to My Store Free →</button>
+      <button class="ask-main-btn" onclick="closeBanner()">Add Chat to My Store Free â†’</button>
       <button class="ask-skip-btn" onclick="closeBanner()">Continue Browsing</button>
     </div>
   </div>
@@ -418,7 +418,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
 <!-- WRAPPER -->
 <div id="wrapper">
 
-  <!-- WEBSITE: YOUR STORE REPLICA -->
+  <!-- WEBSITE: YOUR STORE DEMO -->
   <div id="site">
 
     <!-- NAV -->
@@ -533,19 +533,19 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
           <div class="chat-av">N</div>
           <div><div class="chat-name">Your Store Assistant</div><div class="chat-role">AI Support · Always Online</div></div>
         </div>
-        <button class="chat-x" onclick="closeChat()">✕</button>
+        <button class="chat-x" onclick="closeChat()">âœ•</button>
       </div>
-      <div class="chat-status">Online · Replies instantly</div>
+      <div class="chat-status">Online Â· Replies instantly</div>
     </div>
     <div class="chat-msgs" id="chat-msgs"></div>
     <div class="chat-inp-wrap">
       <div class="chat-inp-row">
-        <textarea class="chat-inp" id="chat-inp" placeholder="Ask about sizes, stock, shipping…" rows="1" onkeydown="handleKey(event)"></textarea>
+        <textarea class="chat-inp" id="chat-inp" placeholder="Ask about sizes, stock, shippingâ€¦" rows="1" onkeydown="handleKey(event)"></textarea>
         <button class="chat-send" onclick="sendMsg()">
           <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
         </button>
       </div>
-      <div class="chat-note">Ask <strong>anything</strong> — AI agent active 24/7</div>
+      <div class="chat-note">Ask <strong>anything</strong> â€” AI agent active 24/7</div>
     </div>
   </div>
 
@@ -556,7 +556,7 @@ body{font-family:'Barlow',sans-serif;color:#000;display:flex;}
   <svg class="ico-chat" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
   <svg class="ico-x" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
 </button>
-<div id="chat-label">💬 Chat with YOUR STORE — AI is live!</div>
+<div id="chat-label">Chat with YOUR STORE - AI is live!</div>
 
 <script>
 const PRODUCTS = [
@@ -649,13 +649,13 @@ function showTyping(cb){
 const DEMO = [
   { r:'a', t:'Hi! Welcome to YOUR STORE.\n\nI can help you find the perfect pair - check sizes, stock, pricing, or shipping. What are you looking for today?' },
   { r:'u', t:'Do you have the Penny Loafers in size 42?' },
-  { r:'a', t:'Great choice. Yes, the Men's Penny Loafers are available in size 42.\n\nWe have them in:\n- Black - Rs.5,999\n- Dark Brown - Rs.4,799 (sale)\n- Burgundy - Rs.4,799 (sale)\n\nAll are in stock and ready to ship. Which color do you prefer?' },
+  { r:'a', t:'Great choice. Yes, the Men''s Penny Loafers are available in size 42.\n\nWe have them in:\n- Black - Rs.5,999\n- Dark Brown - Rs.4,799 (sale)\n- Burgundy - Rs.4,799 (sale)\n\nAll are in stock and ready to ship. Which color do you prefer?' },
   { r:'u', t:'What else do you recommend with it?' },
-  { r:'a', t:'If you want a cleaner formal look, I recommend the Men's Horsebit Loafers as a second option.\n\nThey are more premium in finish, work well for events, and are priced at Rs.6,499.\n\nIf you want value, stay with the Penny Loafers. If you want a sharper dress look, go with the Horsebit pair.' },
+  { r:'a', t:'If you want a cleaner formal look, I recommend the Men''s Horsebit Loafers as a second option.\n\nThey are more premium in finish, work well for events, and are priced at Rs.6,499.\n\nIf you want value, stay with the Penny Loafers. If you want a sharper dress look, go with the Horsebit pair.' },
   { r:'u', t:'How long does delivery take?' },
   { r:'a', t:'Delivery is fast.\n\n- Standard delivery: 1-2 working days\n- Same-day delivery available on select orders before 12pm\n- Nationwide delivery: 3-5 working days\n- Free shipping on orders over Rs.5,000\n\nWant me to add the Penny Loafers to your cart?' },
 let dIdx = 0;
-let demoStarted = false;
+function playDemo(){
   if(dIdx >= DEMO.length){
     setTimeout(() => {
       document.getElementById('ask-banner').classList.add('on');
@@ -687,8 +687,8 @@ function closeBanner(){ document.getElementById('ask-banner').classList.remove('
 
 const LIVE = [
   'That size is in stock. I can reserve it for you right now, just confirm your color preference.',
-  'Our return policy is simple: 14-day easy returns, free exchange if the size does not fit. No hassle at all!',
-  'That style has a 4.8-star rating from over 3,200 verified buyers. Very popular this season!',
+  'Our return policy is simple: 14-day easy returns, free exchange if the size does not fit. No hassle at all.',
+  'That style has a 4.8-star rating from over 3,200 verified buyers. Very popular this season.',
   'Support is available online every day, and selected orders qualify for same-day dispatch.',
   'The thick-sole loafers run true to size. If you are between sizes, we recommend going up one size.',
 ];
@@ -706,26 +706,12 @@ function handleKey(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); s
 function smartScroll(onDone){
   const site = document.getElementById('site');
   const scan = document.getElementById('scan');
-  if(!site || !scan){
-    if(onDone) onDone();
-    return;
-  }
   site.scrollTop = 0;
   scan.style.opacity = '1';
   const grid = document.getElementById('ndure-grid');
-  if(!grid){
-    scan.style.opacity = '0';
-    if(onDone) onDone();
-    return;
-  }
   const gridTop = grid.offsetTop;
   const gridBot = gridTop + grid.offsetHeight;
   const total = site.scrollHeight - site.clientHeight;
-  if(total <= 0){
-    scan.style.opacity = '0';
-    if(onDone) setTimeout(onDone, 150);
-    return;
-  }
   let pos = 0;
   const si = setInterval(() => {
     const spd = (pos > gridTop - 80 && pos < gridBot + 80) ? 3 : (pos < gridTop ? 22 : 20);
@@ -744,23 +730,11 @@ function smartScroll(onDone){
 }
 
 function runDemo(){
-  if(demoStarted) return;
-  demoStarted = true;
   const intro = document.getElementById('intro');
-  if(intro){
-    setTimeout(() => {
-      intro.classList.add('gone');
-      setTimeout(() => { intro.style.display='none'; }, 950);
-    }, 2600);
-  }
+  setTimeout(() => { intro.classList.add('gone'); setTimeout(() => intro.style.display='none', 950); }, 2600);
   setTimeout(() => {
     smartScroll(() => {
       const lbl = document.getElementById('chat-label');
-      if(!lbl){
-        openChat();
-        setTimeout(() => playDemo(), 700);
-        return;
-      }
       lbl.classList.add('v');
       setTimeout(() => {
         lbl.classList.remove('v');
@@ -769,16 +743,6 @@ function runDemo(){
       }, 1100);
     });
   }, 3100);
-}
-
-function bootDemo(){
-  try {
-    runDemo();
-  } catch (err) {
-    const intro = document.getElementById('intro');
-    if(intro) intro.style.display = 'none';
-    openChat();
-  }
 }
 
 function replayDemo(){
@@ -801,20 +765,7 @@ function replayDemo(){
   }, 400);
 }
 
-if(document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', bootDemo, { once: true });
-} else {
-  bootDemo();
-}
-
-setTimeout(() => {
-  const intro = document.getElementById('intro');
-  if(intro && intro.style.display !== 'none') {
-    intro.classList.add('gone');
-    setTimeout(() => { intro.style.display = 'none'; }, 950);
-  }
-}, 4000);
+document.addEventListener('DOMContentLoaded', () => runDemo());
 </script>
 </body>
 </html>
-
