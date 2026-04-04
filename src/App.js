@@ -1470,13 +1470,13 @@ function CaseStudyPage({ study, onBack, onStart }) {
   if (!study) return null;
 
   return (
-    <div className="min-h-screen text-white" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-slate-950 text-white" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <ParticleBg />
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[900px] h-[420px] rounded-full bg-violet-600/10 blur-3xl pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(91,33,182,0.22),rgba(2,6,23,0.94)_50%,rgba(2,6,23,1)_100%)] pointer-events-none z-0" />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-10 sm:py-14">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <button onClick={onBack} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:border-white/20 hover:text-white">
+          <button onClick={onBack} className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/90 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:border-slate-500 hover:text-white">
             <Icon path={icons.arrowL} size={14} /> Back to Home
           </button>
           <Btn onClick={onStart} className="justify-center sm:w-auto">
@@ -1484,20 +1484,20 @@ function CaseStudyPage({ study, onBack, onStart }) {
           </Btn>
         </div>
 
-        <Card className="overflow-hidden border-violet-500/20 bg-[linear-gradient(135deg,rgba(124,58,237,0.12),rgba(15,23,42,0.78))]">
+        <Card className="overflow-hidden border-slate-800 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(30,41,59,0.92))] shadow-[0_30px_80px_rgba(2,6,23,0.55)]">
           <div className="grid grid-cols-1 gap-0 lg:grid-cols-[1.08fr_0.92fr]">
-            <div className="border-b border-white/10 p-7 sm:p-10 lg:border-b-0 lg:border-r">
-              <div className="inline-flex items-center rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-violet-300 mb-5">
+            <div className="border-b border-slate-800 p-7 sm:p-10 lg:border-b-0 lg:border-r">
+              <div className="inline-flex items-center rounded-full border border-violet-500/30 bg-violet-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-violet-200 mb-5">
                 {study.store}
               </div>
               <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight text-white mb-4">{study.title}</h1>
-              <p className="text-base leading-8 text-slate-300 max-w-2xl">{study.intro}</p>
+              <p className="text-base leading-8 text-slate-200 max-w-2xl">{study.intro}</p>
 
-              <div className="mt-10 rounded-3xl border border-white/10 bg-slate-950/35 p-6">
+              <div className="mt-10 rounded-3xl border border-slate-800 bg-slate-950 p-6">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 mb-4">{study.challengeTitle}</div>
                 <div className="space-y-4">
                   {study.challengePoints.map((point) => (
-                    <div key={point} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                    <div key={point} className="flex items-start gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-4">
                       <Icon path={icons.info} size={16} className="mt-0.5 flex-shrink-0 text-violet-300" />
                       <p className="text-sm leading-7 text-slate-200">{point}</p>
                     </div>
@@ -1505,12 +1505,12 @@ function CaseStudyPage({ study, onBack, onStart }) {
                 </div>
               </div>
 
-              <div className="mt-8 rounded-3xl border border-blue-500/20 bg-blue-500/10 p-6">
-                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-300 mb-4">{study.solutionTitle}</div>
+              <div className="mt-8 rounded-3xl border border-emerald-900 bg-emerald-950/60 p-6">
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300 mb-4">{study.solutionTitle}</div>
                 <div className="space-y-4">
                   {study.solutionPoints.map((point) => (
-                    <div key={point} className="flex items-start gap-3 rounded-2xl border border-blue-500/20 bg-slate-950/30 p-4">
-                      <Icon path={icons.check} size={16} className="mt-0.5 flex-shrink-0 text-blue-300" />
+                    <div key={point} className="flex items-start gap-3 rounded-2xl border border-emerald-900/80 bg-slate-950/70 p-4">
+                      <Icon path={icons.check} size={16} className="mt-0.5 flex-shrink-0 text-emerald-300" />
                       <p className="text-sm leading-7 text-slate-100">{point}</p>
                     </div>
                   ))}
@@ -1519,19 +1519,19 @@ function CaseStudyPage({ study, onBack, onStart }) {
             </div>
 
             <div className="p-7 sm:p-10">
-              <div className="rounded-3xl border border-white/10 bg-slate-950/40 p-6 mb-6">
+              <div className="rounded-3xl border border-slate-800 bg-slate-950 p-6 mb-6">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 mb-4">Performance chart</div>
                 <div className="space-y-5">
                   {study.metrics.map((item) => (
                     <div key={item.label}>
-                      <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
+                      <div className="mb-2 flex items-center justify-between text-xs text-slate-300">
                         <span>{item.label}</span>
-                        <span>{item.before}% → {item.after}%</span>
+                        <span>{item.before}% -&gt; {item.after}%</span>
                       </div>
-                      <div className="mb-2 h-2.5 overflow-hidden rounded-full bg-white/8">
-                        <div className="h-full rounded-full bg-slate-500/55" style={{ width: `${item.before}%` }} />
+                      <div className="mb-2 h-2.5 overflow-hidden rounded-full bg-slate-800">
+                        <div className="h-full rounded-full bg-slate-500" style={{ width: `${item.before}%` }} />
                       </div>
-                      <div className="h-2.5 overflow-hidden rounded-full bg-white/8">
+                      <div className="h-2.5 overflow-hidden rounded-full bg-slate-800">
                         <div className="h-full rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-blue-500" style={{ width: `${item.after}%` }} />
                       </div>
                     </div>
@@ -1539,11 +1539,11 @@ function CaseStudyPage({ study, onBack, onStart }) {
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-slate-950/40 p-6 mb-6">
+              <div className="rounded-3xl border border-slate-800 bg-slate-950 p-6 mb-6">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 mb-4">{study.implementationTitle}</div>
                 <div className="space-y-3">
                   {study.implementationPoints.map((point, index) => (
-                    <div key={point} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                    <div key={point} className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
                       <div className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-violet-300">Step {index + 1}</div>
                       <p className="text-sm leading-7 text-slate-200">{point}</p>
                     </div>
@@ -1551,16 +1551,16 @@ function CaseStudyPage({ study, onBack, onStart }) {
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-6 mb-6">
+              <div className="rounded-3xl border border-violet-900 bg-violet-950/50 p-6 mb-6">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300 mb-4">Outcome</div>
                 <p className="text-sm leading-8 text-slate-100">{study.outcome}</p>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-slate-950/40 p-6">
+              <div className="rounded-3xl border border-slate-800 bg-slate-950 p-6">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 mb-4">Solution visuals</div>
                 <div className="space-y-3">
                   {study.visualBlocks.map((block, index) => (
-                    <div key={block.title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                    <div key={block.title} className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
                       <div className="mb-2 flex items-center justify-between">
                         <div className="text-sm font-semibold text-white">{block.title}</div>
                         <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-300">Panel {index + 1}</div>
