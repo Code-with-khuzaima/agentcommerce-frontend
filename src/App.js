@@ -183,6 +183,7 @@ function Textarea({ id, placeholder, value, onChange, rows = 3 }) {
 const DELIVERY_OPTIONS = ["Standard Shipping", "Express Shipping", "Same-Day Delivery", "Click & Collect", "Free Shipping"];
 const CATEGORY_OPTIONS = ["Clothing & Apparel", "Electronics", "Home & Garden", "Beauty & Health", "Sports & Outdoors", "Food & Beverage", "Toys & Games", "Books & Media", "Jewelry & Accessories", "Other"];
 const PHONE_VALIDATION_REGEX = /^[+\d][\d\s().-]{6,}$/;
+const STORE_URL_REGEX = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[^\s]*)?$/i;
 const EMAILJS_SERVICE_ID = "service_26d0u9m";
 const EMAILJS_PUBLIC_KEY = "Nvak4g2MT8AuvKpb6";
 const EMAILJS_CONTACT_TEMPLATE_ID = "template_3s3hffj";
@@ -1050,6 +1051,9 @@ function LandingPage({ onStart, onLogin }) {
   const [contactOpen, setContactOpen] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [contactSent, setContactSent] = useState(false);
+  const [bookDemoForm, setBookDemoForm] = useState({ storeUrl: "", email: "" });
+  const [bookDemoSent, setBookDemoSent] = useState(false);
+  const [bookDemoSending, setBookDemoSending] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const pricingPlans = [
@@ -1154,6 +1158,37 @@ function LandingPage({ onStart, onLogin }) {
     });
   };
 
+  const handleBookDemoSubmit = () => {
+    const storeUrl = bookDemoForm.storeUrl.trim();
+    const email = bookDemoForm.email.trim();
+
+    if (!storeUrl || !email) return;
+    if (!STORE_URL_REGEX.test(storeUrl)) return alert("Enter a valid store URL.");
+    if (!/\S+@\S+\.\S+/.test(email)) return alert("Enter a valid email address.");
+
+    setBookDemoSending(true);
+    window.emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_CONTACT_TEMPLATE_ID,
+      {
+        title: "Book Demo Request",
+        subject: "Book Demo Request",
+        from_name: "Demo Booking Request",
+        from_email: email,
+        reply_to: email,
+        message: `Book demo request\nStore URL: ${storeUrl}\nContact email: ${email}\nRequested action: review store, confirm scope, and prepare custom chat demo build.`,
+      },
+      EMAILJS_PUBLIC_KEY
+    ).then(() => {
+      setBookDemoSent(true);
+      setBookDemoForm({ storeUrl: "", email: "" });
+    }).catch(() => {
+      alert("Failed to send demo request. Please email us directly at agentcomrce@gmail.com");
+    }).finally(() => {
+      setBookDemoSending(false);
+    });
+  };
+
   return (
     <div className="min-h-screen text-white" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
 
@@ -1197,6 +1232,9 @@ function LandingPage({ onStart, onLogin }) {
           </Btn>
           <button onClick={() => setDemoOpen(true)} className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
             See live demo <Icon path={icons.arrow} size={14} />
+          </button>
+          <button onClick={() => document.getElementById('book-demo-section').scrollIntoView({ behavior: 'smooth' })} className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
+            Book custom demo <Icon path={icons.mail} size={14} />
           </button>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500">
@@ -1351,6 +1389,78 @@ function LandingPage({ onStart, onLogin }) {
       </section>
 
       {/* ── PRICING ── */}
+      <section id="book-demo-section" className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
+        <Card className="overflow-hidden border-violet-500/15 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(42,19,78,0.92))]">
+          <div className="grid grid-cols-1 gap-8 p-8 sm:p-10 lg:grid-cols-[1.05fr_0.95fr]">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/25 bg-violet-500/15 px-3 py-1.5 text-xs font-medium text-violet-300 mb-4">
+                <Icon path={icons.mail} size={12} /> Book Demo
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Send your store URL and we will prepare the demo around your store</h2>
+              <p className="text-slate-300 leading-relaxed mb-5">
+                This is the safer sales flow. A generic video is weak, and using a real brand without permission is a bad idea. Instead, collect the store URL and email, then review, confirm, and build the chat demo manually.
+              </p>
+              <div className="space-y-3">
+                {[
+                  "You send the store URL and contact email.",
+                  "We review the store and confirm the demo scope by email.",
+                  "We prepare the custom chat demo button and the demo build for that store."
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-3 text-sm text-slate-200">
+                    <Icon path={icons.check} size={14} className="mt-1 text-emerald-400" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-slate-950/75 p-6 sm:p-7">
+              {bookDemoSent ? (
+                <div className="text-center py-6">
+                  <div className="w-14 h-14 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto mb-4">
+                    <Icon path={icons.check} size={24} className="text-emerald-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Demo request sent</h3>
+                  <p className="text-sm leading-relaxed text-slate-400">
+                    We received the store URL and email. Next step is manual: review the store, confirm the demo, then prepare the custom chat build.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <div>
+                    <label htmlFor="bookDemoUrl" className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Store URL</label>
+                    <input
+                      id="bookDemoUrl"
+                      type="url"
+                      placeholder="https://yourstore.com"
+                      value={bookDemoForm.storeUrl}
+                      onChange={(e) => setBookDemoForm((form) => ({ ...form, storeUrl: e.target.value }))}
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60 focus:border-violet-500/40"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="bookDemoEmail" className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Email</label>
+                    <input
+                      id="bookDemoEmail"
+                      type="email"
+                      placeholder="you@yourstore.com"
+                      value={bookDemoForm.email}
+                      onChange={(e) => setBookDemoForm((form) => ({ ...form, email: e.target.value }))}
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60 focus:border-violet-500/40"
+                    />
+                  </div>
+                  <Btn onClick={handleBookDemoSubmit} loading={bookDemoSending} className="w-full justify-center">
+                    <Icon path={icons.mail} size={16} /> Book Demo
+                  </Btn>
+                  <p className="text-xs leading-relaxed text-slate-500">
+                    This only sends the request email. Confirmation and the actual demo build happen manually after review.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      </section>
+
             <section className="relative z-10 max-w-6xl mx-auto px-6 pb-24 text-center">
         <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 font-medium mb-4">Pricing</div>
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
