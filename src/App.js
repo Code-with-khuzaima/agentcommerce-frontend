@@ -296,6 +296,146 @@ const CASE_STUDIES = [
     ],
   },
 ];
+const COMPARISON_BRANDS = [
+  {
+    name: "AgentComerce",
+    price: "Starts at $19/mo",
+    fit: "Shopify and WooCommerce stores that want done-for-you launch",
+    strength: "Store-specific setup, FAQs, onboarding, recommendations, and fast deployment",
+    limitation: "Smaller product surface than full enterprise CX suites",
+    setup: "Handled for you in 1-2 days",
+    model: "Fixed plans for ecommerce operators",
+    recommended: true,
+  },
+  {
+    name: "Tidio",
+    price: "From $24.17/mo",
+    fit: "Chat support teams that want a helpdesk plus AI layer",
+    strength: "Mature helpdesk, flows, live chat, and analytics",
+    limitation: "You still own more of the setup and operational tuning",
+    setup: "Self-serve with team configuration",
+    model: "Billable conversations and add-ons",
+  },
+  {
+    name: "Manychat",
+    price: "Inbox starts at $99/mo",
+    fit: "Social DM and campaign automation",
+    strength: "Strong Instagram, Messenger, comments, and creator-style automation",
+    limitation: "Not primarily built as a done-for-you onsite ecommerce support layer",
+    setup: "Self-serve automation builder",
+    model: "Channel and seat oriented",
+  },
+  {
+    name: "Intercom",
+    price: "$39/seat/mo + usage",
+    fit: "Support teams needing a broader customer service platform",
+    strength: "Deep inbox, workflows, reporting, and enterprise support tooling",
+    limitation: "Seat pricing and AI usage can scale up quickly for smaller stores",
+    setup: "Platform implementation required",
+    model: "Per seat plus AI outcomes",
+  },
+  {
+    name: "Zendesk",
+    price: "AI bundle from $155/agent/mo",
+    fit: "Larger service organizations and support operations",
+    strength: "Robust service suite, voice, QA, workforce tooling, and enterprise controls",
+    limitation: "Heavyweight and expensive if the goal is only store chat plus sales assistance",
+    setup: "Team implementation and admin overhead",
+    model: "Per agent plus add-ons",
+  },
+  {
+    name: "Gorgias",
+    price: "From $10/mo, Pro from $300/mo",
+    fit: "Ecommerce support teams managing high ticket volume",
+    strength: "Strong ecommerce integrations and support workflows",
+    limitation: "Pricing climbs with ticket and AI usage; better suited to support desks than lightweight store rollout",
+    setup: "Operational setup by the merchant team",
+    model: "Ticket volume plus AI interactions",
+  },
+  {
+    name: "Crisp",
+    price: "From $45/mo, Essentials $95/mo",
+    fit: "Teams wanting a shared inbox and workspace pricing",
+    strength: "Predictable workspace pricing and broad chat support features",
+    limitation: "Still more self-configured than a store-specific managed deployment",
+    setup: "Self-serve workspace setup",
+    model: "Workspace pricing",
+  },
+];
+const COMPARISON_ROWS = [
+  {
+    label: "Best fit",
+    values: {
+      AgentComerce: "Store owners who want launch help and store-specific setup",
+      Tidio: "Support teams adding AI to an existing helpdesk motion",
+      Manychat: "Social and DM automation",
+      Intercom: "Cross-functional support operations",
+      Zendesk: "Enterprise service teams",
+      Gorgias: "Ecommerce support desks",
+      Crisp: "Workspace-based customer support teams",
+    },
+  },
+  {
+    label: "Starting price",
+    values: {
+      AgentComerce: "$19/mo",
+      Tidio: "$24.17/mo",
+      Manychat: "$99/mo inbox",
+      Intercom: "$39/seat/mo",
+      Zendesk: "$155/agent/mo with Copilot",
+      Gorgias: "$10/mo starter",
+      Crisp: "$45/mo",
+    },
+  },
+  {
+    label: "Managed setup",
+    values: {
+      AgentComerce: "Yes",
+      Tidio: "No",
+      Manychat: "No",
+      Intercom: "No",
+      Zendesk: "No",
+      Gorgias: "No",
+      Crisp: "No",
+    },
+  },
+  {
+    label: "Store-specific FAQ training",
+    values: {
+      AgentComerce: "Included",
+      Tidio: "Possible, merchant config needed",
+      Manychat: "Limited for store-site support",
+      Intercom: "Possible, platform setup needed",
+      Zendesk: "Possible, platform setup needed",
+      Gorgias: "Possible, desk setup needed",
+      Crisp: "Possible, merchant config needed",
+    },
+  },
+  {
+    label: "Product recommendation focus",
+    values: {
+      AgentComerce: "Built into Pro and Enterprise",
+      Tidio: "Not core positioning",
+      Manychat: "More marketing automation than onsite recommendation",
+      Intercom: "Not ecommerce-first",
+      Zendesk: "Not ecommerce-first",
+      Gorgias: "More support-first",
+      Crisp: "Possible, not core",
+    },
+  },
+  {
+    label: "Operational overhead",
+    values: {
+      AgentComerce: "Low",
+      Tidio: "Medium",
+      Manychat: "Medium",
+      Intercom: "Medium to high",
+      Zendesk: "High",
+      Gorgias: "Medium",
+      Crisp: "Medium",
+    },
+  },
+];
 
 function MultiSelect({ options, selected, onChange }) {
   const toggle = (o) => onChange(selected.includes(o) ? selected.filter(x => x !== o) : [...selected, o]);
@@ -1029,6 +1169,7 @@ function LandingPage({ onStart, onLogin }) {
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2 sm:flex-nowrap sm:gap-4">
             <button onClick={() => document.getElementById('features-section').scrollIntoView({ behavior: 'smooth' })} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">Features</button>
+            <button onClick={() => window.location.assign('/comparison')} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">Comparison</button>
             <button onClick={() => setPricingOpen(true)} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">Pricing</button>
             <button onClick={() => document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' })} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">FAQ</button>
             <button onClick={() => setContactOpen(true)} className="hidden text-sm text-slate-400 transition-colors hover:text-white md:block">Contact</button>
@@ -1176,6 +1317,37 @@ function LandingPage({ onStart, onLogin }) {
             </button>
           ))}
         </div>
+      </section>
+
+      <section className="relative z-10 max-w-6xl mx-auto px-6 pb-24">
+        <Card className="border-slate-800 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(30,41,59,0.92))] p-8 sm:p-10">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-lg border border-violet-500/25 bg-violet-500/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-violet-200">
+                Comparison Page
+              </div>
+              <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">See how AgentComerce compares against the big brands</h2>
+              <p className="max-w-2xl text-sm leading-7 text-slate-300">
+                We added a direct comparison page against Tidio, Manychat, Intercom, Zendesk, Gorgias, and Crisp. It shows starting price, setup style, ecommerce fit, operational overhead, and where AgentComerce is actually stronger.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {["6 competitors", "Price context", "Setup comparison", "Ecommerce fit", "Managed rollout angle", "Fair tradeoffs"].map((item) => (
+                <div key={item} className="rounded-2xl border border-slate-800 bg-slate-950 p-4 text-sm font-semibold text-slate-200">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            <Btn onClick={() => window.location.assign('/comparison')} className="justify-center">
+              <Icon path={icons.chart} size={16} /> Open Comparison Page
+            </Btn>
+            <button onClick={onStart} className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900/80 px-6 py-3 text-sm font-semibold text-slate-200 transition-colors hover:border-slate-500 hover:text-white">
+              <Icon path={icons.zap} size={14} /> Start Trial Instead
+            </button>
+          </div>
+        </Card>
       </section>
 
       {/* ── PRICING ── */}
@@ -1578,6 +1750,146 @@ function CaseStudyPage({ study, onBack, onStart }) {
   );
 }
 
+function ComparisonPage({ onBack, onStart }) {
+  return (
+    <div className="min-h-screen bg-slate-950 text-white" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+      <ParticleBg />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(91,33,182,0.18),rgba(2,6,23,0.96)_54%,rgba(2,6,23,1)_100%)] pointer-events-none z-0" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 sm:py-14">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <button onClick={onBack} className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/90 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:border-slate-500 hover:text-white">
+            <Icon path={icons.arrowL} size={14} /> Back to Home
+          </button>
+          <Btn onClick={onStart} className="justify-center sm:w-auto">
+            <Icon path={icons.zap} size={16} /> Start Trial
+          </Btn>
+        </div>
+
+        <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+          <Card className="border-slate-800 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(30,41,59,0.92))] p-8 sm:p-10">
+            <div className="mb-4 inline-flex items-center rounded-lg border border-violet-500/30 bg-violet-500/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-violet-200">
+              Comparison
+            </div>
+            <h1 className="mb-4 text-4xl font-extrabold leading-tight text-white sm:text-5xl">AgentComerce vs bigger support platforms</h1>
+            <p className="max-w-3xl text-base leading-8 text-slate-200">
+              This page is not a fake "we beat everyone at everything" claim. Bigger brands have broader helpdesk depth. AgentComerce wins when a store owner wants a faster ecommerce rollout, store-specific setup, and less operational overhead.
+            </p>
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {[
+                ["Best for", "Managed ecommerce AI launch"],
+                ["Setup pace", "1-2 business days"],
+                ["Primary edge", "Store-specific deployment, not generic software"],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+                  <div className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</div>
+                  <div className="text-sm font-semibold text-slate-100">{value}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="border-slate-800 bg-slate-950 p-8">
+            <div className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">How to read this</div>
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                <div className="mb-2 text-sm font-semibold text-white">Where AgentComerce is stronger</div>
+                <p className="text-sm leading-7 text-slate-300">Managed setup, store-specific onboarding, faster launch, simpler plans, and a tighter ecommerce focus.</p>
+              </div>
+              <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                <div className="mb-2 text-sm font-semibold text-white">Where larger platforms are stronger</div>
+                <p className="text-sm leading-7 text-slate-300">Broader service operations, deeper admin tooling, larger ecosystems, and more enterprise-level workflow depth.</p>
+              </div>
+              <div className="rounded-2xl border border-violet-900 bg-violet-950/40 p-4">
+                <div className="mb-2 text-sm font-semibold text-violet-200">Pricing note</div>
+                <p className="text-sm leading-7 text-slate-300">Prices are starting points from official vendor pricing pages and can change. Use them for positioning, not as a legal quote sheet.</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <div className="mb-10 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950">
+          <div className="grid grid-cols-[220px_repeat(7,minmax(180px,1fr))] border-b border-slate-800 bg-slate-900 text-sm font-semibold text-slate-200">
+            <div className="p-4">Category</div>
+            {COMPARISON_BRANDS.map((brand) => (
+              <div key={brand.name} className={cx("border-l border-slate-800 p-4", brand.recommended ? "bg-violet-950/35 text-white" : "")}>
+                <div className="flex items-center justify-between gap-2">
+                  <span>{brand.name}</span>
+                  {brand.recommended ? <span className="rounded-lg border border-violet-500/30 bg-violet-500/15 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-violet-200">Best fit</span> : null}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {COMPARISON_ROWS.map((row, rowIndex) => (
+            <div key={row.label} className={cx("grid grid-cols-[220px_repeat(7,minmax(180px,1fr))]", rowIndex !== COMPARISON_ROWS.length - 1 ? "border-b border-slate-800" : "")}>
+              <div className="p-4 text-sm font-semibold text-slate-300">{row.label}</div>
+              {COMPARISON_BRANDS.map((brand) => (
+                <div key={brand.name + row.label} className={cx("border-l border-slate-800 p-4 text-sm leading-6 text-slate-300", brand.recommended ? "bg-violet-950/20 text-slate-100" : "")}>
+                  {row.values[brand.name]}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="mb-10 grid grid-cols-1 gap-6 xl:grid-cols-2">
+          {COMPARISON_BRANDS.map((brand) => (
+            <Card key={brand.name} className={cx("border-slate-800 p-6", brand.recommended ? "bg-[linear-gradient(135deg,rgba(91,33,182,0.22),rgba(15,23,42,0.95))]" : "bg-slate-950")}>
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-2xl font-bold text-white">{brand.name}</h3>
+                  <p className="mt-1 text-sm font-semibold text-violet-300">{brand.price}</p>
+                </div>
+                {brand.recommended ? <div className="rounded-lg border border-violet-500/30 bg-violet-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-violet-200">Recommended for your positioning</div> : null}
+              </div>
+              <div className="space-y-4 text-sm leading-7 text-slate-300">
+                <div>
+                  <div className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Best fit</div>
+                  <div>{brand.fit}</div>
+                </div>
+                <div>
+                  <div className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Main strength</div>
+                  <div>{brand.strength}</div>
+                </div>
+                <div>
+                  <div className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Tradeoff</div>
+                  <div>{brand.limitation}</div>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                    <div className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Setup style</div>
+                    <div className="text-slate-100">{brand.setup}</div>
+                  </div>
+                  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                    <div className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Pricing model</div>
+                    <div className="text-slate-100">{brand.model}</div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <Card className="border-slate-800 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(30,41,59,0.92))] p-8 text-center sm:p-10">
+          <h2 className="mb-3 text-3xl font-bold text-white">If your goal is faster store launch, use the store-first tool</h2>
+          <p className="mx-auto mb-6 max-w-3xl text-sm leading-7 text-slate-300">
+            If you want a giant support suite, choose one. If you want a managed ecommerce AI rollout with store-specific onboarding, product guidance, and lower setup friction, AgentComerce is the tighter fit.
+          </p>
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
+            <Btn onClick={onStart} className="justify-center">
+              <Icon path={icons.zap} size={16} /> Start Trial
+            </Btn>
+            <button onClick={onBack} className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900/80 px-6 py-3 text-sm font-semibold text-slate-200 transition-colors hover:border-slate-500 hover:text-white">
+              <Icon path={icons.arrowL} size={14} /> Back to Home
+            </button>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 // ── ROOT APP ──────────────────────────────────────────────────
 export default function App() {
   const path = window.location.pathname;
@@ -1586,6 +1898,7 @@ export default function App() {
   const isAdminDashPath = path === "/admin/dashboard" || path === "/admin/dashboard/";
   const isLoginPath = path === "/login" || path === "/login/";
   const isDashPath = path === "/dashboard" || path === "/dashboard/";
+  const isComparisonPath = path === "/comparison" || path === "/comparison/";
   const caseStudyMatch = path.match(/^\/case-studies\/([^/]+)\/?$/);
   const selectedCaseStudy = caseStudyMatch ? CASE_STUDIES.find((study) => study.id === caseStudyMatch[1]) : null;
   const shouldAutoStartFlow = !caseStudyMatch && new URLSearchParams(search).get("start") === "1";
@@ -1649,6 +1962,10 @@ export default function App() {
       return null;
     }
     return <CaseStudyPage study={selectedCaseStudy} onBack={() => window.location.replace("/")} onStart={() => window.location.assign("/?start=1")} />;
+  }
+
+  if (isComparisonPath) {
+    return <ComparisonPage onBack={() => window.location.replace("/")} onStart={() => window.location.assign("/?start=1")} />;
   }
 
   if (isAdminDashPath) {
