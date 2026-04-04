@@ -1,7 +1,7 @@
 const API_BASE = process.env.REACT_APP_API_URL ||
   (window.location.hostname === "localhost"
     ? "http://localhost:4000/api"
-    : "https://agentcommerce-backend-production.up.railway.app/api");
+    : "https://agentcommerce-backend-production-e1d9.up.railway.app/api");
 
 async function parseJsonSafe(res) {
   const text = await res.text();
