@@ -656,6 +656,7 @@ const DEMO = [
   { r:'a', t:'Delivery is fast.\n\n- Standard delivery: 1-2 working days\n- Same-day delivery available on select orders before 12pm\n- Nationwide delivery: 3-5 working days\n- Free shipping on orders over Rs.5,000\n\nWant me to add the Penny Loafers to your cart?' },
 ];
 let dIdx = 0;
+let demoStarted = false;
 function playDemo(){
   if(dIdx >= DEMO.length){
     setTimeout(() => {
@@ -707,12 +708,26 @@ function handleKey(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); s
 function smartScroll(onDone){
   const site = document.getElementById('site');
   const scan = document.getElementById('scan');
+  if(!site || !scan){
+    if(onDone) onDone();
+    return;
+  }
   site.scrollTop = 0;
   scan.style.opacity = '1';
   const grid = document.getElementById('ndure-grid');
+  if(!grid){
+    scan.style.opacity = '0';
+    if(onDone) onDone();
+    return;
+  }
   const gridTop = grid.offsetTop;
   const gridBot = gridTop + grid.offsetHeight;
   const total = site.scrollHeight - site.clientHeight;
+  if(total <= 0){
+    scan.style.opacity = '0';
+    if(onDone) setTimeout(onDone, 150);
+    return;
+  }
   let pos = 0;
   const si = setInterval(() => {
     const spd = (pos > gridTop - 80 && pos < gridBot + 80) ? 3 : (pos < gridTop ? 22 : 20);
@@ -731,11 +746,23 @@ function smartScroll(onDone){
 }
 
 function runDemo(){
+  if(demoStarted) return;
+  demoStarted = true;
   const intro = document.getElementById('intro');
-  setTimeout(() => { intro.classList.add('gone'); setTimeout(() => intro.style.display='none', 950); }, 2600);
+  if(intro){
+    setTimeout(() => {
+      intro.classList.add('gone');
+      setTimeout(() => { intro.style.display='none'; }, 950);
+    }, 2600);
+  }
   setTimeout(() => {
     smartScroll(() => {
       const lbl = document.getElementById('chat-label');
+      if(!lbl){
+        openChat();
+        setTimeout(() => playDemo(), 700);
+        return;
+      }
       lbl.classList.add('v');
       setTimeout(() => {
         lbl.classList.remove('v');
@@ -744,6 +771,16 @@ function runDemo(){
       }, 1100);
     });
   }, 3100);
+}
+
+function bootDemo(){
+  try {
+    runDemo();
+  } catch (err) {
+    const intro = document.getElementById('intro');
+    if(intro) intro.style.display = 'none';
+    openChat();
+  }
 }
 
 function replayDemo(){
@@ -766,7 +803,19 @@ function replayDemo(){
   }, 400);
 }
 
-document.addEventListener('DOMContentLoaded', () => runDemo());
+if(document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootDemo, { once: true });
+} else {
+  bootDemo();
+}
+
+setTimeout(() => {
+  const intro = document.getElementById('intro');
+  if(intro && intro.style.display !== 'none') {
+    intro.classList.add('gone');
+    setTimeout(() => { intro.style.display = 'none'; }, 950);
+  }
+}, 4000);
 </script>
 </body>
 </html>
