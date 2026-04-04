@@ -654,10 +654,8 @@ const DEMO = [
   { r:'a', t:'If you want a cleaner formal look, I recommend the Men's Horsebit Loafers as a second option.\n\nThey are more premium in finish, work well for events, and are priced at Rs.6,499.\n\nIf you want value, stay with the Penny Loafers. If you want a sharper dress look, go with the Horsebit pair.' },
   { r:'u', t:'How long does delivery take?' },
   { r:'a', t:'Delivery is fast.\n\n- Standard delivery: 1-2 working days\n- Same-day delivery available on select orders before 12pm\n- Nationwide delivery: 3-5 working days\n- Free shipping on orders over Rs.5,000\n\nWant me to add the Penny Loafers to your cart?' },
-];
 let dIdx = 0;
 let demoStarted = false;
-function playDemo(){
   if(dIdx >= DEMO.length){
     setTimeout(() => {
       document.getElementById('ask-banner').classList.add('on');
