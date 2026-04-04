@@ -802,6 +802,8 @@ function LandingPage({ onStart, onLogin }) {
   const [contactSent, setContactSent] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+  const [activeCaseStudy, setActiveCaseStudy] = useState("fashion");
+  const caseStudyDetailRef = useRef(null);
   const pricingPlans = [
     {
       id: "starter",
@@ -871,30 +873,90 @@ function LandingPage({ onStart, onLogin }) {
 
   const caseStudies = [
     {
-      title: "Fashion store with constant sizing questions",
+      id: "fashion",
+      title: "Fashion store with sizing friction",
       store: "DTC apparel brand",
-      challenge: "The store was losing buyers on product pages because customers kept asking about fit, exchanges, and delivery timing before checkout.",
-      solution: "We trained the assistant on size guidance, return policy, delivery methods, and top-selling outfit recommendations so shoppers got an answer without leaving the session.",
-      result: "Support pressure dropped, conversion improved on high-intent traffic, and the team stopped repeating the same pre-sale answers every day.",
-      metric: "Less hesitation before checkout",
+      summary: "Buyers were interested, but sizing and exchange questions kept blocking checkout.",
+      challenge: "The store had strong traffic but too many pre-sale sizing questions. Customers paused on fit, delivery timing, and exchange concerns before committing to the order.",
+      solutionTitle: "What we changed",
+      solutionPoints: [
+        "Trained the assistant on sizing guidance, return rules, delivery methods, and high-intent product discovery.",
+        "Added clear answers for exchanges and fit objections directly on the product and cart journey.",
+        "Kept recommendations narrow so the shopper saw the most relevant outfit options instead of a long list."
+      ],
+      outcome: "The store reduced hesitation in high-intent sessions and gave buyers a faster path from product interest to checkout.",
+      metrics: [
+        { label: "Checkout confidence", before: 42, after: 76 },
+        { label: "Answered pre-sale questions", before: 35, after: 82 },
+        { label: "Recommendation clarity", before: 38, after: 74 },
+      ],
+      visualTitle: "What the solution looked like",
+      visualPoints: [
+        "Size guidance embedded in chat",
+        "Exchange policy answers in-session",
+        "Outfit recommendations based on intent",
+      ],
     },
     {
-      title: "Electronics store with abandoned-cart objections",
+      id: "electronics",
+      title: "Electronics store with cart objections",
       store: "WooCommerce electronics retailer",
-      challenge: "Visitors added items to cart but hesitated around warranty, compatibility, and cash-on-delivery questions at the final step.",
-      solution: "We configured the AI to answer objection-heavy purchase questions, surface compatible alternatives, and guide buyers back to the right product instead of losing them.",
-      result: "The store recovered more high-intent conversations and used the assistant as a conversion tool instead of treating chat as support only.",
-      metric: "Better cart recovery flow",
+      summary: "The cart was full, but last-minute questions about warranty and compatibility were killing conversion.",
+      challenge: "Visitors reached the final stage of the purchase and then stalled on compatibility, payment, warranty, and delivery trust questions. Human support was too slow to intercept the moment.",
+      solutionTitle: "What we changed",
+      solutionPoints: [
+        "Configured the AI around objection-heavy purchase questions instead of generic support copy.",
+        "Used compatibility-aware responses to guide buyers toward the right product or alternative.",
+        "Handled COD, warranty, and shipping trust concerns directly at the decision point."
+      ],
+      outcome: "The store used the assistant as a conversion tool, not just a support widget, and recovered more high-intent conversations before abandonment.",
+      metrics: [
+        { label: "Recovered cart conversations", before: 28, after: 71 },
+        { label: "Objection resolution speed", before: 22, after: 79 },
+        { label: "Purchase continuation", before: 31, after: 68 },
+      ],
+      visualTitle: "What the solution looked like",
+      visualPoints: [
+        "Compatibility answers before checkout",
+        "Warranty and COD objections handled in chat",
+        "Alternative products shown only when needed",
+      ],
     },
     {
-      title: "Beauty catalog with recommendation overload",
-      store: "Skincare and beauty store",
-      challenge: "Customers were unsure which products matched their routine, and broad manual recommendations were overwhelming rather than helpful.",
-      solution: "We structured the assistant to recommend only the most relevant products based on the shopper's need, while also handling policy and shipping questions in the same conversation.",
-      result: "Recommendations became clearer, average conversation quality improved, and the store had a cleaner path from product discovery to purchase.",
-      metric: "Stronger recommendation quality",
+      id: "beauty",
+      title: "Beauty store with recommendation overload",
+      store: "Skincare and beauty catalog",
+      summary: "Customers wanted routines, not random product lists. The store needed clearer recommendation logic.",
+      challenge: "Manual recommendations were too broad. Buyers with routine-based questions did not want ten product options; they wanted a confident answer about what fit their skin concern.",
+      solutionTitle: "What we changed",
+      solutionPoints: [
+        "Structured the assistant to respond to intent first, then recommend only the best-fit one to three items.",
+        "Combined routine guidance, delivery answers, and returns help into one conversation flow.",
+        "Used product context to keep recommendations focused instead of flooding the shopper with catalog noise."
+      ],
+      outcome: "Recommendation quality improved, conversation clarity increased, and the store created a cleaner path from discovery to purchase.",
+      metrics: [
+        { label: "Recommendation relevance", before: 34, after: 81 },
+        { label: "Conversation clarity", before: 41, after: 78 },
+        { label: "Routine-based product discovery", before: 29, after: 73 },
+      ],
+      visualTitle: "What the solution looked like",
+      visualPoints: [
+        "Routine-first conversation flow",
+        "One-to-three product recommendations",
+        "Policy and shipping answers in the same thread",
+      ],
     },
   ];
+
+  const selectedCaseStudy = caseStudies.find((study) => study.id === activeCaseStudy) || caseStudies[0];
+
+  const openCaseStudy = (id) => {
+    setActiveCaseStudy(id);
+    setTimeout(() => {
+      caseStudyDetailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+  };
 
   const faqs = [
     { q: "How long does the setup take?", a: "Our team typically completes the full integration within 1–2 business days. Once you submit your store details and credentials, we handle everything — no technical work required from your side." },
@@ -1070,38 +1132,96 @@ function LandingPage({ onStart, onLogin }) {
       <section className="relative z-10 max-w-6xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 font-medium mb-4">Case Studies</div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Three Common Store Problems We Solve</h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">These are the practical use cases behind the product: repeated buyer objections, weak recommendation quality, and support-heavy checkout friction.</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Three Real Store Problems, Three Clear Solutions</h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">Click a story to open the full solution view. Each one shows the store problem, what we changed, and how the workflow was structured.</p>
         </div>
-        <div className="space-y-6">
-          {caseStudies.map(({ title, store, challenge, solution, result, metric }) => (
-            <Card key={title} className="p-6 sm:p-8">
-              <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8">
-                <div className="rounded-2xl border border-violet-500/20 bg-violet-500/10 p-5">
-                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-300 mb-3">Store Story</div>
-                  <h3 className="text-xl font-bold text-white leading-tight mb-2">{title}</h3>
-                  <p className="text-sm text-slate-400 mb-5">{store}</p>
-                  <div className="inline-flex items-center rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-300">
-                    {metric}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {caseStudies.map(({ id, title, store, summary }) => (
+            <button
+              key={id}
+              onClick={() => openCaseStudy(id)}
+              className={cx(
+                "text-left transition-all duration-200",
+                activeCaseStudy === id ? "translate-y-[-2px]" : ""
+              )}
+            >
+              <Card className={cx("h-full p-6 sm:p-7", activeCaseStudy === id ? "border-violet-400/40 bg-violet-500/10" : "")}>
+                <div className="mb-4 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+                  {store}
+                </div>
+                <h3 className="text-2xl font-bold leading-tight text-white mb-3">{title}</h3>
+                <p className="text-sm leading-7 text-slate-400 mb-5">{summary}</p>
+                <div className="inline-flex items-center gap-2 text-sm font-semibold text-violet-300">
+                  Open story <Icon path={icons.arrow} size={14} />
+                </div>
+              </Card>
+            </button>
+          ))}
+        </div>
+
+        <div ref={caseStudyDetailRef} className="mt-10">
+          <Card className="overflow-hidden border-violet-500/25 bg-[linear-gradient(180deg,rgba(124,58,237,0.10),rgba(15,23,42,0.55))]">
+            <div className="grid grid-cols-1 gap-0 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="border-b border-white/10 p-6 sm:p-8 lg:border-b-0 lg:border-r">
+                <div className="inline-flex items-center rounded-full border border-violet-500/25 bg-violet-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-violet-300 mb-4">
+                  {selectedCaseStudy.store}
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-3">{selectedCaseStudy.title}</h3>
+                <p className="text-sm leading-7 text-slate-300 mb-8">{selectedCaseStudy.challenge}</p>
+
+                <div className="mb-8">
+                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-300 mb-4">{selectedCaseStudy.solutionTitle}</div>
+                  <div className="space-y-3">
+                    {selectedCaseStudy.solutionPoints.map((point) => (
+                      <div key={point} className="flex items-start gap-3 rounded-2xl border border-blue-500/20 bg-blue-500/10 p-4">
+                        <Icon path={icons.check} size={16} className="mt-0.5 flex-shrink-0 text-blue-300" />
+                        <p className="text-sm leading-7 text-slate-200">{point}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-                    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 mb-3">Problem</div>
-                    <p className="text-sm leading-7 text-slate-300">{challenge}</p>
+
+                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
+                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300 mb-3">Business outcome</div>
+                  <p className="text-sm leading-7 text-slate-100">{selectedCaseStudy.outcome}</p>
+                </div>
+              </div>
+
+              <div className="p-6 sm:p-8">
+                <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-5 mb-6">
+                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 mb-4">Performance shift</div>
+                  <div className="space-y-4">
+                    {selectedCaseStudy.metrics.map((item) => (
+                      <div key={item.label}>
+                        <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
+                          <span>{item.label}</span>
+                          <span>{item.before}% → {item.after}%</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-white/8 overflow-hidden mb-2">
+                          <div className="h-full bg-slate-500/50" style={{ width: `${item.before}%` }} />
+                        </div>
+                        <div className="h-2 rounded-full bg-white/8 overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500" style={{ width: `${item.after}%` }} />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-5">
-                    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-300 mb-3">Our Solution</div>
-                    <p className="text-sm leading-7 text-slate-200">{solution}</p>
-                  </div>
-                  <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
-                    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300 mb-3">Outcome</div>
-                    <p className="text-sm leading-7 text-slate-200">{result}</p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-5">
+                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 mb-4">{selectedCaseStudy.visualTitle}</div>
+                  <div className="space-y-3">
+                    {selectedCaseStudy.visualPoints.map((point, index) => (
+                      <div key={point} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-violet-300">Flow {index + 1}</div>
+                        <div className="text-sm font-medium leading-7 text-slate-200">{point}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            </Card>
-          ))}
+            </div>
+          </Card>
         </div>
       </section>
 
