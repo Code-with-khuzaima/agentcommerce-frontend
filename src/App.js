@@ -1422,9 +1422,18 @@ function LandingPage({ onStart, onLogin }) {
                 ))}
               </div>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-slate-950/75 p-6 sm:p-7">
-              <div className="mb-6 overflow-hidden rounded-2xl border border-white/10 bg-black">
-                <div className="relative">
+            <div className="rounded-2xl border border-white/10 bg-slate-950/80 p-6 sm:p-7">
+              <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+                <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Demo Preview</div>
+                    <div className="text-sm font-semibold text-white">Store walkthrough</div>
+                  </div>
+                  <div className="inline-flex items-center gap-1 rounded-md border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-200">
+                    View only
+                  </div>
+                </div>
+                <div className="relative bg-black">
                   <iframe
                     src={demoUrl}
                     title="AgentComerce Demo Preview"
