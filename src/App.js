@@ -180,6 +180,127 @@ function Textarea({ id, placeholder, value, onChange, rows = 3 }) {
   );
 }
 
+function ShopifyCredentialAnimation() {
+  const frames = [
+    {
+      step: "Step 1",
+      title: "Open Apps in Shopify admin",
+      caption: "Go to Apps and sales channels, then open your app.",
+      tab: "Apps",
+      lines: ["Apps and sales channels", "AgentComerce AI", "Custom app settings"],
+      focus: 1,
+    },
+    {
+      step: "Step 2",
+      title: "Open Configuration",
+      caption: "Enable the Admin API scopes before installation.",
+      tab: "Configuration",
+      lines: ["Admin API integration", "read_products", "read_orders", "read_inventory"],
+      focus: 0,
+    },
+    {
+      step: "Step 3",
+      title: "Install the app on the store",
+      caption: "Select the store and complete installation.",
+      tab: "Distribution",
+      lines: ["Select store", "Install app", "Approve permissions"],
+      focus: 1,
+    },
+    {
+      step: "Step 4",
+      title: "Open API credentials",
+      caption: "This is where Shopify exposes the client pair.",
+      tab: "API credentials",
+      lines: ["Client ID", "Client Secret", "Admin API access"],
+      focus: 1,
+    },
+    {
+      step: "Step 5",
+      title: "Copy the values into AgentComerce",
+      caption: "Paste Client ID and Client Secret, then verify.",
+      tab: "AgentComerce",
+      lines: ["Client ID -> first field", "Client Secret -> second field", "Verify and continue"],
+      focus: 2,
+    },
+  ];
+
+  const [frameIndex, setFrameIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setFrameIndex((index) => (index + 1) % frames.length);
+    }, 2200);
+    return () => clearInterval(timer);
+  }, [frames.length]);
+
+  const frame = frames[frameIndex];
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-emerald-500/20 bg-[linear-gradient(135deg,rgba(6,78,59,0.16),rgba(15,23,42,0.94))] shadow-[0_20px_50px_rgba(2,6,23,0.35)]">
+      <div className="border-b border-white/10 px-5 py-4">
+        <div className="mb-1 flex items-center justify-between gap-4">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">{frame.step}</div>
+            <div className="text-lg font-bold text-white">{frame.title}</div>
+          </div>
+          <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-200">
+            Shopify guide
+          </div>
+        </div>
+        <p className="text-sm leading-6 text-slate-300">{frame.caption}</p>
+      </div>
+
+      <div className="grid grid-cols-[180px_1fr] gap-0">
+        <div className="border-r border-white/10 bg-slate-950/50 p-4">
+          <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Navigation</div>
+          {["Apps", "Configuration", "Distribution", "API credentials"].map((item) => (
+            <div
+              key={item}
+              className={cx(
+                "mb-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-all",
+                frame.tab === item
+                  ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-200"
+                  : "border-white/5 bg-white/[0.03] text-slate-400"
+              )}
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+
+        <div className="p-4">
+          <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Current screen</div>
+          <div className="rounded-xl border border-white/10 bg-slate-950/70 p-4">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-sm font-semibold text-white">{frame.tab}</div>
+              <div className="flex gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+              </div>
+            </div>
+            <div className="space-y-3">
+              {frame.lines.map((line, index) => (
+                <div
+                  key={line}
+                  className={cx(
+                    "rounded-lg border px-3 py-3 text-sm transition-all",
+                    frame.focus === index
+                      ? "border-violet-500/35 bg-violet-500/12 text-white shadow-[0_0_0_1px_rgba(139,92,246,0.18)]"
+                      : "border-white/5 bg-white/[0.03] text-slate-400"
+                  )}
+                >
+                  {line}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const DELIVERY_OPTIONS = ["Standard Shipping", "Express Shipping", "Same-Day Delivery", "Click & Collect", "Free Shipping"];
 const CATEGORY_OPTIONS = ["Clothing & Apparel", "Electronics", "Home & Garden", "Beauty & Health", "Sports & Outdoors", "Food & Beverage", "Toys & Games", "Books & Media", "Jewelry & Accessories", "Other"];
 const PHONE_VALIDATION_REGEX = /^[+\d][\d\s().-]{6,}$/;
@@ -669,6 +790,7 @@ function Step2({ data, setData, onNext, onBack }) {
       <div className="space-y-2">
         {(isShopify ? shopifyInstructions : wooInstructions).map((txt, i) => <Instruction key={i} step={i + 1}>{txt}</Instruction>)}
       </div>
+      {isShopify ? <ShopifyCredentialAnimation /> : null}
       <div className="space-y-4 pt-2">
         {isShopify ? (<>
           <Field label="Client ID" id="apiKey" error={errors.apiKey} helper="Dev Dashboard → Settings tab → Client ID">
