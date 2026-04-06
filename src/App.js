@@ -1056,7 +1056,7 @@ function LandingPage({ onStart, onLogin }) {
   const [bookDemoSending, setBookDemoSending] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
-  const demoVideoUrl = `${process.env.PUBLIC_URL || ""}/agentcommerce-demo.mp4`;
+  const demoUrl = `${process.env.PUBLIC_URL || ""}/demo.html`;
 
   function openDemo() {
     setDemoOpen(true);
@@ -1407,11 +1407,11 @@ function LandingPage({ onStart, onLogin }) {
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Send your store URL and we will prepare the demo around your store</h2>
               <p className="text-slate-300 leading-relaxed mb-5">
-                Watch the short product demo first, then send your store URL and email. We use that to prepare the next demo conversation around your store instead of showing a generic pitch only.
+                Watch the demo preview first, then send your store URL and email. We use that to prepare the next demo conversation around your store instead of relying on a generic pitch only.
               </p>
               <div className="space-y-3">
                 {[
-                  "Watch the short product demo to understand the flow.",
+                  "Watch the demo preview to understand the flow.",
                   "Send the store URL and contact email.",
                   "We review the store and prepare the next demo around that store."
                 ].map((item) => (
@@ -1424,13 +1424,15 @@ function LandingPage({ onStart, onLogin }) {
             </div>
             <div className="rounded-3xl border border-white/10 bg-slate-950/75 p-6 sm:p-7">
               <div className="mb-6 overflow-hidden rounded-2xl border border-white/10 bg-black">
-                <video
-                  src={demoVideoUrl}
-                  controls
-                  playsInline
-                  preload="metadata"
-                  className="block w-full h-[220px] object-cover"
-                />
+                <div className="relative">
+                  <iframe
+                    src={demoUrl}
+                    title="AgentComerce Demo Preview"
+                    className="block h-[220px] w-full border-none"
+                    tabIndex={-1}
+                  />
+                  <div className="absolute inset-0 z-10 cursor-default bg-transparent" aria-hidden="true" />
+                </div>
               </div>
               {bookDemoSent ? (
                 <div className="text-center py-6">
@@ -1660,16 +1662,17 @@ function LandingPage({ onStart, onLogin }) {
             <button onClick={closeDemo} className="absolute top-3 right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/80 text-lg text-white">x</button>
             <div className="border-b border-white/10 px-6 py-4">
               <h3 className="text-lg font-semibold text-white">AgentComerce Demo</h3>
-              <p className="text-sm text-slate-400">Short product walkthrough</p>
+              <p className="text-sm text-slate-400">Non-interactive product preview</p>
             </div>
-            <video
-              src={demoVideoUrl}
-              controls
-              autoPlay
-              playsInline
-              preload="metadata"
-              className="block w-full max-h-[78vh] bg-black"
-            />
+            <div className="relative">
+              <iframe
+                src={demoUrl}
+                className="block h-[78vh] w-full border-none bg-white"
+                title="AgentComerce Demo"
+                tabIndex={-1}
+              />
+              <div className="absolute inset-0 z-10 cursor-default bg-transparent" aria-hidden="true" />
+            </div>
           </div>
         </div>
       )}
