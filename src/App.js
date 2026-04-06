@@ -1048,8 +1048,6 @@ function LandingPage({ onStart, onLogin }) {
   const [pricingOpen, setPricingOpen] = useState(false);
   const [pricingCycle, setPricingCycle] = useState("monthly");
   const [demoOpen, setDemoOpen] = useState(false);
-  const [demoLoading, setDemoLoading] = useState(false);
-  const [demoFailed, setDemoFailed] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [contactSent, setContactSent] = useState(false);
@@ -1058,18 +1056,14 @@ function LandingPage({ onStart, onLogin }) {
   const [bookDemoSending, setBookDemoSending] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
-  const demoUrl = `${process.env.PUBLIC_URL || ""}/demo.html`;
+  const demoVideoUrl = `${process.env.PUBLIC_URL || ""}/agentcommerce-demo.mp4`;
 
   function openDemo() {
-    setDemoFailed(false);
-    setDemoLoading(true);
     setDemoOpen(true);
   }
 
   function closeDemo() {
     setDemoOpen(false);
-    setDemoLoading(false);
-    setDemoFailed(false);
   }
   const pricingPlans = [
     {
@@ -1413,13 +1407,13 @@ function LandingPage({ onStart, onLogin }) {
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Send your store URL and we will prepare the demo around your store</h2>
               <p className="text-slate-300 leading-relaxed mb-5">
-                This is the safer sales flow. A generic video is weak, and using a real brand without permission is a bad idea. Instead, collect the store URL and email, then review, confirm, and build the chat demo manually.
+                Watch the short product demo first, then send your store URL and email. We use that to prepare the next demo conversation around your store instead of showing a generic pitch only.
               </p>
               <div className="space-y-3">
                 {[
-                  "You send the store URL and contact email.",
-                  "We review the store and confirm the demo scope by email.",
-                  "We prepare the custom chat demo button and the demo build for that store."
+                  "Watch the short product demo to understand the flow.",
+                  "Send the store URL and contact email.",
+                  "We review the store and prepare the next demo around that store."
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-3 text-sm text-slate-200">
                     <Icon path={icons.check} size={14} className="mt-1 text-emerald-400" />
@@ -1429,6 +1423,15 @@ function LandingPage({ onStart, onLogin }) {
               </div>
             </div>
             <div className="rounded-3xl border border-white/10 bg-slate-950/75 p-6 sm:p-7">
+              <div className="mb-6 overflow-hidden rounded-2xl border border-white/10 bg-black">
+                <video
+                  src={demoVideoUrl}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="block w-full h-[220px] object-cover"
+                />
+              </div>
               {bookDemoSent ? (
                 <div className="text-center py-6">
                   <div className="w-14 h-14 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto mb-4">
@@ -1436,7 +1439,7 @@ function LandingPage({ onStart, onLogin }) {
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">Demo request sent</h3>
                   <p className="text-sm leading-relaxed text-slate-400">
-                    We received the store URL and email. Next step is manual: review the store, confirm the demo, then prepare the custom chat build.
+                    We received the store URL and email. Next step is review, then we prepare the next demo around that store.
                   </p>
                 </div>
               ) : (
@@ -1467,7 +1470,7 @@ function LandingPage({ onStart, onLogin }) {
                     <Icon path={icons.mail} size={16} /> Book Demo
                   </Btn>
                   <p className="text-xs leading-relaxed text-slate-500">
-                    This only sends the request email. Confirmation and the actual demo build happen manually after review.
+                    This sends the request so we can review the store and prepare the next demo around your setup.
                   </p>
                 </div>
               )}
@@ -1653,33 +1656,19 @@ function LandingPage({ onStart, onLogin }) {
         </div>
       )}{demoOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" onClick={closeDemo}>
-          <div className="relative w-full max-w-5xl h-[85vh] rounded-2xl overflow-hidden border border-white/10" onClick={e => e.stopPropagation()}>
-            <button onClick={closeDemo} className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-black/80 flex items-center justify-center text-white text-lg border border-white/20">✕</button>
-            {demoLoading && !demoFailed ? (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black text-slate-300 text-sm">
-                Loading demo...
-              </div>
-            ) : null}
-            {demoFailed ? (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black px-6 text-center">
-                <div>
-                  <p className="text-white text-lg font-semibold mb-2">Demo failed to load</p>
-                  <p className="text-slate-400 text-sm mb-4">The demo page could not be opened from <span className="font-mono">{demoUrl}</span>.</p>
-                  <button onClick={openDemo} className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black">
-                    Retry
-                  </button>
-                </div>
-              </div>
-            ) : null}
-            <iframe
-              src={demoUrl}
-              className="w-full h-full border-none"
-              title="AgentComerce Demo"
-              onLoad={() => setDemoLoading(false)}
-              onError={() => {
-                setDemoLoading(false);
-                setDemoFailed(true);
-              }}
+          <div className="relative w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-slate-950" onClick={e => e.stopPropagation()}>
+            <button onClick={closeDemo} className="absolute top-3 right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/80 text-lg text-white">x</button>
+            <div className="border-b border-white/10 px-6 py-4">
+              <h3 className="text-lg font-semibold text-white">AgentComerce Demo</h3>
+              <p className="text-sm text-slate-400">Short product walkthrough</p>
+            </div>
+            <video
+              src={demoVideoUrl}
+              controls
+              autoPlay
+              playsInline
+              preload="metadata"
+              className="block w-full max-h-[78vh] bg-black"
             />
           </div>
         </div>
