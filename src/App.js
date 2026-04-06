@@ -1057,6 +1057,12 @@ function LandingPage({ onStart, onLogin }) {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const demoUrl = `${process.env.PUBLIC_URL || ""}/demo.html`;
+  const [demoPreviewLoopKey, setDemoPreviewLoopKey] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => setDemoPreviewLoopKey((n) => n + 1), 28000);
+    return () => clearInterval(timer);
+  }, []);
 
   function openDemo() {
     setDemoOpen(true);
@@ -1422,27 +1428,30 @@ function LandingPage({ onStart, onLogin }) {
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/80 p-6 sm:p-7">
-              <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+            <div className="space-y-5">
+              <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-950/95 shadow-[0_20px_50px_rgba(2,6,23,0.35)]">
                 <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
                   <div>
                     <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Demo Preview</div>
                     <div className="text-sm font-semibold text-white">Store walkthrough</div>
                   </div>
                   <div className="inline-flex items-center gap-1 rounded-md border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-200">
-                    View only
+                    Live preview
                   </div>
                 </div>
                 <div className="relative bg-black">
                   <iframe
+                    key={demoPreviewLoopKey}
                     src={demoUrl}
                     title="AgentComerce Demo Preview"
-                    className="block h-[220px] w-full border-none"
+                    className="block h-[280px] w-full border-none"
                     tabIndex={-1}
                   />
                   <div className="absolute inset-0 z-10 cursor-default bg-transparent" aria-hidden="true" />
                 </div>
               </div>
+
+              <div className="rounded-2xl border border-white/10 bg-slate-950/80 p-6 sm:p-7">
               {bookDemoSent ? (
                 <div className="text-center py-6">
                   <div className="w-14 h-14 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto mb-4">
@@ -1485,6 +1494,7 @@ function LandingPage({ onStart, onLogin }) {
                   </p>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </Card>
@@ -1671,7 +1681,7 @@ function LandingPage({ onStart, onLogin }) {
             <button onClick={closeDemo} className="absolute top-3 right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/80 text-lg text-white">x</button>
             <div className="border-b border-white/10 px-6 py-4">
               <h3 className="text-lg font-semibold text-white">AgentComerce Demo</h3>
-              <p className="text-sm text-slate-400">Non-interactive product preview</p>
+              <p className="text-sm text-slate-400">Product demo preview</p>
             </div>
             <div className="relative">
               <iframe
