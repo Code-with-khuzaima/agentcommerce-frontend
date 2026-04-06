@@ -221,6 +221,47 @@ function ShopifyCredentialVideo() {
     );
   }
 
+function WooCredentialVideo() {
+  const videoUrl = `${process.env.PUBLIC_URL || ""}/woocommerce-credentials-guide.mp4`;
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-blue-500/20 bg-[linear-gradient(135deg,rgba(30,64,175,0.16),rgba(15,23,42,0.94))] shadow-[0_20px_50px_rgba(2,6,23,0.35)]">
+      <div className="border-b border-white/10 px-5 py-4">
+        <div className="mb-1 flex items-center justify-between gap-4">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-300">Real tutorial</div>
+            <div className="text-lg font-bold text-white">How to get WooCommerce Consumer Key and Secret</div>
+          </div>
+          <div className="rounded-lg border border-blue-500/25 bg-blue-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-200">
+            Screen recording
+          </div>
+        </div>
+      </div>
+      <div className="bg-black">
+        <video
+          src={videoUrl}
+          controls
+          playsInline
+          preload="metadata"
+          className="block w-full"
+        />
+      </div>
+      <div className="flex flex-col gap-3 border-t border-white/10 bg-slate-950/85 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs leading-6 text-slate-400">Need a clearer view? Open the tutorial in a larger window before you paste the credentials here.</p>
+        <a
+          href={videoUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center justify-center gap-2 rounded-md border border-blue-500/25 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200 transition-colors hover:border-blue-400/40 hover:bg-blue-500/15 hover:text-white"
+        >
+          <Icon path={icons.arrow} size={14} />
+          Open larger view
+        </a>
+      </div>
+    </div>
+  );
+}
+
 const DELIVERY_OPTIONS = ["Standard Shipping", "Express Shipping", "Same-Day Delivery", "Click & Collect", "Free Shipping"];
 const CATEGORY_OPTIONS = ["Clothing & Apparel", "Electronics", "Home & Garden", "Beauty & Health", "Sports & Outdoors", "Food & Beverage", "Toys & Games", "Books & Media", "Jewelry & Accessories", "Other"];
 const PHONE_VALIDATION_REGEX = /^[+\d][\d\s().-]{6,}$/;
@@ -710,7 +751,7 @@ function Step2({ data, setData, onNext, onBack }) {
       <div className="space-y-2">
         {(isShopify ? shopifyInstructions : wooInstructions).map((txt, i) => <Instruction key={i} step={i + 1}>{txt}</Instruction>)}
       </div>
-      {isShopify ? <ShopifyCredentialVideo /> : null}
+      {isShopify ? <ShopifyCredentialVideo /> : <WooCredentialVideo />}
       <div className="space-y-4 pt-2">
         {isShopify ? (<>
           <Field label="Client ID" id="apiKey" error={errors.apiKey} helper="Dev Dashboard → Settings tab → Client ID">
