@@ -578,7 +578,7 @@ function Step2({ data, setData, onNext, onBack }) {
     const e = {};
     if (isShopify) {
       if (!data.apiKey?.trim()) e.apiKey = "Client ID is required";
-      if (!data.accessToken?.trim()) e.accessToken = "Admin API Access Token is required";
+      if (!data.accessToken?.trim()) e.accessToken = "Client Secret is required";
     } else {
       if (!data.consumerKey?.trim()) e.consumerKey = "Consumer Key is required";
       if (!data.consumerSecret?.trim()) e.consumerSecret = "Consumer Secret is required";
@@ -603,7 +603,7 @@ function Step2({ data, setData, onNext, onBack }) {
 
     // Client-side format validation first
     if (isShopify) {
-      const tokenOk = /^shpat_/i.test((data.accessToken || "").trim()) && data.accessToken?.trim().length > 12;
+      const tokenOk = /^(shpss_|shpat_)/i.test((data.accessToken || "").trim()) && data.accessToken?.trim().length > 12;
       if (!tokenOk) {
         setApiStatus("error");
         setValidating(false);
@@ -649,7 +649,7 @@ function Step2({ data, setData, onNext, onBack }) {
     <>Name it <strong>"AgentComerce AI"</strong> → click <strong>Create app</strong>.</>,
     <>Go to <strong>Configuration</strong> tab → under Admin API scopes enable: <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_products</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_orders</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_inventory</code> → click <strong>Save</strong>.</>,
     <>Go to <strong>Distribution</strong> tab → click <strong>Select store</strong> → choose your store → click <strong>Install</strong>.</>,
-    <>Go to <strong>API credentials</strong> → copy your <strong>Client ID</strong> and your <strong>Admin API access token</strong> (starts with <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">shpat_</code>) → paste them below.</>,
+    <>Go to <strong>Settings</strong> or <strong>API credentials</strong> → copy your <strong>Client ID</strong> and <strong>Client Secret</strong> (starts with <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">shpss_</code>) → paste them below.</>,
   ];
   const wooInstructions = [
     <>Go to <strong>WooCommerce → Settings → Advanced → REST API</strong>.</>,
@@ -677,9 +677,9 @@ function Step2({ data, setData, onNext, onBack }) {
                 className={cx("w-full rounded-xl border bg-white/5 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.apiKey ? "border-red-500/60" : "border-white/10")} />
             </div>{errors.apiKey && <p className="text-xs text-red-400">{errors.apiKey}</p>}
           </Field>
-          <Field label="Admin API Access Token" id="accessToken" error={errors.accessToken} helper="Admin API access token — starts with shpat_">
+          <Field label="Client Secret" id="accessToken" error={errors.accessToken} helper="Dev Dashboard secret — starts with shpss_">
             <div className="relative"><span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"><Icon path={icons.shield} size={16} /></span>
-              <input id="accessToken" type="password" placeholder="e.g. shpat_xxxxxxxxxxxxxxxx..." value={data.accessToken || ""} onChange={e => setData(d => ({ ...d, accessToken: e.target.value }))}
+              <input id="accessToken" type="password" placeholder="e.g. shpss_xxxxxxxxxxxxxxxx..." value={data.accessToken || ""} onChange={e => setData(d => ({ ...d, accessToken: e.target.value }))}
                 className={cx("w-full rounded-xl border bg-white/5 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.accessToken ? "border-red-500/60" : "border-white/10")} />
             </div>{errors.accessToken && <p className="text-xs text-red-400">{errors.accessToken}</p>}
           </Field>
