@@ -185,30 +185,42 @@ function ShopifyCredentialVideo() {
 
   return (
     <div className="overflow-hidden rounded-2xl border border-emerald-500/20 bg-[linear-gradient(135deg,rgba(6,78,59,0.16),rgba(15,23,42,0.94))] shadow-[0_20px_50px_rgba(2,6,23,0.35)]">
-      <div className="border-b border-white/10 px-5 py-4">
-        <div className="mb-1 flex items-center justify-between gap-4">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">Real tutorial</div>
-            <div className="text-lg font-bold text-white">How to get Shopify Client ID and Client Secret</div>
+        <div className="border-b border-white/10 px-5 py-4">
+          <div className="mb-1 flex items-center justify-between gap-4">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">Real tutorial</div>
+              <div className="text-lg font-bold text-white">How to get Shopify Client ID and Shopify credentials</div>
+            </div>
+            <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-200">
+              Screen recording
+            </div>
           </div>
-          <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-200">
-            Screen recording
-          </div>
+          <p className="text-sm leading-6 text-slate-300">This is the actual recorded path inside Shopify, not a simulated animation.</p>
         </div>
-        <p className="text-sm leading-6 text-slate-300">This is the actual recorded path inside Shopify, not a simulated animation.</p>
+        <div className="bg-black">
+          <video
+            src={videoUrl}
+            controls
+            playsInline
+            preload="metadata"
+            className="block w-full"
+          />
+        </div>
+        <div className="flex flex-col gap-3 border-t border-white/10 bg-slate-950/85 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs leading-6 text-slate-400">Need a clearer view? Open the tutorial in a larger window before you paste the credentials here.</p>
+          <a
+            href={videoUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition-colors hover:border-emerald-400/40 hover:bg-emerald-500/15 hover:text-white"
+          >
+            <Icon path={icons.arrow} size={14} />
+            Open larger view
+          </a>
+        </div>
       </div>
-      <div className="bg-black">
-        <video
-          src={videoUrl}
-          controls
-          playsInline
-          preload="metadata"
-          className="block w-full"
-        />
-      </div>
-    </div>
-  );
-}
+    );
+  }
 
 const DELIVERY_OPTIONS = ["Standard Shipping", "Express Shipping", "Same-Day Delivery", "Click & Collect", "Free Shipping"];
 const CATEGORY_OPTIONS = ["Clothing & Apparel", "Electronics", "Home & Garden", "Beauty & Health", "Sports & Outdoors", "Food & Beverage", "Toys & Games", "Books & Media", "Jewelry & Accessories", "Other"];
@@ -608,7 +620,7 @@ function Step2({ data, setData, onNext, onBack }) {
     const e = {};
     if (isShopify) {
       if (!data.apiKey?.trim()) e.apiKey = "Client ID is required";
-      if (!data.accessToken?.trim()) e.accessToken = "Client Secret is required";
+      if (!data.accessToken?.trim()) e.accessToken = "Shopify credential is required";
     } else {
       if (!data.consumerKey?.trim()) e.consumerKey = "Consumer Key is required";
       if (!data.consumerSecret?.trim()) e.consumerSecret = "Consumer Secret is required";
@@ -679,7 +691,7 @@ function Step2({ data, setData, onNext, onBack }) {
     <>Name it <strong>"AgentComerce AI"</strong> → click <strong>Create app</strong>.</>,
     <>Go to <strong>Configuration</strong> tab → under Admin API scopes enable: <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_products</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_orders</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_inventory</code> → click <strong>Save</strong>.</>,
     <>Go to <strong>Distribution</strong> tab → click <strong>Select store</strong> → choose your store → click <strong>Install</strong>.</>,
-    <>Go to <strong>Settings</strong> or <strong>API credentials</strong> → copy your <strong>Client ID</strong> and <strong>Client Secret</strong> (starts with <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">shpss_</code>) → paste them below.</>,
+    <>Go to <strong>Settings</strong> or <strong>API credentials</strong> → copy your <strong>Client ID</strong> and either your <strong>Client Secret</strong> (<code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">shpss_</code>) or your <strong>Admin API access token</strong> (<code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">shpat_</code>) → paste them below.</>,
   ];
   const wooInstructions = [
     <>Go to <strong>WooCommerce → Settings → Advanced → REST API</strong>.</>,
@@ -708,9 +720,9 @@ function Step2({ data, setData, onNext, onBack }) {
                 className={cx("w-full rounded-xl border bg-white/5 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.apiKey ? "border-red-500/60" : "border-white/10")} />
             </div>{errors.apiKey && <p className="text-xs text-red-400">{errors.apiKey}</p>}
           </Field>
-          <Field label="Client Secret" id="accessToken" error={errors.accessToken} helper="Dev Dashboard secret — starts with shpss_">
+          <Field label="Client Secret or Admin API Access Token" id="accessToken" error={errors.accessToken} helper="Use either shpss_ client secret or shpat_ Admin API token">
             <div className="relative"><span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"><Icon path={icons.shield} size={16} /></span>
-              <input id="accessToken" type="password" placeholder="e.g. shpss_xxxxxxxxxxxxxxxx..." value={data.accessToken || ""} onChange={e => setData(d => ({ ...d, accessToken: e.target.value }))}
+              <input id="accessToken" type="password" placeholder="e.g. shpss_xxx... or shpat_xxx..." value={data.accessToken || ""} onChange={e => setData(d => ({ ...d, accessToken: e.target.value }))}
                 className={cx("w-full rounded-xl border bg-white/5 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60", errors.accessToken ? "border-red-500/60" : "border-white/10")} />
             </div>{errors.accessToken && <p className="text-xs text-red-400">{errors.accessToken}</p>}
           </Field>
@@ -730,7 +742,7 @@ function Step2({ data, setData, onNext, onBack }) {
         </>)}
       </div>
       {apiStatus === "success" && <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-sm"><Icon path={icons.check} size={16} /> Credentials validated successfully!</div>}
-      {apiStatus === "error" && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> Could not verify credentials. Make sure your Client ID and Client Secret are correct — find them in Dev Dashboard → Settings. Contact us at agentcomrce@gmail.com if you need help.</div>}
+      {apiStatus === "error" && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> Could not verify credentials. Use your Client ID with either the Shopify Client Secret (`shpss_`) or the Admin API access token (`shpat_`). Also make sure the app is installed on the exact store URL you entered.</div>}
 
       <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-800/50 border border-white/5">
         <Icon path={icons.shield} size={16} className="text-violet-400 flex-shrink-0 mt-0.5" />
@@ -2226,6 +2238,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
