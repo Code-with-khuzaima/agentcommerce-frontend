@@ -1102,7 +1102,7 @@ function LandingPage({ onStart, onLogin }) {
   const [demoPreviewLoopKey, setDemoPreviewLoopKey] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setDemoPreviewLoopKey((n) => n + 1), 28000);
+    const timer = setInterval(() => setDemoPreviewLoopKey((n) => n + 1), 65000);
     return () => clearInterval(timer);
   }, []);
 
