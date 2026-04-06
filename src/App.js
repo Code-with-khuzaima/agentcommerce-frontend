@@ -195,7 +195,6 @@ function ShopifyCredentialVideo() {
               Screen recording
             </div>
           </div>
-          <p className="text-sm leading-6 text-slate-300">This is the actual recorded path inside Shopify, not a simulated animation.</p>
         </div>
         <div className="bg-black">
           <video
@@ -212,7 +211,7 @@ function ShopifyCredentialVideo() {
             href={videoUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition-colors hover:border-emerald-400/40 hover:bg-emerald-500/15 hover:text-white"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-emerald-500/25 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition-colors hover:border-emerald-400/40 hover:bg-emerald-500/15 hover:text-white"
           >
             <Icon path={icons.arrow} size={14} />
             Open larger view
