@@ -1405,99 +1405,100 @@ function LandingPage({ onStart, onLogin }) {
 
       {/* ── PRICING ── */}
       <section id="book-demo-section" className="relative z-10 max-w-5xl mx-auto px-6 pb-24">
-        <Card className="overflow-hidden border-violet-500/15 bg-[linear-gradient(135deg,rgba(15,23,42,0.96),rgba(42,19,78,0.92))]">
-          <div className="grid grid-cols-1 gap-8 p-8 sm:p-10 lg:grid-cols-[1.05fr_0.95fr]">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/25 bg-violet-500/15 px-3 py-1.5 text-xs font-medium text-violet-300 mb-4">
-                <Icon path={icons.mail} size={12} /> Book Demo
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Send your store URL and we will prepare the demo around your store</h2>
-              <p className="text-slate-300 leading-relaxed mb-5">
-                Watch the demo preview first, then send your store URL and email. We use that to prepare the next demo conversation around your store instead of relying on a generic pitch only.
-              </p>
-              <div className="space-y-3">
-                {[
-                  "Watch the demo preview to understand the flow.",
-                  "Send the store URL and contact email.",
-                  "We review the store and prepare the next demo around that store."
-                ].map((item) => (
-                  <div key={item} className="flex items-start gap-3 text-sm text-slate-200">
-                    <Icon path={icons.check} size={14} className="mt-1 text-emerald-400" />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="space-y-5">
-              <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-950/95 shadow-[0_20px_50px_rgba(2,6,23,0.35)]">
-                <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
-                  <div>
-                    <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Demo Preview</div>
-                    <div className="text-sm font-semibold text-white">Store walkthrough</div>
-                  </div>
-                  <div className="inline-flex items-center gap-1 rounded-md border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-200">
-                    Live preview
-                  </div>
-                </div>
-                <div className="relative bg-black">
-                  <iframe
-                    key={demoPreviewLoopKey}
-                    src={demoUrl}
-                    title="AgentComerce Demo Preview"
-                    className="block h-[280px] w-full border-none"
-                    tabIndex={-1}
-                  />
-                  <div className="absolute inset-0 z-10 cursor-default bg-transparent" aria-hidden="true" />
-                </div>
-              </div>
+        <div className="mb-8 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/25 bg-violet-500/15 px-3 py-1.5 text-xs font-medium text-violet-300">
+            <Icon path={icons.mail} size={12} /> Book Demo
+          </div>
+          <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">Send your store URL and we will prepare the demo around your store</h2>
+          <p className="mx-auto max-w-3xl text-slate-300 leading-relaxed">
+            Watch the demo preview first, then send your store URL and email. We use that to prepare the next demo conversation around your store instead of relying on a generic pitch only.
+          </p>
+        </div>
 
-              <div className="rounded-2xl border border-white/10 bg-slate-950/80 p-6 sm:p-7">
-              {bookDemoSent ? (
-                <div className="text-center py-6">
-                  <div className="w-14 h-14 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto mb-4">
-                    <Icon path={icons.check} size={24} className="text-emerald-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Demo request sent</h3>
-                  <p className="text-sm leading-relaxed text-slate-400">
-                    We received the store URL and email. Next step is review, then we prepare the next demo around that store.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-5">
-                  <div>
-                    <label htmlFor="bookDemoUrl" className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Store URL</label>
-                    <input
-                      id="bookDemoUrl"
-                      type="url"
-                      placeholder="https://yourstore.com"
-                      value={bookDemoForm.storeUrl}
-                      onChange={(e) => setBookDemoForm((form) => ({ ...form, storeUrl: e.target.value }))}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60 focus:border-violet-500/40"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="bookDemoEmail" className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Email</label>
-                    <input
-                      id="bookDemoEmail"
-                      type="email"
-                      placeholder="you@yourstore.com"
-                      value={bookDemoForm.email}
-                      onChange={(e) => setBookDemoForm((form) => ({ ...form, email: e.target.value }))}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60 focus:border-violet-500/40"
-                    />
-                  </div>
-                  <Btn onClick={handleBookDemoSubmit} loading={bookDemoSending} className="w-full justify-center">
-                    <Icon path={icons.mail} size={16} /> Book Demo
-                  </Btn>
-                  <p className="text-xs leading-relaxed text-slate-500">
-                    This sends the request so we can review the store and prepare the next demo around your setup.
-                  </p>
-                </div>
-              )}
-              </div>
+        <div className="mb-8 overflow-hidden rounded-xl border border-slate-800 bg-slate-950/95 shadow-[0_24px_60px_rgba(2,6,23,0.35)]">
+          <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3 sm:px-5">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Demo Preview</div>
+              <div className="text-sm font-semibold text-white">Store walkthrough</div>
+            </div>
+            <div className="inline-flex items-center gap-1 rounded-md border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-200">
+              Live preview
             </div>
           </div>
-        </Card>
+          <div className="relative bg-black">
+            <iframe
+              key={demoPreviewLoopKey}
+              src={demoUrl}
+              title="AgentComerce Demo Preview"
+              className="block h-[420px] w-full border-none sm:h-[520px]"
+              tabIndex={-1}
+            />
+            <div className="absolute inset-0 z-10 cursor-default bg-transparent" aria-hidden="true" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-6">
+            <div className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">How this works</div>
+            <div className="space-y-3">
+              {[
+                "Watch the demo preview to understand the flow.",
+                "Send the store URL and contact email.",
+                "We review the store and prepare the next demo around that store."
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3 text-sm text-slate-200">
+                  <Icon path={icons.check} size={14} className="mt-1 text-emerald-400" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-slate-950/80 p-6 sm:p-7">
+            {bookDemoSent ? (
+              <div className="text-center py-6">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/15">
+                  <Icon path={icons.check} size={24} className="text-emerald-400" />
+                </div>
+                <h3 className="mb-2 text-xl font-bold text-white">Demo request sent</h3>
+                <p className="text-sm leading-relaxed text-slate-400">
+                  We received the store URL and email. Next step is review, then we prepare the next demo around that store.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-5">
+                <div>
+                  <label htmlFor="bookDemoUrl" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-slate-400">Store URL</label>
+                  <input
+                    id="bookDemoUrl"
+                    type="url"
+                    placeholder="https://yourstore.com"
+                    value={bookDemoForm.storeUrl}
+                    onChange={(e) => setBookDemoForm((form) => ({ ...form, storeUrl: e.target.value }))}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60 focus:border-violet-500/40"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="bookDemoEmail" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-slate-400">Email</label>
+                  <input
+                    id="bookDemoEmail"
+                    type="email"
+                    placeholder="you@yourstore.com"
+                    value={bookDemoForm.email}
+                    onChange={(e) => setBookDemoForm((form) => ({ ...form, email: e.target.value }))}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/60 focus:border-violet-500/40"
+                  />
+                </div>
+                <Btn onClick={handleBookDemoSubmit} loading={bookDemoSending} className="w-full justify-center">
+                  <Icon path={icons.mail} size={16} /> Book Demo
+                </Btn>
+                <p className="text-xs leading-relaxed text-slate-500">
+                  This sends the request so we can review the store and prepare the next demo around your setup.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </section>
 
             <section className="relative z-10 max-w-6xl mx-auto px-6 pb-24 text-center">
