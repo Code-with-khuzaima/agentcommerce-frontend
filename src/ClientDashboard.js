@@ -75,9 +75,7 @@ function toFaqList(text) {
 
 function normalizeForm(store) {
   return {
-    storeName: store.storeName || "",
-    contactEmail: store.contactEmail || "",
-    phoneNumber: store.phoneNumber || "",
+    storeName: store.storeName || "",    phoneNumber: store.phoneNumber || "",
     hasPhysicalStore: Boolean(store.hasPhysicalStore),
     storeAddress: store.storeAddress || "",
     agentName: store.agentName || "",
@@ -141,9 +139,7 @@ export default function ClientDashboard({ onLogout }) {
     setSuccess("");
     try {
       const payload = {
-        storeName: form.storeName.trim(),
-        contactEmail: form.contactEmail.trim(),
-        phoneNumber: form.phoneNumber.trim(),
+        storeName: form.storeName.trim(),        phoneNumber: form.phoneNumber.trim(),
         hasPhysicalStore: !!form.hasPhysicalStore,
         storeAddress: form.hasPhysicalStore ? form.storeAddress.trim() : "",
         agentName: form.agentName.trim(),
@@ -376,9 +372,8 @@ export default function ClientDashboard({ onLogout }) {
                       <Field label="Store Name">
                         <input value={form.storeName} onChange={(event) => setForm((current) => ({ ...current, storeName: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" />
                       </Field>
-                      <Field label="Store Contact Email">
-                        <input type="email" value={form.contactEmail} onChange={(event) => setForm((current) => ({ ...current, contactEmail: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" />
-                      </Field>
+                      <InfoRow label="Store Contact Email" value={store.contactEmail || "Not set"} />
+
                       <Field label="Phone Number">
                         <input value={form.phoneNumber} onChange={(event) => setForm((current) => ({ ...current, phoneNumber: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" />
                       </Field>
@@ -489,3 +484,5 @@ export default function ClientDashboard({ onLogout }) {
     </div>
   );
 }
+
+
