@@ -101,4 +101,13 @@ export function apiGetDashboard() {
   });
 }
 
+export function apiUpdateDashboard(body) {
+  const token = localStorage.getItem("ac_token");
+  return request("/client/dashboard", {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  });
+}
+
 export { API_BASE };

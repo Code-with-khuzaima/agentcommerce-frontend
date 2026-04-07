@@ -153,6 +153,11 @@ export default function AdminDashboard() {
   const [accountLoading, setAccountLoading] = useState(false);
   const [tempPassword, setTempPassword] = useState("");
 
+  function jumpToSection(id) {
+    const node = document.getElementById(id);
+    if (node) node.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function handleLogout() {
     clearAdminSession();
     localStorage.removeItem("ac_admin_auth");
@@ -301,6 +306,15 @@ export default function AdminDashboard() {
     return logs.filter((log) => log.event === activityFilter);
   }, [selectedStore, activityFilter]);
 
+  const navItems = [
+    ["admin-overview", "Overview"],
+    ["admin-queue", "Store Queue"],
+    ["admin-settings", "Store Settings"],
+    ["admin-workflow", "Workflow"],
+    ["admin-client-access", "Client Access"],
+    ["admin-activity", "Activity"],
+  ];
+
   return (
     <div className="min-h-screen bg-[#050816] text-white">
       <div className="mx-auto max-w-[1720px] px-4 py-6 sm:px-6 lg:px-8">
@@ -323,13 +337,13 @@ export default function AdminDashboard() {
           </div>
 
           <div className="px-5 py-5 sm:px-8">
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div id="admin-overview" className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 scroll-mt-24">
               {cards.map(([label, value, hint]) => (
                 <SummaryCard key={label} label={label} value={value} hint={hint} />
               ))}
             </div>
 
-            <div className="mt-5 grid gap-4 rounded-[28px] border border-slate-800 bg-slate-950/70 p-5 xl:grid-cols-[2.1fr_1fr_1fr_1fr_auto]">
+            <div id="admin-queue" className="mt-5 grid gap-4 rounded-[28px] border border-slate-800 bg-slate-950/70 p-5 xl:grid-cols-[2.1fr_1fr_1fr_1fr_auto] scroll-mt-24">
               <InputField label="Search" value={filters.search} onChange={(value) => setFilters((current) => ({ ...current, search: value }))} placeholder="Store, email, URL, ID" />
               <SelectField label="Status" value={filters.status} onChange={(value) => setFilters((current) => ({ ...current, status: value }))} options={["all", ...statusOptions]} />
               <SelectField label="Plan" value={filters.plan} onChange={(value) => setFilters((current) => ({ ...current, plan: value }))} options={["all", ...planOptions]} />
@@ -349,7 +363,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="mt-6 grid gap-6 2xl:grid-cols-[380px_minmax(0,1fr)]">
+            <div className="mt-6 grid gap-6 2xl:grid-cols-[380px_220px_minmax(0,1fr)]">
               <aside className="rounded-[30px] border border-slate-800 bg-slate-950/70 p-4">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                   <div>
@@ -396,6 +410,35 @@ export default function AdminDashboard() {
                 </div>
               </aside>
 
+              <aside className="rounded-[30px] border border-slate-800 bg-slate-950/70 p-4">
+                <div className="border-b border-slate-800 pb-4">
+                  <div className="text-sm font-bold text-white">Sidebar</div>
+                  <div className="mt-1 text-sm text-slate-400">Jump between the main admin sections without scrolling the full page manually.</div>
+                </div>
+                <div className="mt-4 space-y-2">
+                  {navItems.map(([id, label]) => (
+                    <button
+                      key={id}
+                      onClick={() => jumpToSection(id)}
+                      className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-left text-sm font-semibold text-slate-300 transition hover:border-slate-700 hover:text-white"
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {selectedStore ? (
+                  <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                    <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Selected Store</div>
+                    <div className="mt-2 text-sm font-bold text-white">{selectedStore.storeName}</div>
+                    <div className="mt-1 text-xs text-slate-500">{selectedStore.storeId}</div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Badge tone={toneForStatus(selectedStore.setupStatus)}>{formatLabel(selectedStore.setupStatus)}</Badge>
+                      <Badge tone={toneForStatus(selectedStore.workflowStatus)}>{formatLabel(selectedStore.workflowStatus)}</Badge>
+                    </div>
+                  </div>
+                ) : null}
+              </aside>
+
               <main className="space-y-6">
                 {!selectedStore || !form ? (
                   <div className="flex min-h-[560px] items-center justify-center rounded-[30px] border border-dashed border-slate-800 bg-slate-950/60 p-8 text-center text-slate-500">Select a store from the queue to manage onboarding, workflows, usage, and notes.</div>
@@ -438,7 +481,7 @@ export default function AdminDashboard() {
                       </div>
                     </section>
 
-                    <div className="grid gap-6 xl:grid-cols-2">
+                    <div id="admin-settings" className="grid gap-6 xl:grid-cols-2 scroll-mt-24">
                       <SectionCard title="Operations" description="Control account state, payment, workflow stage, and priority.">
                         <div className="grid gap-4 sm:grid-cols-2">
                           <SelectField label="Store Status" value={form.status} onChange={(value) => setForm((current) => ({ ...current, status: value }))} options={statusOptions} />
@@ -468,7 +511,7 @@ export default function AdminDashboard() {
                       </SectionCard>
                     </div>
 
-                    <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+                    <div id="admin-workflow" className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr] scroll-mt-24">
                       <SectionCard title="Store context" description="Operational data captured from the client setup form and training notes.">
                         <div className="grid gap-4 lg:grid-cols-2">
                           <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
@@ -537,6 +580,7 @@ export default function AdminDashboard() {
                       </SectionCard>
                     </div>
 
+                    <div id="admin-client-access" className="scroll-mt-24">
                     <SectionCard title="Client access" description="Check whether a dashboard login exists for an email and generate a temporary password if needed.">
                       <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto]">
                         <InputField label="Client Email" value={accountEmail} onChange={setAccountEmail} placeholder="client@store.com" />
@@ -583,7 +627,9 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     </SectionCard>
+                    </div>
 
+                    <div id="admin-activity" className="scroll-mt-24">
                     <div className="flex flex-col gap-4 rounded-[28px] border border-slate-800 bg-slate-950/70 p-5 xl:flex-row xl:items-center xl:justify-between">
                       <div className="text-sm text-slate-400">Last active: {formatDate(selectedStore.lastActiveAt)} · Last synced: {formatDate(selectedStore.lastSyncedAt)}</div>
                       <div className="flex flex-wrap gap-3">
@@ -591,6 +637,7 @@ export default function AdminDashboard() {
                         <button onClick={() => setForm((current) => ({ ...current, widgetStatus: "live", status: "active", setupStatus: "live" }))} className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white">Mark Live</button>
                         <button onClick={saveStore} disabled={saving} className="rounded-2xl bg-white px-6 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">{saving ? "Saving..." : "Save Changes"}</button>
                       </div>
+                    </div>
                     </div>
                   </>
                 )}

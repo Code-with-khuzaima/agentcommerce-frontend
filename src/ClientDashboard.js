@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiGetDashboard } from "./api";
+import { apiGetDashboard, apiUpdateDashboard } from "./api";
 
 const cx = (...values) => values.filter(Boolean).join(" ");
 
@@ -16,22 +16,13 @@ function StatusBadge({ label, tone = "slate" }) {
     blue: "border-sky-500/30 bg-sky-500/10 text-sky-200",
     emerald: "border-emerald-500/30 bg-emerald-500/10 text-emerald-200",
     amber: "border-amber-500/30 bg-amber-500/10 text-amber-200",
+    rose: "border-rose-500/30 bg-rose-500/10 text-rose-200",
   };
 
   return <span className={cx("inline-flex items-center rounded-xl border px-3 py-1 text-xs font-semibold", tones[tone])}>{label}</span>;
 }
 
-function MetricCard({ label, value, hint }) {
-  return (
-    <div className="rounded-[24px] border border-slate-800 bg-slate-950/80 p-5">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">{label}</div>
-      <div className="mt-3 text-2xl font-black text-white">{value}</div>
-      <div className="mt-2 text-sm text-slate-400">{hint}</div>
-    </div>
-  );
-}
-
-function Panel({ title, description, action, children }) {
+function SectionCard({ title, description, action, children }) {
   return (
     <section className="rounded-[28px] border border-slate-800 bg-slate-950/80 p-5">
       <div className="flex flex-col gap-3 border-b border-slate-800 pb-4 sm:flex-row sm:items-start sm:justify-between">
@@ -46,30 +37,83 @@ function Panel({ title, description, action, children }) {
   );
 }
 
-function QuickStat({ label, value }) {
+function MetricCard({ label, value, hint }) {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
-      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">{label}</div>
-      <div className="mt-2 text-sm font-semibold text-white">{value}</div>
+    <div className="rounded-[24px] border border-slate-800 bg-slate-950/80 p-5">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">{label}</div>
+      <div className="mt-3 text-2xl font-black text-white">{value}</div>
+      <div className="mt-2 text-sm text-slate-400">{hint}</div>
     </div>
   );
 }
 
+function Field({ label, helper, children }) {
+  return (
+    <label className="block">
+      <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">{label}</div>
+      {children}
+      {helper ? <div className="mt-2 text-xs text-slate-500">{helper}</div> : null}
+    </label>
+  );
+}
+
+function InfoRow({ label, value }) {
+  return (
+    <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+      <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{label}</div>
+      <div className="mt-2 text-sm font-semibold text-white break-words">{value || "Not set"}</div>
+    </div>
+  );
+}
+
+function toFaqList(text) {
+  return String(text || "")
+    .split(/\n+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function normalizeForm(store) {
+  return {
+    storeName: store.storeName || "",
+    contactEmail: store.contactEmail || "",
+    phoneNumber: store.phoneNumber || "",
+    hasPhysicalStore: Boolean(store.hasPhysicalStore),
+    storeAddress: store.storeAddress || "",
+    agentName: store.agentName || "",
+    accentColor: store.accentColor || "#7c3aed",
+    welcomeMessage: store.welcomeMessage || "",
+    categories: Array.isArray(store.categories) ? store.categories.join(", ") : "",
+    deliveryMethods: Array.isArray(store.deliveryMethods) ? store.deliveryMethods.join(", ") : "",
+    returnPolicy: store.returnPolicy || "",
+    faqs: store.faqs || "",
+    notes: store.notes || "",
+    receiveLeads: store.storeAnswers?.receiveLeads === "yes",
+  };
+}
+
+function parseCsv(value) {
+  return String(value || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 export default function ClientDashboard({ onLogout }) {
   const [data, setData] = useState(null);
+  const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [tab, setTab] = useState("overview");
+  const [success, setSuccess] = useState("");
   const [copied, setCopied] = useState("");
-  const [msgSubject, setMsgSubject] = useState("");
-  const [msgBody, setMsgBody] = useState("");
-  const [msgSending, setMsgSending] = useState(false);
-  const [msgSent, setMsgSent] = useState(false);
+  const [section, setSection] = useState("overview");
 
   useEffect(() => {
     apiGetDashboard()
       .then((response) => {
         setData(response);
+        setForm(normalizeForm(response.store || {}));
         setLoading(false);
       })
       .catch((err) => {
@@ -90,19 +134,40 @@ export default function ClientDashboard({ onLogout }) {
     setTimeout(() => setCopied(""), 2000);
   }
 
-  async function sendMessage() {
-    if (!msgSubject.trim() || !msgBody.trim()) return;
-    setMsgSending(true);
+  async function saveClientSettings() {
+    if (!form) return;
+    setSaving(true);
+    setError("");
+    setSuccess("");
     try {
-      const store = data?.store;
-      const mailto = `mailto:agentcomrce@gmail.com?subject=${encodeURIComponent(`[${store?.storeName || "Client"}] ${msgSubject}`)}&body=${encodeURIComponent(`From: ${data?.user?.email}\nStore: ${store?.storeName} (${store?.storeId})\nPlan: ${store?.plan}\n\n${msgBody}`)}`;
-      window.open(mailto);
-      setMsgSent(true);
-      setMsgSubject("");
-      setMsgBody("");
-      setTimeout(() => setMsgSent(false), 3000);
+      const payload = {
+        storeName: form.storeName.trim(),
+        contactEmail: form.contactEmail.trim(),
+        phoneNumber: form.phoneNumber.trim(),
+        hasPhysicalStore: !!form.hasPhysicalStore,
+        storeAddress: form.hasPhysicalStore ? form.storeAddress.trim() : "",
+        agentName: form.agentName.trim(),
+        accentColor: form.accentColor.trim(),
+        welcomeMessage: form.welcomeMessage.trim(),
+        categories: parseCsv(form.categories),
+        deliveryMethods: parseCsv(form.deliveryMethods),
+        returnPolicy: form.returnPolicy.trim(),
+        faqs: form.faqs.trim(),
+        notes: form.notes.trim(),
+        storeAnswers: {
+          ...(data?.store?.storeAnswers || {}),
+          receiveLeads: form.receiveLeads ? "yes" : "no",
+          physicalStore: form.hasPhysicalStore ? "yes" : "no",
+        },
+      };
+      const response = await apiUpdateDashboard(payload);
+      setData((current) => ({ ...current, store: response.store }));
+      setForm(normalizeForm(response.store));
+      setSuccess("Dashboard settings updated.");
+    } catch (err) {
+      setError(err.message || "Failed to update dashboard settings.");
     } finally {
-      setMsgSending(false);
+      setSaving(false);
     }
   }
 
@@ -117,7 +182,7 @@ export default function ClientDashboard({ onLogout }) {
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#050816] px-4 text-white">
         <div className="rounded-[28px] border border-slate-800 bg-slate-950/80 p-8 text-center">
@@ -132,271 +197,292 @@ export default function ClientDashboard({ onLogout }) {
 
   const store = data?.store || {};
   const plan = store.plan || "starter";
-  const msgCount = store.msgCount || 0;
-  const msgLimit = store.msgLimit || 5000;
-  const usagePercent = msgLimit >= 999999 ? 6 : Math.min(Math.round((msgCount / msgLimit) * 100), 100);
+  const msgCount = Number(store.msgCount || 0);
+  const msgLimit = Number(store.msgLimit || 5000);
+  const usagePercent = msgLimit >= 999999 ? 0 : Math.min(Math.round((msgCount / Math.max(msgLimit, 1)) * 100), 100);
   const usageRemaining = msgLimit >= 999999 ? "Unlimited" : `${Math.max(msgLimit - msgCount, 0).toLocaleString()} remaining`;
   const planLabels = { starter: "$19/mo", pro: "$29/mo", enterprise: "$49/mo" };
-  const webhookUrl = `https://temp56.app.n8n.cloud/webhook/${plan}-chat`;
+  const webhookUrl = store.webhookUrl || `https://temp56.app.n8n.cloud/webhook/${plan}-chat`;
+  const storeAnswers = store.storeAnswers || {};
+  const widgetCode = `<!-- AgentComerce ${plan.charAt(0).toUpperCase() + plan.slice(1)} Widget -->\n<script>\n  window.AgentComerce = {\n    store_id: "${store.storeId || "store_001"}",\n    plan: "${plan}",\n    agent_name: "${form?.agentName || store.agentName || "Store Assistant"}",\n    accent_color: "${form?.accentColor || store.accentColor || "#7c3aed"}",\n    welcome_message: "${form?.welcomeMessage || store.welcomeMessage || "Hi! How can I help you today?"}",\n    webhook_url: "${webhookUrl}"\n  };\n</script>\n<script src="https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget.js"></script>`;
 
-  const widgetCode = `<!-- AgentComerce ${plan.charAt(0).toUpperCase() + plan.slice(1)} Widget -->
-<script>
-  window.AgentComerce = {
-    store_id:        "${store.storeId || "store_001"}",
-    plan:            "${plan}",
-    agent_name:      "${store.agentName || "Store Assistant"}",
-    accent_color:    "${store.accentColor || "#5B4FE8"}",
-    welcome_message: "${store.welcomeMessage || "Hi! How can I help you today?"}",
-    webhook_url:     "${webhookUrl}"
-  };
-</script>
-<script src="https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget.js"></script>`;
-
-  const installSteps =
-    store.platform === "shopify"
-      ? [
-          ["Open theme editor", "Shopify Admin > Online Store > Themes > Edit code."],
-          ["Open theme.liquid", "Find Layout > theme.liquid in the left sidebar."],
-          ["Find closing body tag", "Search for </body> near the bottom of the file."],
-          ["Paste widget code", "Paste the widget snippet just before </body>."],
-          ["Save and test", "Save changes and open your storefront to confirm the widget appears."],
-        ]
-      : [
-          ["Open footer script plugin", "Use Insert Headers and Footers or your preferred code injection plugin."],
-          ["Paste widget code", "Add the snippet to the footer scripts area."],
-          ["Save changes", "Save the plugin settings."],
-          ["Open store", "Visit your WooCommerce store and confirm the widget button appears."],
-          ["Enable legacy API if needed", "If your workflow uses it, enable WooCommerce Legacy API under Advanced settings."],
-        ];
-
-  const statusTone = (value) => {
-    if (["live", "active", "ready"].includes(value)) return "emerald";
-    if (["qa_testing", "widget_installing", "workflow_building"].includes(value)) return "amber";
-    return "slate";
-  };
-
-  const overviewCards = [
+  const metrics = [
     ["Plan", formatLabel(plan), planLabels[plan]],
     ["Messages Used", msgCount.toLocaleString(), usageRemaining],
-    ["Platform", formatLabel(store.platform || "unknown"), "Connected store"],
-    ["Store ID", store.storeId || "Not set", "Used in widget and workflow"],
+    ["Setup", formatLabel(store.setupStatus || "new"), formatLabel(store.workflowStatus || "not_started")],
+    ["Widget", formatLabel(store.widgetStatus || "not_installed"), formatLabel(store.platform || "unknown")],
   ];
 
-  const statusItems = [
-    ["Setup", store.setupStatus || "new"],
-    ["Workflow", store.workflowStatus || "not_started"],
-    ["Widget", store.widgetStatus || "not_installed"],
-  ];
-
-  const tabs = [
+  const navItems = [
     ["overview", "Overview"],
-    ["install", store.platform === "shopify" ? "Shopify Setup" : "WooCommerce Setup"],
-    ["widget", "Widget Code"],
+    ["assistant", "Assistant Settings"],
+    ["branding", "Branding"],
+    ["store", "Store Info"],
+    ["knowledge", "Knowledge Base"],
+    ["billing", "Billing"],
+    ["integration", "Integration"],
     ["support", "Support"],
-  ];
-
-  const highlights = [
-    ["Store Name", store.storeName || "Not set"],
-    ["Agent Name", store.agentName || "Store Assistant"],
-    ["Accent Color", store.accentColor || "#5B4FE8"],
-    ["Welcome Message", store.welcomeMessage || "Not set"],
   ];
 
   return (
     <div className="min-h-screen bg-[#050816] text-white">
-      <div className="mx-auto max-w-[1480px] px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
         <div className="rounded-[36px] border border-slate-800 bg-[radial-gradient(circle_at_top_left,_rgba(124,58,237,0.18),_transparent_30%),linear-gradient(180deg,rgba(2,6,23,0.96),rgba(2,6,23,1))] shadow-[0_40px_120px_rgba(2,6,23,0.82)]">
           <header className="border-b border-slate-800 px-5 py-5 sm:px-8">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.28em] text-violet-300">Client Dashboard</div>
                 <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">{store.storeName || "Your Store"} dashboard</h1>
-                <p className="mt-2 max-w-3xl text-sm text-slate-400">This is the operational view for your live widget, usage, setup progress, and installation details.</p>
+                <p className="mt-2 max-w-3xl text-sm text-slate-400">Manage your assistant branding, store content, usage, billing, and installation from one place.</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <StatusBadge tone="violet" label={`${formatLabel(plan)} Â· ${planLabels[plan]}`} />
+                <StatusBadge tone="violet" label={`${formatLabel(plan)} · ${planLabels[plan]}`} />
                 <StatusBadge tone="blue" label={data?.user?.email || "No email"} />
+                <button onClick={saveClientSettings} disabled={saving || !form} className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
                 <button onClick={handleLogout} className="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-white">
                   Log Out
                 </button>
               </div>
             </div>
+            {error ? <div className="mt-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">{error}</div> : null}
+            {success ? <div className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">{success}</div> : null}
           </header>
 
           <div className="px-5 py-5 sm:px-8">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {overviewCards.map(([label, value, hint]) => (
+              {metrics.map(([label, value, hint]) => (
                 <MetricCard key={label} label={label} value={value} hint={hint} />
               ))}
             </div>
 
-            <div className="mt-5 rounded-[28px] border border-slate-800 bg-slate-950/80 p-5">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-white">Status overview</h2>
-                  <p className="mt-1 text-sm text-slate-400">Track where setup, workflow, and widget installation currently stand.</p>
+            <div className="mt-6 grid gap-6 xl:grid-cols-[270px_minmax(0,1fr)]">
+              <aside className="rounded-[28px] border border-slate-800 bg-slate-950/80 p-4">
+                <div className="border-b border-slate-800 pb-4">
+                  <div className="text-sm font-bold text-white">Workspace</div>
+                  <div className="mt-1 text-sm text-slate-400">Use the sections below to manage the live store configuration.</div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {statusItems.map(([label, value]) => (
-                    <StatusBadge key={label} label={`${label}: ${formatLabel(value)}`} tone={statusTone(value)} />
+                <div className="mt-4 space-y-2">
+                  {navItems.map(([key, label]) => (
+                    <button
+                      key={key}
+                      onClick={() => setSection(key)}
+                      className={cx(
+                        "w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold transition",
+                        section === key ? "bg-white text-slate-950" : "border border-slate-800 bg-[#050816] text-slate-300 hover:border-slate-700 hover:text-white"
+                      )}
+                    >
+                      {label}
+                    </button>
                   ))}
                 </div>
-              </div>
-
-              {msgLimit < 999999 ? (
-                <div className="mt-5 rounded-[24px] border border-slate-800 bg-[#050816] p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-white">Usage this cycle</span>
-                    <span className={cx("text-sm font-bold", usagePercent > 80 ? "text-amber-300" : "text-emerald-300")}>{usagePercent}%</span>
-                  </div>
+                <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Usage this cycle</div>
                   <div className="mt-3 h-2 rounded-full bg-slate-800">
-                    <div className={cx("h-2 rounded-full", usagePercent > 80 ? "bg-amber-400" : "bg-gradient-to-r from-violet-500 to-sky-400")} style={{ width: `${usagePercent}%` }} />
+                    <div className={cx("h-2 rounded-full", usagePercent > 80 ? "bg-amber-400" : "bg-gradient-to-r from-violet-500 to-sky-400")} style={{ width: `${Math.max(usagePercent, 4)}%` }} />
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                  <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
                     <span>{msgCount.toLocaleString()} used</span>
                     <span>{usageRemaining}</span>
                   </div>
                 </div>
-              ) : null}
-            </div>
+              </aside>
 
-            <div className="mt-5 flex flex-wrap gap-2 rounded-2xl border border-slate-800 bg-slate-950/80 p-2">
-              {tabs.map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => setTab(key)}
-                  className={cx(
-                    "rounded-xl px-4 py-2 text-sm font-semibold transition",
-                    tab === key ? "bg-white text-slate-950" : "text-slate-400 hover:bg-slate-900 hover:text-white"
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+              <main className="space-y-6">
+                {section === "overview" ? (
+                  <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+                    <SectionCard title="Store snapshot" description="Current status of your account, setup, and storefront configuration.">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <InfoRow label="Store Name" value={store.storeName} />
+                        <InfoRow label="Store URL" value={store.storeUrl} />
+                        <InfoRow label="Platform" value={formatLabel(store.platform)} />
+                        <InfoRow label="Store ID" value={store.storeId} />
+                        <InfoRow label="Setup Status" value={formatLabel(store.setupStatus)} />
+                        <InfoRow label="Workflow Status" value={formatLabel(store.workflowStatus)} />
+                        <InfoRow label="Widget Status" value={formatLabel(store.widgetStatus)} />
+                        <InfoRow label="Lead Capture" value={storeAnswers.receiveLeads === "yes" ? "Enabled" : "Disabled"} />
+                      </div>
+                    </SectionCard>
 
-            {tab === "overview" ? (
-              <div className="mt-5 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-                <Panel title="Widget profile" description="Values currently used by your widget on the storefront.">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {highlights.map(([label, value]) => (
-                      <QuickStat key={label} label={label} value={value} />
-                    ))}
-                    <QuickStat label="Webhook URL" value={webhookUrl} />
-                    <QuickStat label="Store ID" value={store.storeId || "Not set"} />
+                    <SectionCard title="Account summary" description="Current commercial state of the account.">
+                      <div className="grid gap-4">
+                        <InfoRow label="Plan" value={`${formatLabel(plan)} · ${planLabels[plan]}`} />
+                        <InfoRow label="Payment Status" value={formatLabel(store.paymentStatus || "pending")} />
+                        <InfoRow label="Messages Used" value={`${msgCount.toLocaleString()} / ${msgLimit >= 999999 ? "Unlimited" : msgLimit.toLocaleString()}`} />
+                        <InfoRow label="Last Activity" value={store.lastActiveAt ? new Date(store.lastActiveAt).toLocaleString() : "Not available"} />
+                      </div>
+                    </SectionCard>
                   </div>
-                </Panel>
+                ) : null}
 
-                <Panel title="Plan guidance" description="What you can expect from the current plan and what changes after an upgrade.">
-                  <div className="space-y-4">
-                    <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
-                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Current plan</div>
-                      <div className="mt-2 text-lg font-bold text-white">{formatLabel(plan)}</div>
-                      <div className="mt-1 text-sm text-slate-400">{planLabels[plan]}</div>
-                    </div>
-                    <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
-                      {plan === "starter"
-                        ? "Starter is enough for chat-only support. If you need product cards, richer memory, and more automation control, move to Pro."
-                        : plan === "pro"
-                          ? "Pro is suitable for most stores. Upgrade to Enterprise only if you actually need deeper reporting and higher-touch operations."
-                          : "Enterprise is already the top tier. If something is missing here, it is an implementation issue, not a plan issue."}
-                    </div>
-                    {plan !== "enterprise" ? (
-                      <a href="mailto:agentcomrce@gmail.com?subject=Upgrade Request" className="inline-flex rounded-2xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 text-sm font-semibold text-violet-100">
-                        Request Upgrade
-                      </a>
-                    ) : null}
-                  </div>
-                </Panel>
-              </div>
-            ) : null}
-
-            {tab === "install" ? (
-              <div className="mt-5 grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-                <Panel title={`Install on ${formatLabel(store.platform || "store")}`} description="Use these steps exactly. If your widget does not show after this, the issue is in the install placement or workflow URL.">
-                  <div className="space-y-4">
-                    {installSteps.map(([title, description], index) => (
-                      <div key={title} className="flex gap-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-violet-500/30 bg-violet-500/10 text-sm font-bold text-violet-200">
-                          {index + 1}
+                {section === "assistant" ? (
+                  <SectionCard title="Assistant Settings" description="Edit the assistant identity and the welcome copy shown to visitors.">
+                    <div className="grid gap-4 lg:grid-cols-2">
+                      <Field label="AI Agent Name">
+                        <input value={form.agentName} onChange={(event) => setForm((current) => ({ ...current, agentName: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" placeholder="Store Assistant" />
+                      </Field>
+                      <Field label="Lead Capture">
+                        <div className="flex gap-3">
+                          <button onClick={() => setForm((current) => ({ ...current, receiveLeads: true }))} className={cx("rounded-xl px-4 py-3 text-sm font-semibold", form.receiveLeads ? "bg-emerald-500 text-white" : "border border-slate-800 bg-[#050816] text-slate-300")}>Enabled</button>
+                          <button onClick={() => setForm((current) => ({ ...current, receiveLeads: false }))} className={cx("rounded-xl px-4 py-3 text-sm font-semibold", !form.receiveLeads ? "bg-rose-500 text-white" : "border border-slate-800 bg-[#050816] text-slate-300")}>Disabled</button>
                         </div>
-                        <div>
-                          <div className="text-sm font-semibold text-white">{title}</div>
-                          <div className="mt-1 text-sm text-slate-400">{description}</div>
+                      </Field>
+                    </div>
+                    <div className="mt-4">
+                      <Field label="Welcome Text" helper="This appears when the chat opens for a new visitor.">
+                        <textarea value={form.welcomeMessage} onChange={(event) => setForm((current) => ({ ...current, welcomeMessage: event.target.value }))} rows={4} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" placeholder="Hi, how can I help you today?" />
+                      </Field>
+                    </div>
+                  </SectionCard>
+                ) : null}
+
+                {section === "branding" ? (
+                  <SectionCard title="Branding" description="Manage the visual settings used by your live widget." action={<button onClick={() => copy(widgetCode, "widget")} className={cx("rounded-2xl px-4 py-3 text-sm font-semibold", copied === "widget" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}>{copied === "widget" ? "Copied" : "Copy Widget Code"}</button>}>
+                    <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+                      <div className="rounded-[28px] border border-slate-800 bg-[#050816] p-5">
+                        <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Widget preview</div>
+                        <div className="mt-5 rounded-[24px] border border-slate-800 bg-slate-950 p-5">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full" style={{ backgroundColor: form.accentColor || "#7c3aed" }} />
+                            <div>
+                              <div className="text-sm font-bold text-white">{form.agentName || "Store Assistant"}</div>
+                              <div className="text-xs text-slate-500">{store.storeName || "Your Store"}</div>
+                            </div>
+                          </div>
+                          <div className="mt-4 rounded-2xl bg-slate-900 p-4 text-sm leading-6 text-slate-200">
+                            {form.welcomeMessage || "Hi! How can I help you today?"}
+                          </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </Panel>
+                      <div className="space-y-4">
+                        <Field label="Accent Color" helper="Use a hex color such as #7c3aed.">
+                          <div className="flex gap-3">
+                            <input value={form.accentColor} onChange={(event) => setForm((current) => ({ ...current, accentColor: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" placeholder="#7c3aed" />
+                            <div className="h-12 w-12 shrink-0 rounded-2xl border border-slate-800" style={{ backgroundColor: form.accentColor || "#7c3aed" }} />
+                          </div>
+                        </Field>
+                        <Field label="Widget Code">
+                          <pre className="overflow-x-auto rounded-2xl border border-slate-800 bg-[#050816] p-4 text-xs leading-6 text-slate-300">{widgetCode}</pre>
+                        </Field>
+                      </div>
+                    </div>
+                  </SectionCard>
+                ) : null}
 
-                <Panel title="Operational details" description="Keep these values for support or troubleshooting.">
-                  <div className="grid gap-4">
-                    <QuickStat label="Platform" value={formatLabel(store.platform || "unknown")} />
-                    <QuickStat label="Store URL" value={store.storeUrl || "Not set"} />
-                    <QuickStat label="Workflow Status" value={formatLabel(store.workflowStatus || "not_started")} />
-                    <QuickStat label="Widget Status" value={formatLabel(store.widgetStatus || "not_installed")} />
-                  </div>
-                </Panel>
-              </div>
-            ) : null}
+                {section === "store" ? (
+                  <SectionCard title="Store Info" description="Update business details used in setup, support, and widget context.">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Field label="Store Name">
+                        <input value={form.storeName} onChange={(event) => setForm((current) => ({ ...current, storeName: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" />
+                      </Field>
+                      <Field label="Store Contact Email">
+                        <input type="email" value={form.contactEmail} onChange={(event) => setForm((current) => ({ ...current, contactEmail: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" />
+                      </Field>
+                      <Field label="Phone Number">
+                        <input value={form.phoneNumber} onChange={(event) => setForm((current) => ({ ...current, phoneNumber: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" />
+                      </Field>
+                      <Field label="Physical Store">
+                        <div className="flex gap-3">
+                          <button onClick={() => setForm((current) => ({ ...current, hasPhysicalStore: true }))} className={cx("rounded-xl px-4 py-3 text-sm font-semibold", form.hasPhysicalStore ? "bg-emerald-500 text-white" : "border border-slate-800 bg-[#050816] text-slate-300")}>Yes</button>
+                          <button onClick={() => setForm((current) => ({ ...current, hasPhysicalStore: false, storeAddress: "" }))} className={cx("rounded-xl px-4 py-3 text-sm font-semibold", !form.hasPhysicalStore ? "bg-rose-500 text-white" : "border border-slate-800 bg-[#050816] text-slate-300")}>No</button>
+                        </div>
+                      </Field>
+                    </div>
+                    {form.hasPhysicalStore ? (
+                      <div className="mt-4">
+                        <Field label="Address">
+                          <input value={form.storeAddress} onChange={(event) => setForm((current) => ({ ...current, storeAddress: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" />
+                        </Field>
+                      </div>
+                    ) : null}
+                    <div className="mt-4 grid gap-4">
+                      <Field label="Categories" helper="Separate categories with commas.">
+                        <input value={form.categories} onChange={(event) => setForm((current) => ({ ...current, categories: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" placeholder="Fashion, Sneakers, Accessories" />
+                      </Field>
+                      <Field label="Delivery Methods" helper="Separate methods with commas.">
+                        <input value={form.deliveryMethods} onChange={(event) => setForm((current) => ({ ...current, deliveryMethods: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" placeholder="Courier, Local Delivery, Pickup" />
+                      </Field>
+                      <Field label="Return Policy">
+                        <textarea value={form.returnPolicy} onChange={(event) => setForm((current) => ({ ...current, returnPolicy: event.target.value }))} rows={4} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" />
+                      </Field>
+                    </div>
+                  </SectionCard>
+                ) : null}
 
-            {tab === "widget" ? (
-              <div className="mt-5 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-                <Panel
-                  title="Widget code"
-                  description="Paste this snippet before the closing body tag or into your footer script injection area."
-                  action={
-                    <button
-                      onClick={() => copy(widgetCode, "widget")}
-                      className={cx("rounded-2xl px-4 py-3 text-sm font-semibold", copied === "widget" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}
-                    >
-                      {copied === "widget" ? "Copied" : "Copy Code"}
-                    </button>
-                  }
-                >
-                  <pre className="overflow-x-auto rounded-2xl border border-slate-800 bg-[#050816] p-4 text-xs leading-6 text-slate-300">{widgetCode}</pre>
-                </Panel>
+                {section === "knowledge" ? (
+                  <SectionCard title="Knowledge Base" description="Edit the Q&A and notes used to support training and store context.">
+                    <div className="grid gap-4">
+                      <Field label="FAQs / Q&A" helper="Use one line per Q&A or paste your current training notes block.">
+                        <textarea value={form.faqs} onChange={(event) => setForm((current) => ({ ...current, faqs: event.target.value }))} rows={10} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" placeholder="Shipping time: 3-5 business days" />
+                      </Field>
+                      <Field label="Store Notes" helper="Internal notes, delivery details, promotions, and anything useful for configuration.">
+                        <textarea value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} rows={6} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" />
+                      </Field>
+                    </div>
+                    <div className="mt-4 grid gap-4 md:grid-cols-3">
+                      <InfoRow label="Q&A Entries" value={String(toFaqList(form.faqs).length)} />
+                      <InfoRow label="Categories" value={String(parseCsv(form.categories).length)} />
+                      <InfoRow label="Lead Capture" value={form.receiveLeads ? "Enabled" : "Disabled"} />
+                    </div>
+                  </SectionCard>
+                ) : null}
 
-                <Panel title="Config reference" description="These are the values currently embedded in the snippet.">
-                  <div className="grid gap-4">
-                    <QuickStat label="Agent Name" value={store.agentName || "Store Assistant"} />
-                    <QuickStat label="Accent Color" value={store.accentColor || "#5B4FE8"} />
-                    <QuickStat label="Welcome Message" value={store.welcomeMessage || "Not set"} />
-                    <QuickStat label="Webhook URL" value={webhookUrl} />
-                  </div>
-                </Panel>
-              </div>
-            ) : null}
+                {section === "billing" ? (
+                  <SectionCard title="Billing" description="This view is read-only. Admin controls payment confirmation, limits, and unlock state.">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <InfoRow label="Plan" value={`${formatLabel(plan)} · ${planLabels[plan]}`} />
+                      <InfoRow label="Billing Cycle" value={formatLabel(store.billingCycle || "monthly")} />
+                      <InfoRow label="Payment Status" value={formatLabel(store.paymentStatus || "pending")} />
+                      <InfoRow label="Amount" value={`$${store.paymentAmount || 0}`} />
+                      <InfoRow label="Messages Used" value={`${msgCount.toLocaleString()} / ${msgLimit >= 999999 ? "Unlimited" : msgLimit.toLocaleString()}`} />
+                      <InfoRow label="Usage Left" value={usageRemaining} />
+                    </div>
+                    <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
+                      If your plan reaches its limit or payment becomes overdue, contact support to renew or unlock access. Payment changes are handled from the admin side, not from this dashboard.
+                    </div>
+                  </SectionCard>
+                ) : null}
 
-            {tab === "support" ? (
-              <div className="mt-5 grid gap-6 xl:grid-cols-[1fr_0.85fr]">
-                <Panel title="Send support message" description="This opens your mail client with the correct store context attached.">
-                  {msgSent ? <div className="mb-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">Message prepared. Send it from your email client.</div> : null}
-                  <div className="space-y-4">
-                    <label className="block">
-                      <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Subject</div>
-                      <input value={msgSubject} onChange={(event) => setMsgSubject(event.target.value)} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600" placeholder="Widget issue, plan change, branding update..." />
-                    </label>
-                    <label className="block">
-                      <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Message</div>
-                      <textarea value={msgBody} onChange={(event) => setMsgBody(event.target.value)} rows={6} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600" placeholder="Describe the issue or request clearly." />
-                    </label>
-                    <button onClick={sendMessage} disabled={msgSending || !msgSubject.trim() || !msgBody.trim()} className="rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
-                      {msgSending ? "Opening..." : "Send Message"}
-                    </button>
+                {section === "integration" ? (
+                  <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+                    <SectionCard title="Integration" description="Use this code and status view to keep the live widget installed correctly." action={<button onClick={() => copy(widgetCode, "install")} className={cx("rounded-2xl px-4 py-3 text-sm font-semibold", copied === "install" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}>{copied === "install" ? "Copied" : "Copy Code"}</button>}>
+                      <pre className="overflow-x-auto rounded-2xl border border-slate-800 bg-[#050816] p-4 text-xs leading-6 text-slate-300">{widgetCode}</pre>
+                    </SectionCard>
+                    <SectionCard title="Integration Status" description="Operational references for your current live setup.">
+                      <div className="grid gap-4">
+                        <InfoRow label="Platform" value={formatLabel(store.platform)} />
+                        <InfoRow label="Webhook URL" value={webhookUrl} />
+                        <InfoRow label="Workflow Status" value={formatLabel(store.workflowStatus || "not_started")} />
+                        <InfoRow label="Widget Status" value={formatLabel(store.widgetStatus || "not_installed")} />
+                        <InfoRow label="Store ID" value={store.storeId} />
+                      </div>
+                    </SectionCard>
                   </div>
-                </Panel>
+                ) : null}
 
-                <Panel title="Support details" description="Use these references when you contact support.">
-                  <div className="grid gap-4">
-                    <QuickStat label="Support Email" value="agentcomrce@gmail.com" />
-                    <QuickStat label="Store Name" value={store.storeName || "Not set"} />
-                    <QuickStat label="Store ID" value={store.storeId || "Not set"} />
-                    <QuickStat label="Plan" value={`${formatLabel(plan)} Â· ${planLabels[plan]}`} />
+                {section === "support" ? (
+                  <div className="grid gap-6 xl:grid-cols-[1fr_0.85fr]">
+                    <SectionCard title="Support" description="Use these references when contacting support.">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <InfoRow label="Support Email" value="agentcomrce@gmail.com" />
+                        <InfoRow label="Dashboard Email" value={data?.user?.email || "Not set"} />
+                        <InfoRow label="Store Name" value={store.storeName} />
+                        <InfoRow label="Store ID" value={store.storeId} />
+                      </div>
+                    </SectionCard>
+                    <SectionCard title="Operational Snapshot" description="Useful support context from the current account state.">
+                      <div className="grid gap-4">
+                        <InfoRow label="Current Plan" value={`${formatLabel(plan)} · ${planLabels[plan]}`} />
+                        <InfoRow label="Setup Stage" value={formatLabel(store.setupStatus || "new")} />
+                        <InfoRow label="Widget Stage" value={formatLabel(store.widgetStatus || "not_installed")} />
+                        <InfoRow label="Last Sync" value={store.lastSyncedAt ? new Date(store.lastSyncedAt).toLocaleString() : "Not available"} />
+                      </div>
+                    </SectionCard>
                   </div>
-                </Panel>
-              </div>
-            ) : null}
+                ) : null}
+              </main>
+            </div>
           </div>
         </div>
       </div>
