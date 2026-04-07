@@ -495,7 +495,7 @@ export default function AdminDashboard() {
                         </div>
                       </SectionCard>
 
-                      <SectionCard title="Branding & limits" description="Widget settings and plan usage values used by the live store.">
+                      <SectionCard title="Branding, usage, and routing" description="Widget branding, usage counters, and the store webhook used for live chat routing.">
                         <div className="grid gap-4 sm:grid-cols-2">
                           <InputField label="Messages Used" type="number" value={form.msgCount} onChange={(value) => setForm((current) => ({ ...current, msgCount: Number(value) || 0 }))} />
                           <InputField label="Message Limit" type="number" value={form.msgLimit} onChange={(value) => setForm((current) => ({ ...current, msgLimit: Number(value) || 0 }))} />
@@ -503,11 +503,16 @@ export default function AdminDashboard() {
                           <InputField label="Accent Color" value={form.accentColor} onChange={(value) => setForm((current) => ({ ...current, accentColor: value }))} placeholder="#7c3aed" />
                         </div>
                         <div className="mt-4">
-                          <InputField label="Webhook URL" value={form.webhookUrl} onChange={(value) => setForm((current) => ({ ...current, webhookUrl: value }))} placeholder="https://n8n.example.com/webhook/..." />
+                          <InputField label="Webhook URL *" value={form.webhookUrl} onChange={(value) => setForm((current) => ({ ...current, webhookUrl: value }))} placeholder="https://n8n.example.com/webhook/..." />
                         </div>
                         <div className="mt-4">
                           <TextareaField label="Welcome Message" value={form.welcomeMessage} onChange={(value) => setForm((current) => ({ ...current, welcomeMessage: value }))} rows={3} />
                         </div>
+                        {!form.webhookUrl ? (
+                          <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">
+                            This store does not have a webhook URL yet. The widget can render, but chat routing will fail until you save the workflow webhook here.
+                          </div>
+                        ) : null}
                       </SectionCard>
                     </div>
 

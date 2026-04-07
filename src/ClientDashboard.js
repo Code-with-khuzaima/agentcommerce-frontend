@@ -198,9 +198,9 @@ export default function ClientDashboard({ onLogout }) {
   const usagePercent = msgLimit >= 999999 ? 0 : Math.min(Math.round((msgCount / Math.max(msgLimit, 1)) * 100), 100);
   const usageRemaining = msgLimit >= 999999 ? "Unlimited" : `${Math.max(msgLimit - msgCount, 0).toLocaleString()} remaining`;
   const planLabels = { starter: "$19/mo", pro: "$29/mo", enterprise: "$49/mo" };
-  const webhookUrl = store.webhookUrl || `https://temp56.app.n8n.cloud/webhook/${plan}-chat`;
+  const webhookUrl = store.webhookUrl || "";
   const storeAnswers = store.storeAnswers || {};
-  const widgetCode = `<!-- AgentComerce ${plan.charAt(0).toUpperCase() + plan.slice(1)} Widget -->\n<script>\n  window.AgentComerce = {\n    store_id: "${store.storeId || "store_001"}",\n    plan: "${plan}",\n    agent_name: "${form?.agentName || store.agentName || "Store Assistant"}",\n    accent_color: "${form?.accentColor || store.accentColor || "#7c3aed"}",\n    welcome_message: "${form?.welcomeMessage || store.welcomeMessage || "Hi! How can I help you today?"}",\n    webhook_url: "${webhookUrl}"\n  };\n</script>\n<script src="https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget.js"></script>`;
+  const widgetCode = `<!-- AgentComerce Widget -->\n<script>\n  window.AgentComerce = {\n    store_id: "${store.storeId || "store_001"}"\n  };\n</script>\n<script src="https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget.js"></script>`;
 
   const metrics = [
     ["Plan", formatLabel(plan), planLabels[plan]],
@@ -441,17 +441,30 @@ export default function ClientDashboard({ onLogout }) {
 
                 {section === "integration" ? (
                   <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-                    <SectionCard title="Integration" description="Use this code and status view to keep the live widget installed correctly." action={<button onClick={() => copy(widgetCode, "install")} className={cx("rounded-2xl px-4 py-3 text-sm font-semibold", copied === "install" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}>{copied === "install" ? "Copied" : "Copy Code"}</button>}>
-                      <pre className="overflow-x-auto rounded-2xl border border-slate-800 bg-[#050816] p-4 text-xs leading-6 text-slate-300">{widgetCode}</pre>
+                    <SectionCard title="Integration" description="Install the widget with your store ID. Live color, welcome text, and routing are loaded automatically from the backend." action={<button onClick={() => copy(widgetCode, "install")} className={cx("rounded-2xl px-4 py-3 text-sm font-semibold", copied === "install" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}>{copied === "install" ? "Copied" : "Copy Install Code"}</button>}>
+                      <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm text-slate-300">
+                        Paste this snippet before the closing <code className="text-white">&lt;/body&gt;</code> tag or into your footer script area.
+                      </div>
+                      <pre className="mt-4 overflow-x-auto rounded-2xl border border-slate-800 bg-[#050816] p-4 text-xs leading-6 text-slate-300">{widgetCode}</pre>
+                      <div className="mt-4 grid gap-3">
+                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm text-slate-300">1. Copy the install code.</div>
+                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm text-slate-300">2. Add it to your Shopify theme or WooCommerce footer script area.</div>
+                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm text-slate-300">3. Save and refresh your storefront.</div>
+                      </div>
                     </SectionCard>
-                    <SectionCard title="Integration Status" description="Operational references for your current live setup.">
+                    <SectionCard title="Integration Status" description="These values decide whether the widget works end to end.">
                       <div className="grid gap-4">
                         <InfoRow label="Platform" value={formatLabel(store.platform)} />
-                        <InfoRow label="Webhook URL" value={webhookUrl} />
+                        <InfoRow label="Store ID" value={store.storeId} />
                         <InfoRow label="Workflow Status" value={formatLabel(store.workflowStatus || "not_started")} />
                         <InfoRow label="Widget Status" value={formatLabel(store.widgetStatus || "not_installed")} />
-                        <InfoRow label="Store ID" value={store.storeId} />
+                        <InfoRow label="Webhook URL" value={webhookUrl || "Not configured yet"} />
                       </div>
+                      {!webhookUrl ? (
+                        <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">
+                          Your workflow URL is not configured yet. The widget can load, but chat will not work until admin saves the store webhook.
+                        </div>
+                      ) : null}
                     </SectionCard>
                   </div>
                 ) : null}
@@ -484,5 +497,7 @@ export default function ClientDashboard({ onLogout }) {
     </div>
   );
 }
+
+
 
 
