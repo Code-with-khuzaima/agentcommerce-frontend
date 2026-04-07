@@ -147,11 +147,11 @@ export default function AdminDashboard() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [logMessage, setLogMessage] = useState("");
-  const [activityFilter, setActivityFilter] = useState("all");
   const [accountEmail, setAccountEmail] = useState("");
   const [accountLookup, setAccountLookup] = useState(null);
   const [accountLoading, setAccountLoading] = useState(false);
   const [tempPassword, setTempPassword] = useState("");
+  const [copied, setCopied] = useState("");
 
   function jumpToSection(id) {
     const node = document.getElementById(id);
@@ -290,6 +290,12 @@ export default function AdminDashboard() {
     }
   }
 
+  function copy(text, key) {
+    navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(""), 2000);
+  }
+
   const cards = useMemo(() => {
     if (!summary) return [];
     return [
@@ -300,12 +306,6 @@ export default function AdminDashboard() {
     ];
   }, [summary]);
 
-  const filteredLogs = useMemo(() => {
-    const logs = selectedStore?.logs || [];
-    if (activityFilter === "all") return logs;
-    return logs.filter((log) => log.event === activityFilter);
-  }, [selectedStore, activityFilter]);
-
   const navItems = [
     ["admin-overview", "Overview"],
     ["admin-queue", "Store Queue"],
@@ -314,6 +314,10 @@ export default function AdminDashboard() {
     ["admin-client-access", "Client Access"],
     ["admin-activity", "Activity"],
   ];
+
+  const installSnippet = selectedStore
+    ? `<!-- AgentComerce Widget -->\n<script>\n  window.AgentComerce = {\n    store_id: "${selectedStore.storeId || "store_001"}"\n  };\n</script>\n<script src="https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget.js"></script>`
+    : "";
 
   return (
     <div className="min-h-screen bg-[#050816] text-white">
@@ -517,6 +521,38 @@ export default function AdminDashboard() {
                     </div>
 
                     <div id="admin-workflow" className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr] scroll-mt-24">
+                      <SectionCard title="Workflow and install" description="Finish setup here: save the webhook, copy the install snippet, then test and mark the store live.">
+                        <div className="grid gap-4 lg:grid-cols-2">
+                          <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Store ID</div>
+                            <div className="mt-2 text-sm font-semibold text-white">{selectedStore.storeId}</div>
+                          </div>
+                          <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Platform</div>
+                            <div className="mt-2 text-sm font-semibold text-white">{formatLabel(selectedStore.platform)}</div>
+                          </div>
+                        </div>
+                        <div className="mt-4">
+                          <InputField label="Webhook URL *" value={form.webhookUrl} onChange={(value) => setForm((current) => ({ ...current, webhookUrl: value }))} placeholder="https://n8n.example.com/webhook/..." />
+                        </div>
+                        {!form.webhookUrl ? (
+                          <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">
+                            Save the workflow webhook first. Without it, the widget can render but chat will not work.
+                          </div>
+                        ) : null}
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          <button onClick={() => copy(installSnippet, "install-snippet")} className={cx("rounded-2xl px-5 py-3 text-sm font-semibold", copied === "install-snippet" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}>
+                            {copied === "install-snippet" ? "Copied" : "Copy Install Snippet"}
+                          </button>
+                          <button onClick={() => setForm((current) => ({ ...current, setupStatus: "workflow_building", workflowStatus: "draft" }))} className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white">Prepare Workflow</button>
+                          <button onClick={() => setForm((current) => ({ ...current, widgetStatus: "live", status: "active", setupStatus: "live", workflowStatus: current.workflowStatus === "not_started" ? "ready" : current.workflowStatus }))} className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white">Mark Live</button>
+                        </div>
+                        <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                          <div className="mb-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">Install Snippet</div>
+                          <pre className="overflow-x-auto text-xs leading-6 text-slate-300">{installSnippet}</pre>
+                        </div>
+                      </SectionCard>
+
                       <SectionCard title="Store context" description="Operational data captured from the client setup form and training notes.">
                         <div className="grid gap-4 lg:grid-cols-2">
                           <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
@@ -544,43 +580,6 @@ export default function AdminDashboard() {
                         </div>
                         <div className="mt-4">
                           <TextareaField label="Internal Notes" value={form.internalNotes} onChange={(value) => setForm((current) => ({ ...current, internalNotes: value }))} rows={8} placeholder="Track payment notes, workflow URLs, QA blockers, and client requests." />
-                        </div>
-                      </SectionCard>
-
-                      <SectionCard
-                        title="Activity timeline"
-                        description="Track manual work, QA changes, and client communication."
-                        action={
-                          <select value={activityFilter} onChange={(event) => setActivityFilter(event.target.value)} className="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-2 text-sm text-white outline-none">
-                            <option value="all">All activity</option>
-                            {Array.from(new Set((selectedStore.logs || []).map((log) => log.event))).map((event) => (
-                              <option key={event} value={event}>
-                                {formatLabel(event)}
-                              </option>
-                            ))}
-                          </select>
-                        }
-                      >
-                        <TextareaField label="Quick Log Note" value={logMessage} onChange={setLogMessage} rows={4} placeholder="Example: Payment confirmed. Workflow moved to QA." />
-                        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                          <button onClick={() => addLog("workflow_prepared")} disabled={saving} className="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">Workflow Ready</button>
-                          <button onClick={() => addLog("widget_published")} disabled={saving} className="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">Widget Live</button>
-                          <button onClick={() => addLog("client_follow_up")} disabled={saving} className="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">Client Follow-Up</button>
-                        </div>
-                        <div className="mt-5 space-y-3">
-                          {filteredLogs.map((log) => (
-                            <div key={log.id} className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
-                              <div className="flex items-start justify-between gap-3">
-                                <div>
-                                  <div className="text-sm font-bold text-white">{formatLabel(log.event)}</div>
-                                  <div className="mt-1 text-xs text-slate-500">{formatDate(log.createdAt)}</div>
-                                </div>
-                                <Badge tone={toneForStatus(log.event)}>{formatLabel(log.event)}</Badge>
-                              </div>
-                              <div className="mt-3 text-sm leading-6 text-slate-300">{typeof log.payload?.note === "string" ? log.payload.note : JSON.stringify(log.payload)}</div>
-                            </div>
-                          ))}
-                          {!filteredLogs.length ? <div className="rounded-2xl border border-dashed border-slate-800 px-4 py-5 text-sm text-slate-500">No activity logs for this filter.</div> : null}
                         </div>
                       </SectionCard>
                     </div>
