@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentComerce Widget Test</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #09111f;
+      --panel: #121c31;
+      --panel-border: rgba(148, 163, 184, 0.18);
+      --text: #e5eefc;
+      --muted: #93a4c3;
+      --accent: #7c3aed;
+      --accent-2: #2563eb;
+      --success: #10b981;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(124, 58, 237, 0.18), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.18), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      padding: 32px 16px 80px;
+    }
+    .shell {
+      width: min(920px, 100%);
+      margin: 0 auto;
+    }
+    .panel {
+      background: rgba(18, 28, 49, 0.88);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.05;
+    }
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+    .stack { display: grid; gap: 16px; }
+    .card {
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 16px;
+      padding: 18px;
+      background: rgba(9, 17, 31, 0.4);
+    }
+    .label {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #a8b6d4;
+      margin-bottom: 8px;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    input {
+      flex: 1 1 280px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(6, 11, 21, 0.92);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 15px;
+    }
+    button, .link {
+      border: 0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+    }
+    .secondary {
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+    .status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #d1fae5;
+      font-size: 14px;
+    }
+    .muted-note {
+      font-size: 13px;
+      color: #9fb0cf;
+      line-height: 1.7;
+    }
+    code {
+      font-family: Consolas, monospace;
+      background: rgba(148, 163, 184, 0.12);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+      .panel { padding: 18px; }
+      body { padding-top: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <h1>Widget Test Page</h1>
+      <p>Use this page to test the live AgentComerce chat widget without installing it on a client storefront first.</p>
+
+      <div class="grid">
+        <div class="stack">
+          <div class="card">
+            <label class="label" for="storeId">Store ID</label>
+            <div class="row">
+              <input id="storeId" type="text" value="store_002" placeholder="store_002" />
+              <button id="loadWidget" class="primary" type="button">Load Widget</button>
+            </div>
+            <div id="status" class="status">Ready. Load the widget for a store and test the live chat flow.</div>
+          </div>
+
+          <div class="card">
+            <span class="label">What This Tests</span>
+            <ul>
+              <li>Live widget config fetch by <code>store_id</code></li>
+              <li>Welcome text, color, and agent name rendering</li>
+              <li>Chat routing to the saved webhook URL</li>
+              <li>Real message usage tracking after successful replies</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="card">
+            <span class="label">How Store URL Usually Works</span>
+            <p class="muted-note">A client store URL is the website where the snippet is installed, for example <code>https://brand-store.com</code> or a Shopify storefront. For testing, you do not need that. This page acts as a clean storefront substitute.</p>
+          </div>
+
+          <div class="card">
+            <span class="label">After This Page Works</span>
+            <ul>
+              <li>Give the client their install snippet</li>
+              <li>Client pastes it into Shopify or WooCommerce</li>
+              <li>Save webhook URL in admin</li>
+              <li>Mark the store live after one real message test</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const storeInput = document.getElementById('storeId');
+      const loadButton = document.getElementById('loadWidget');
+      const status = document.getElementById('status');
+      const params = new URLSearchParams(window.location.search);
+      const queryStore = params.get('store_id');
+      if (queryStore) storeInput.value = queryStore;
+
+      function setStatus(message, isError) {
+        status.textContent = message;
+        status.style.background = isError ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)';
+        status.style.borderColor = isError ? 'rgba(239, 68, 68, 0.26)' : 'rgba(16, 185, 129, 0.25)';
+        status.style.color = isError ? '#fecaca' : '#d1fae5';
+      }
+
+      function removeExistingWidget() {
+        document.querySelectorAll('script[data-agentcomerce-widget]').forEach((node) => node.remove());
+        const existing = document.getElementById('agentcommerce-config-script');
+        if (existing) existing.remove();
+        delete window.AgentComerce;
+      }
+
+      function loadWidget() {
+        const storeId = storeInput.value.trim();
+        if (!storeId) {
+          setStatus('Enter a store ID first.', true);
+          return;
+        }
+
+        removeExistingWidget();
+        window.AgentComerce = { store_id: storeId };
+
+        const configScript = document.createElement('script');
+        configScript.id = 'agentcommerce-config-script';
+        configScript.text = 'window.AgentComerce = ' + JSON.stringify({ store_id: storeId }) + ';';
+        document.body.appendChild(configScript);
+
+        const script = document.createElement('script');
+        script.src = '/widget.js';
+        script.async = true;
+        script.dataset.agentcomerceWidget = 'true';
+        script.onload = function () {
+          setStatus('Widget loaded for ' + storeId + '. Open the chat bubble and test live messages.');
+          const nextUrl = new URL(window.location.href);
+          nextUrl.searchParams.set('store_id', storeId);
+          window.history.replaceState({}, '', nextUrl.toString());
+        };
+        script.onerror = function () {
+          setStatus('Widget failed to load.', true);
+        };
+        document.body.appendChild(script);
+      }
+
+      loadButton.addEventListener('click', loadWidget);
+    })();
+  </script>
+</body>
+</html>
