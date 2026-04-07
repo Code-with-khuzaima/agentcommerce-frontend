@@ -4,6 +4,7 @@
   var config = window.AgentComerce || {};
   var storeId = config.store_id || "store_001";
   var webhook = config.webhook_url || "";
+  var apiBase = config.api_base || "https://agentcommerce-backend-production-e1d9.up.railway.app/api";
   var agentName = config.agent_name || "AI Assistant";
   var accent = config.accent_color || "#7c3aed";
   var welcome = config.welcome_message || "Welcome! How can I help you today?";
@@ -29,7 +30,8 @@
   var style = document.createElement("style");
   style.textContent = `
     #acw-root, #acw-root * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
-    #acw-button { position: fixed; right: 20px; bottom: 20px; width: 60px; height: 60px; border-radius: 18px; border: none; background: ${accent}; color: white; cursor: pointer; box-shadow: 0 12px 32px rgba(0,0,0,0.24); z-index: 99998; }
+    #acw-root { --acw-accent: ${accent}; }
+    #acw-button { position: fixed; right: 20px; bottom: 20px; width: 60px; height: 60px; border-radius: 18px; border: none; background: var(--acw-accent); color: white; cursor: pointer; box-shadow: 0 12px 32px rgba(0,0,0,0.24); z-index: 99998; }
     #acw-panel { position: fixed; right: 20px; bottom: 92px; width: min(380px, calc(100vw - 24px)); height: min(640px, calc(100vh - 120px)); background: #0f172a; color: white; border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 48px rgba(0,0,0,0.35); display: none; flex-direction: column; z-index: 99999; }
     #acw-panel.open { display: flex; }
     #acw-head { padding: 18px 18px 14px; background: linear-gradient(135deg, #111827 0%, #1f2937 100%); border-bottom: 1px solid rgba(255,255,255,0.08); }
@@ -46,9 +48,9 @@
     #acw-msgs { display: flex; flex-direction: column; gap: 12px; }
     .acw-msg { max-width: 86%; padding: 12px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; box-shadow: 0 2px 8px rgba(15,23,42,0.08); }
     .acw-bot { align-self: flex-start; background: white; color: #111827; border-bottom-left-radius: 4px; }
-    .acw-user { align-self: flex-end; background: ${accent}; color: white; border-bottom-right-radius: 4px; }
+    .acw-user { align-self: flex-end; background: var(--acw-accent); color: white; border-bottom-right-radius: 4px; }
     #acw-foot { padding: 12px; border-top: 1px solid #e2e8f0; background: white; display: flex; gap: 10px; }
-    #acw-send, #acw-save-lead { border: none; border-radius: 14px; background: ${accent}; color: white; font-weight: 700; cursor: pointer; }
+    #acw-send, #acw-save-lead { border: none; border-radius: 14px; background: var(--acw-accent); color: white; font-weight: 700; cursor: pointer; }
     #acw-send { width: 52px; }
     #acw-save-lead { width: 100%; padding: 12px 14px; }
     #acw-products { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
@@ -56,7 +58,7 @@
     .acw-card img { width: 100%; height: 120px; object-fit: cover; background: #e2e8f0; }
     .acw-card-body { padding: 10px; }
     .acw-card-name { font-size: 13px; font-weight: 600; line-height: 1.45; min-height: 36px; }
-    .acw-card-price { font-size: 13px; color: ${accent}; font-weight: 700; margin-top: 4px; }
+    .acw-card-price { font-size: 13px; color: var(--acw-accent); font-weight: 700; margin-top: 4px; }
     .acw-card-stock { font-size: 11px; color: #047857; margin-top: 4px; }
     .acw-error { color: #b91c1c; font-size: 12px; margin: 0 0 12px; }
     @media (max-width: 640px) {
@@ -113,6 +115,8 @@
 
   var button = document.getElementById("acw-button");
   var panel = document.getElementById("acw-panel");
+  var rootNode = document.getElementById("acw-root");
+  var titleNode = document.getElementById("acw-title");
   var leadWrap = document.getElementById("acw-lead");
   var chatWrap = document.getElementById("acw-chat");
   var foot = document.getElementById("acw-foot");
@@ -124,6 +128,37 @@
 
   function persistMessages() {
     try { localStorage.setItem(msgKey, JSON.stringify(messages.slice(-30))); } catch (e) {}
+  }
+
+  function applyLiveConfig(next) {
+    if (!next) return;
+    agentName = next.agentName || agentName;
+    accent = next.accentColor || accent;
+    welcome = next.welcomeMessage || welcome;
+    webhook = next.webhookUrl || webhook;
+    if (rootNode) rootNode.style.setProperty("--acw-accent", accent);
+    if (titleNode) titleNode.textContent = agentName;
+  }
+
+  async function loadLiveConfig() {
+    if (!storeId || !apiBase) return;
+    try {
+      var res = await fetch(apiBase + "/widget-config/" + encodeURIComponent(storeId));
+      if (!res.ok) return;
+      var data = await res.json();
+      if (data && data.config) applyLiveConfig(data.config);
+    } catch (e) {}
+  }
+
+  async function trackUsage() {
+    if (!storeId || !apiBase) return;
+    try {
+      await fetch(apiBase + "/widget-usage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storeId: storeId, amount: 1 }),
+      });
+    } catch (e) {}
   }
 
   function renderProducts(products) {
@@ -178,6 +213,7 @@
       });
       var data = await res.json();
       addMessage("bot", data.reply || "I could not generate a response.", data.products || []);
+      trackUsage();
     } catch (e) {
       addMessage("bot", "The assistant is temporarily unavailable. Please try again.");
     }
@@ -212,4 +248,6 @@
       sendMessage();
     }
   });
+
+  loadLiveConfig();
 })();
