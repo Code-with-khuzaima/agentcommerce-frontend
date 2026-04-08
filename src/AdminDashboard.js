@@ -334,6 +334,9 @@ export default function AdminDashboard() {
   const installSnippet = selectedStore
     ? `<!-- AgentComerce Widget -->\n<script>\n  window.AgentComerce = {\n    store_id: "${selectedStore.storeId || "store_001"}"\n  };\n</script>\n<script src="https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget.js"></script>`
     : "";
+  const widgetTestUrl = selectedStore
+    ? `https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget-test.html?store_id=${encodeURIComponent(selectedStore.storeId || "store_001")}`
+    : "";
 
   return (
     <div className="min-h-screen bg-[#050816] text-white">
@@ -403,7 +406,7 @@ export default function AdminDashboard() {
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <div className="truncate text-sm font-bold text-white">{store.storeName}</div>
-                              <div className="mt-1 truncate text-xs text-slate-500">{store.storeId} · {formatLabel(store.platform)}</div>
+                              <div className="mt-1 truncate text-xs text-slate-500">{store.storeId} Â· {formatLabel(store.platform)}</div>
                             </div>
                             <Badge tone="violet">{formatLabel(store.plan)}</Badge>
                           </div>
@@ -560,6 +563,9 @@ export default function AdminDashboard() {
                           <button onClick={() => copy(installSnippet, "install-snippet")} className={cx("rounded-2xl px-5 py-3 text-sm font-semibold", copied === "install-snippet" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}>
                             {copied === "install-snippet" ? "Copied" : "Copy Install Snippet"}
                           </button>
+                          <a href={widgetTestUrl} target="_blank" rel="noreferrer" className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:border-slate-600">
+                            Open Test Page
+                          </a>
                           <button
                             onClick={() => applyStorePatch({ setupStatus: "workflow_building", workflowStatus: "draft" }, "Workflow moved to draft.")}
                             disabled={saving || !selectedId}
@@ -673,7 +679,7 @@ export default function AdminDashboard() {
 
                     <div id="admin-activity" className="scroll-mt-24">
                     <div className="flex flex-col gap-4 rounded-[28px] border border-slate-800 bg-slate-950/70 p-5 xl:flex-row xl:items-center xl:justify-between">
-                      <div className="text-sm text-slate-400">Last active: {formatDate(selectedStore.lastActiveAt)} · Last synced: {formatDate(selectedStore.lastSyncedAt)}</div>
+                      <div className="text-sm text-slate-400">Last active: {formatDate(selectedStore.lastActiveAt)} Â· Last synced: {formatDate(selectedStore.lastSyncedAt)}</div>
                       <div className="flex flex-wrap gap-3">
                         <button
                           onClick={() => applyStorePatch({ setupStatus: "workflow_building", workflowStatus: "draft" }, "Workflow moved to draft.")}
@@ -713,3 +719,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
