@@ -226,6 +226,22 @@ export default function AdminDashboard() {
     }
   }
 
+  async function applyStorePatch(patch, message) {
+    if (!selectedId) return;
+    setSaving(true);
+    setError("");
+    setSuccess("");
+    try {
+      await apiPatch(`/admin/stores/${selectedId}`, patch);
+      await loadDashboard(filters, selectedId);
+      setSuccess(message);
+    } catch (err) {
+      setError(err.message || "Failed to update store.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function addLog(event) {
     if (!selectedId) return;
     setSaving(true);
@@ -544,8 +560,30 @@ export default function AdminDashboard() {
                           <button onClick={() => copy(installSnippet, "install-snippet")} className={cx("rounded-2xl px-5 py-3 text-sm font-semibold", copied === "install-snippet" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}>
                             {copied === "install-snippet" ? "Copied" : "Copy Install Snippet"}
                           </button>
-                          <button onClick={() => setForm((current) => ({ ...current, setupStatus: "workflow_building", workflowStatus: "draft" }))} className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white">Prepare Workflow</button>
-                          <button onClick={() => setForm((current) => ({ ...current, widgetStatus: "live", status: "active", setupStatus: "live", workflowStatus: current.workflowStatus === "not_started" ? "ready" : current.workflowStatus }))} className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white">Mark Live</button>
+                          <button
+                            onClick={() => applyStorePatch({ setupStatus: "workflow_building", workflowStatus: "draft" }, "Workflow moved to draft.")}
+                            disabled={saving || !selectedId}
+                            className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                          >
+                            Prepare Workflow
+                          </button>
+                          <button
+                            onClick={() =>
+                              applyStorePatch(
+                                {
+                                  status: "active",
+                                  setupStatus: "live",
+                                  workflowStatus: "live",
+                                  widgetStatus: "live",
+                                },
+                                "Store marked live."
+                              )
+                            }
+                            disabled={saving || !selectedId || !form?.webhookUrl}
+                            className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                          >
+                            Mark Live
+                          </button>
                         </div>
                         <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
                           <div className="mb-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">Install Snippet</div>
@@ -637,8 +675,30 @@ export default function AdminDashboard() {
                     <div className="flex flex-col gap-4 rounded-[28px] border border-slate-800 bg-slate-950/70 p-5 xl:flex-row xl:items-center xl:justify-between">
                       <div className="text-sm text-slate-400">Last active: {formatDate(selectedStore.lastActiveAt)} · Last synced: {formatDate(selectedStore.lastSyncedAt)}</div>
                       <div className="flex flex-wrap gap-3">
-                        <button onClick={() => setForm((current) => ({ ...current, setupStatus: "workflow_building", workflowStatus: "draft" }))} className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white">Prepare Workflow</button>
-                        <button onClick={() => setForm((current) => ({ ...current, widgetStatus: "live", status: "active", setupStatus: "live" }))} className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white">Mark Live</button>
+                        <button
+                          onClick={() => applyStorePatch({ setupStatus: "workflow_building", workflowStatus: "draft" }, "Workflow moved to draft.")}
+                          disabled={saving || !selectedId}
+                          className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                        >
+                          Prepare Workflow
+                        </button>
+                        <button
+                          onClick={() =>
+                            applyStorePatch(
+                              {
+                                status: "active",
+                                setupStatus: "live",
+                                workflowStatus: "live",
+                                widgetStatus: "live",
+                              },
+                              "Store marked live."
+                            )
+                          }
+                          disabled={saving || !selectedId || !form?.webhookUrl}
+                          className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                        >
+                          Mark Live
+                        </button>
                         <button onClick={saveStore} disabled={saving} className="rounded-2xl bg-white px-6 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">{saving ? "Saving..." : "Save Changes"}</button>
                       </div>
                     </div>
