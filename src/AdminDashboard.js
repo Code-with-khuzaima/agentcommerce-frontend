@@ -151,6 +151,8 @@ export default function AdminDashboard() {
   const [accountLookup, setAccountLookup] = useState(null);
   const [accountLoading, setAccountLoading] = useState(false);
   const [tempPassword, setTempPassword] = useState("");
+  const [installGuideEmail, setInstallGuideEmail] = useState("");
+  const [installGuideText, setInstallGuideText] = useState("");
   
   function jumpToSection(id) {
     const node = document.getElementById(id);
@@ -172,6 +174,8 @@ export default function AdminDashboard() {
       setSelectedStore(detail.store);
       setForm(mapForm(detail.store));
       setAccountEmail(detail.store?.loginEmail || "");
+      setInstallGuideEmail(detail.store?.loginEmail || detail.store?.contactEmail || "");
+      setInstallGuideText(detail.store?.installGuide || "");
       setAccountLookup(null);
     } catch (err) {
       setError(err.message || "Failed to load store.");
@@ -302,6 +306,34 @@ export default function AdminDashboard() {
       setError(err.message || "Failed to reset client password.");
     } finally {
       setAccountLoading(false);
+    }
+  }
+
+  async function sendInstallGuide() {
+    if (!selectedId) return;
+    if (!installGuideEmail.trim()) {
+      setError("Enter the client email for the install guide.");
+      return;
+    }
+    if (installGuideText.trim().length < 10) {
+      setError("Install guide details are too short.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    setSuccess("");
+    try {
+      const result = await apiPost(`/admin/stores/${selectedId}/send-install-guide`, {
+        email: installGuideEmail.trim().toLowerCase(),
+        installGuide: installGuideText.trim(),
+      });
+      await loadDashboard(filters, selectedId);
+      setSuccess(result.message || "Install guide sent.");
+    } catch (err) {
+      setError(err.message || "Failed to send install guide.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -573,6 +605,18 @@ export default function AdminDashboard() {
                         </div>
                         <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
                           Client installation is handled manually. After you test the workflow yourself, send the final instructions by email and let the client use the dashboard only for content and branding edits.
+                        </div>
+                        <div className="mt-4 grid gap-4">
+                          <InputField label="Install Guide Email" value={installGuideEmail} onChange={setInstallGuideEmail} placeholder="client@store.com" />
+                          <TextareaField label="Install Guide Details" value={installGuideText} onChange={setInstallGuideText} rows={8} placeholder="Write the final installation details you want saved on the dashboard and sent by email." />
+                          <div className="flex flex-wrap gap-3">
+                            <button onClick={sendInstallGuide} disabled={saving || !selectedId} className="rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
+                              {saving ? "Sending..." : "Send Install Guide"}
+                            </button>
+                          </div>
+                          {selectedStore.installGuideSentAt ? (
+                            <div className="text-xs text-slate-500">Last sent: {formatDate(selectedStore.installGuideSentAt)}</div>
+                          ) : null}
                         </div>
                       </SectionCard>
 

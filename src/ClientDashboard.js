@@ -233,6 +233,9 @@ export default function ClientDashboard({ onLogout }) {
             </div>
             {error ? <div className="mt-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">{error}</div> : null}
             {success ? <div className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">{success}</div> : null}
+            <div className="mt-4 rounded-2xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 text-sm text-violet-100">
+              You receive your install guide in 1 to 2 days by email after internal setup review.
+            </div>
           </header>
 
           <div className="px-5 py-5 sm:px-8">
@@ -429,6 +432,13 @@ export default function ClientDashboard({ onLogout }) {
                       <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
                         Installation details are sent manually after internal QA. Typical setup time is 1 to 2 days.
                       </div>
+                      {store.installGuide ? (
+                        <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Latest Install Guide</div>
+                          <div className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-300">{store.installGuide}</div>
+                          {store.installGuideSentAt ? <div className="mt-3 text-xs text-slate-500">Sent: {new Date(store.installGuideSentAt).toLocaleString()}</div> : null}
+                        </div>
+                      ) : null}
                     </SectionCard>
                   </div>
                 ) : null}
