@@ -151,8 +151,7 @@ export default function AdminDashboard() {
   const [accountLookup, setAccountLookup] = useState(null);
   const [accountLoading, setAccountLoading] = useState(false);
   const [tempPassword, setTempPassword] = useState("");
-  const [copied, setCopied] = useState("");
-
+  
   function jumpToSection(id) {
     const node = document.getElementById(id);
     if (node) node.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -306,12 +305,6 @@ export default function AdminDashboard() {
     }
   }
 
-  function copy(text, key) {
-    navigator.clipboard.writeText(text);
-    setCopied(key);
-    setTimeout(() => setCopied(""), 2000);
-  }
-
   const cards = useMemo(() => {
     if (!summary) return [];
     return [
@@ -331,13 +324,6 @@ export default function AdminDashboard() {
     ["admin-activity", "Activity"],
   ];
 
-  const installSnippet = selectedStore
-    ? `<!-- AgentComerce Widget -->\n<script>\n  window.AgentComerce = {\n    store_id: "${selectedStore.storeId || "store_001"}"\n  };\n</script>\n<script src="https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget.js"></script>`
-    : "";
-  const widgetTestUrl = selectedStore
-    ? `https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget-test.html?store_id=${encodeURIComponent(selectedStore.storeId || "store_001")}`
-    : "";
-
   return (
     <div className="min-h-screen bg-[#050816] text-white">
       <div className="mx-auto max-w-[1720px] px-4 py-6 sm:px-6 lg:px-8">
@@ -346,8 +332,8 @@ export default function AdminDashboard() {
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.28em] text-violet-300">Admin Dashboard</div>
-                <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">Operations, onboarding, and store control</h1>
-                <p className="mt-2 max-w-3xl text-sm text-slate-400">This view is rebuilt for workflow operations. It keeps the same data and actions, but the layout is simpler and more usable.</p>
+                <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">Operations and store delivery</h1>
+                <p className="mt-2 max-w-3xl text-sm text-slate-400">This dashboard is for internal review, workflow setup, QA, and client handoff.</p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <button onClick={() => loadDashboard(filters, selectedId)} className="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:border-slate-600">Refresh</button>
@@ -406,7 +392,7 @@ export default function AdminDashboard() {
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <div className="truncate text-sm font-bold text-white">{store.storeName}</div>
-                              <div className="mt-1 truncate text-xs text-slate-500">{store.storeId} Â· {formatLabel(store.platform)}</div>
+                              <div className="mt-1 truncate text-xs text-slate-500">{store.storeId} Ã‚Â· {formatLabel(store.platform)}</div>
                             </div>
                             <Badge tone="violet">{formatLabel(store.plan)}</Badge>
                           </div>
@@ -518,7 +504,7 @@ export default function AdminDashboard() {
                         </div>
                       </SectionCard>
 
-                      <SectionCard title="Branding, usage, and routing" description="Widget branding, usage counters, and the store webhook used for live chat routing.">
+                      <SectionCard title="Branding and usage" description="Widget branding and usage counters managed from the admin side.">
                         <div className="grid gap-4 sm:grid-cols-2">
                           <InputField label="Messages Used" type="number" value={form.msgCount} onChange={(value) => setForm((current) => ({ ...current, msgCount: Number(value) || 0 }))} />
                           <InputField label="Message Limit" type="number" value={form.msgLimit} onChange={(value) => setForm((current) => ({ ...current, msgLimit: Number(value) || 0 }))} />
@@ -540,7 +526,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div id="admin-workflow" className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr] scroll-mt-24">
-                      <SectionCard title="Workflow and install" description="Finish setup here: save the webhook, copy the install snippet, then test and mark the store live.">
+                      <SectionCard title="Workflow" description="This is the internal setup area. Save the webhook, test it yourself, then send installation details manually when the store is ready.">
                         <div className="grid gap-4 lg:grid-cols-2">
                           <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
                             <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Store ID</div>
@@ -556,16 +542,10 @@ export default function AdminDashboard() {
                         </div>
                         {!form.webhookUrl ? (
                           <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">
-                            Save the workflow webhook first. Without it, the widget can render but chat will not work.
+                            Save the workflow webhook first. Do your own QA before sending any installation details to the client.
                           </div>
                         ) : null}
                         <div className="mt-4 flex flex-wrap gap-3">
-                          <button onClick={() => copy(installSnippet, "install-snippet")} className={cx("rounded-2xl px-5 py-3 text-sm font-semibold", copied === "install-snippet" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}>
-                            {copied === "install-snippet" ? "Copied" : "Copy Install Snippet"}
-                          </button>
-                          <a href={widgetTestUrl} target="_blank" rel="noreferrer" className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:border-slate-600">
-                            Open Test Page
-                          </a>
                           <button
                             onClick={() => applyStorePatch({ setupStatus: "workflow_building", workflowStatus: "draft" }, "Workflow moved to draft.")}
                             disabled={saving || !selectedId}
@@ -591,9 +571,8 @@ export default function AdminDashboard() {
                             Mark Live
                           </button>
                         </div>
-                        <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
-                          <div className="mb-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">Install Snippet</div>
-                          <pre className="overflow-x-auto text-xs leading-6 text-slate-300">{installSnippet}</pre>
+                        <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
+                          Client installation is handled manually. After you test the workflow yourself, send the final instructions by email and let the client use the dashboard only for content and branding edits.
                         </div>
                       </SectionCard>
 
@@ -629,85 +608,61 @@ export default function AdminDashboard() {
                     </div>
 
                     <div id="admin-client-access" className="scroll-mt-24">
-                    <SectionCard title="Client access" description="Check whether a dashboard login exists for an email and generate a temporary password if needed.">
-                      <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto]">
-                        <InputField label="Client Email" value={accountEmail} onChange={setAccountEmail} placeholder="client@store.com" />
-                        <div className="flex items-end">
-                          <button onClick={lookupClientAccount} disabled={accountLoading} className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
-                            {accountLoading ? "Checking..." : "Check Account"}
-                          </button>
-                        </div>
-                        <div className="flex items-end">
-                          <button onClick={resetClientPassword} disabled={accountLoading} className="w-full rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
-                            Generate Temp Password
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="mt-5 grid gap-4 xl:grid-cols-2">
-                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
-                          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Account Status</div>
-                          {!accountLookup ? <div className="mt-2 text-sm text-slate-400">No lookup yet.</div> : null}
-                          {accountLookup && !accountLookup.exists ? <div className="mt-2 text-sm text-amber-300">No client account found for this email.</div> : null}
-                          {accountLookup?.exists ? (
-                            <div className="mt-3 space-y-2 text-sm text-slate-300">
-                              <div><span className="text-slate-500">Email:</span> {accountLookup.user?.email}</div>
-                              <div><span className="text-slate-500">Store ID:</span> {accountLookup.user?.store_id}</div>
-                              <div><span className="text-slate-500">Active:</span> {accountLookup.user?.is_active ? "Yes" : "No"}</div>
-                              <div><span className="text-slate-500">Created:</span> {formatDate(accountLookup.user?.created_at)}</div>
-                              {accountLookup.store ? (
-                                <div><span className="text-slate-500">Store:</span> {accountLookup.store.storeName} ({accountLookup.store.storeId})</div>
-                              ) : null}
-                            </div>
-                          ) : null}
+                      <SectionCard title="Client access" description="Check whether a dashboard login exists for an email and generate a temporary password if needed.">
+                        <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto]">
+                          <InputField label="Client Email" value={accountEmail} onChange={setAccountEmail} placeholder="client@store.com" />
+                          <div className="flex items-end">
+                            <button onClick={lookupClientAccount} disabled={accountLoading} className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
+                              {accountLoading ? "Checking..." : "Check Account"}
+                            </button>
+                          </div>
+                          <div className="flex items-end">
+                            <button onClick={resetClientPassword} disabled={accountLoading} className="w-full rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
+                              Generate Temp Password
+                            </button>
+                          </div>
                         </div>
 
-                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
-                          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Temporary Password</div>
-                          {tempPassword ? (
-                            <div className="mt-3">
-                              <div className="rounded-xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 font-mono text-sm text-violet-100">{tempPassword}</div>
-                              <p className="mt-3 text-xs text-slate-400">This replaces the old password. Copy it and send it to the client manually.</p>
-                            </div>
-                          ) : (
-                            <div className="mt-2 text-sm text-slate-400">No temporary password generated yet.</div>
-                          )}
+                        <div className="mt-5 grid gap-4 xl:grid-cols-2">
+                          <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Account Status</div>
+                            {!accountLookup ? <div className="mt-2 text-sm text-slate-400">No lookup yet.</div> : null}
+                            {accountLookup && !accountLookup.exists ? <div className="mt-2 text-sm text-amber-300">No client account found for this email.</div> : null}
+                            {accountLookup?.exists ? (
+                              <div className="mt-3 space-y-2 text-sm text-slate-300">
+                                <div><span className="text-slate-500">Email:</span> {accountLookup.user?.email}</div>
+                                <div><span className="text-slate-500">Store ID:</span> {accountLookup.user?.store_id}</div>
+                                <div><span className="text-slate-500">Active:</span> {accountLookup.user?.is_active ? "Yes" : "No"}</div>
+                                <div><span className="text-slate-500">Created:</span> {formatDate(accountLookup.user?.created_at)}</div>
+                                {accountLookup.store ? (
+                                  <div><span className="text-slate-500">Store:</span> {accountLookup.store.storeName} ({accountLookup.store.storeId})</div>
+                                ) : null}
+                              </div>
+                            ) : null}
+                          </div>
+
+                          <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Temporary Password</div>
+                            {tempPassword ? (
+                              <div className="mt-3">
+                                <div className="rounded-xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 font-mono text-sm text-violet-100">{tempPassword}</div>
+                                <p className="mt-3 text-xs text-slate-400">This replaces the old password. Copy it and send it to the client manually.</p>
+                              </div>
+                            ) : (
+                              <div className="mt-2 text-sm text-slate-400">No temporary password generated yet.</div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </SectionCard>
+                      </SectionCard>
                     </div>
 
                     <div id="admin-activity" className="scroll-mt-24">
-                    <div className="flex flex-col gap-4 rounded-[28px] border border-slate-800 bg-slate-950/70 p-5 xl:flex-row xl:items-center xl:justify-between">
-                      <div className="text-sm text-slate-400">Last active: {formatDate(selectedStore.lastActiveAt)} Â· Last synced: {formatDate(selectedStore.lastSyncedAt)}</div>
-                      <div className="flex flex-wrap gap-3">
-                        <button
-                          onClick={() => applyStorePatch({ setupStatus: "workflow_building", workflowStatus: "draft" }, "Workflow moved to draft.")}
-                          disabled={saving || !selectedId}
-                          className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
-                        >
-                          Prepare Workflow
-                        </button>
-                        <button
-                          onClick={() =>
-                            applyStorePatch(
-                              {
-                                status: "active",
-                                setupStatus: "live",
-                                workflowStatus: "live",
-                                widgetStatus: "live",
-                              },
-                              "Store marked live."
-                            )
-                          }
-                          disabled={saving || !selectedId || !form?.webhookUrl}
-                          className="rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
-                        >
-                          Mark Live
-                        </button>
-                        <button onClick={saveStore} disabled={saving} className="rounded-2xl bg-white px-6 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">{saving ? "Saving..." : "Save Changes"}</button>
+                      <div className="flex flex-col gap-4 rounded-[28px] border border-slate-800 bg-slate-950/70 p-5 xl:flex-row xl:items-center xl:justify-between">
+                        <div className="text-sm text-slate-400">Last active: {formatDate(selectedStore.lastActiveAt)} · Last synced: {formatDate(selectedStore.lastSyncedAt)}</div>
+                        <div className="flex flex-wrap gap-3">
+                          <button onClick={saveStore} disabled={saving} className="rounded-2xl bg-white px-6 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">{saving ? "Saving..." : "Save Changes"}</button>
+                        </div>
                       </div>
-                    </div>
                     </div>
                   </>
                 )}

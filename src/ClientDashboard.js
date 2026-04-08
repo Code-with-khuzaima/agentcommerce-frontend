@@ -104,7 +104,6 @@ export default function ClientDashboard({ onLogout }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [copied, setCopied] = useState("");
   const [section, setSection] = useState("overview");
 
   useEffect(() => {
@@ -124,12 +123,6 @@ export default function ClientDashboard({ onLogout }) {
     localStorage.removeItem("ac_token");
     localStorage.removeItem("ac_user");
     onLogout();
-  }
-
-  function copy(text, key) {
-    navigator.clipboard.writeText(text);
-    setCopied(key);
-    setTimeout(() => setCopied(""), 2000);
   }
 
   async function saveClientSettings() {
@@ -198,10 +191,7 @@ export default function ClientDashboard({ onLogout }) {
   const usagePercent = msgLimit >= 999999 ? 0 : Math.min(Math.round((msgCount / Math.max(msgLimit, 1)) * 100), 100);
   const usageRemaining = msgLimit >= 999999 ? "Unlimited" : `${Math.max(msgLimit - msgCount, 0).toLocaleString()} remaining`;
   const planLabels = { starter: "$19/mo", pro: "$29/mo", enterprise: "$49/mo" };
-  const webhookUrl = store.webhookUrl || "";
   const storeAnswers = store.storeAnswers || {};
-  const widgetTestUrl = `https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget-test.html?store_id=${encodeURIComponent(store.storeId || "store_001")}`;
-  const widgetCode = `<!-- AgentComerce Widget -->\n<script>\n  window.AgentComerce = {\n    store_id: "${store.storeId || "store_001"}"\n  };\n</script>\n<script src="https://agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app/widget.js"></script>`;
 
   const metrics = [
     ["Plan", formatLabel(plan), planLabels[plan]],
@@ -216,8 +206,6 @@ export default function ClientDashboard({ onLogout }) {
     ["branding", "Branding"],
     ["store", "Store Info"],
     ["knowledge", "Knowledge Base"],
-    ["billing", "Billing"],
-    ["integration", "Integration"],
     ["support", "Support"],
   ];
 
@@ -230,10 +218,10 @@ export default function ClientDashboard({ onLogout }) {
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.28em] text-violet-300">Client Dashboard</div>
                 <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">{store.storeName || "Your Store"} dashboard</h1>
-                <p className="mt-2 max-w-3xl text-sm text-slate-400">Manage your assistant branding, store content, usage, billing, and installation from one place.</p>
+                <p className="mt-2 max-w-3xl text-sm text-slate-400">Manage your assistant branding and store content from one place. Installation is handled by our team after setup review.</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <StatusBadge tone="violet" label={`${formatLabel(plan)} · ${planLabels[plan]}`} />
+                <StatusBadge tone="violet" label={`${formatLabel(plan)} ? ${planLabels[plan]}`} />
                 <StatusBadge tone="blue" label={data?.user?.email || "No email"} />
                 <button onClick={saveClientSettings} disabled={saving || !form} className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
                   {saving ? "Saving..." : "Save Changes"}
@@ -304,7 +292,7 @@ export default function ClientDashboard({ onLogout }) {
 
                     <SectionCard title="Account summary" description="Current commercial state of the account.">
                       <div className="grid gap-4">
-                        <InfoRow label="Plan" value={`${formatLabel(plan)} · ${planLabels[plan]}`} />
+                        <InfoRow label="Plan" value={`${formatLabel(plan)} Ã‚Â· ${planLabels[plan]}`} />
                         <InfoRow label="Payment Status" value={formatLabel(store.paymentStatus || "pending")} />
                         <InfoRow label="Messages Used" value={`${msgCount.toLocaleString()} / ${msgLimit >= 999999 ? "Unlimited" : msgLimit.toLocaleString()}`} />
                         <InfoRow label="Last Activity" value={store.lastActiveAt ? new Date(store.lastActiveAt).toLocaleString() : "Not available"} />
@@ -335,7 +323,7 @@ export default function ClientDashboard({ onLogout }) {
                 ) : null}
 
                 {section === "branding" ? (
-                  <SectionCard title="Branding" description="Manage the visual settings used by your live widget." action={<button onClick={() => copy(widgetCode, "widget")} className={cx("rounded-2xl px-4 py-3 text-sm font-semibold", copied === "widget" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}>{copied === "widget" ? "Copied" : "Copy Widget Code"}</button>}>
+                  <SectionCard title="Branding" description="Manage the visual settings used by your live widget. Changes apply after save and sync.">
                     <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
                       <div className="rounded-[28px] border border-slate-800 bg-[#050816] p-5">
                         <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Widget preview</div>
@@ -358,9 +346,6 @@ export default function ClientDashboard({ onLogout }) {
                             <input value={form.accentColor} onChange={(event) => setForm((current) => ({ ...current, accentColor: event.target.value }))} className="w-full rounded-2xl border border-slate-800 bg-[#050816] px-4 py-3 text-sm text-white outline-none" placeholder="#7c3aed" />
                             <div className="h-12 w-12 shrink-0 rounded-2xl border border-slate-800" style={{ backgroundColor: form.accentColor || "#7c3aed" }} />
                           </div>
-                        </Field>
-                        <Field label="Widget Code">
-                          <pre className="overflow-x-auto rounded-2xl border border-slate-800 bg-[#050816] p-4 text-xs leading-6 text-slate-300">{widgetCode}</pre>
                         </Field>
                       </div>
                     </div>
@@ -424,59 +409,9 @@ export default function ClientDashboard({ onLogout }) {
                   </SectionCard>
                 ) : null}
 
-                {section === "billing" ? (
-                  <SectionCard title="Billing" description="This view is read-only. Admin controls payment confirmation, limits, and unlock state.">
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <InfoRow label="Plan" value={`${formatLabel(plan)} · ${planLabels[plan]}`} />
-                      <InfoRow label="Billing Cycle" value={formatLabel(store.billingCycle || "monthly")} />
-                      <InfoRow label="Payment Status" value={formatLabel(store.paymentStatus || "pending")} />
-                      <InfoRow label="Amount" value={`$${store.paymentAmount || 0}`} />
-                      <InfoRow label="Messages Used" value={`${msgCount.toLocaleString()} / ${msgLimit >= 999999 ? "Unlimited" : msgLimit.toLocaleString()}`} />
-                      <InfoRow label="Usage Left" value={usageRemaining} />
-                    </div>
-                    <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
-                      If your plan reaches its limit or payment becomes overdue, contact support to renew or unlock access. Payment changes are handled from the admin side, not from this dashboard.
-                    </div>
-                  </SectionCard>
-                ) : null}
-
-                {section === "integration" ? (
-                  <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-                    <SectionCard title="Integration" description="Install the widget with your store ID. Live color, welcome text, and routing are loaded automatically from the backend." action={<button onClick={() => copy(widgetCode, "install")} className={cx("rounded-2xl px-4 py-3 text-sm font-semibold", copied === "install" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "bg-white text-slate-950")}>{copied === "install" ? "Copied" : "Copy Install Code"}</button>}>
-                      <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm text-slate-300">
-                        Paste this snippet before the closing <code className="text-white">&lt;/body&gt;</code> tag or into your footer script area.
-                      </div>
-                      <pre className="mt-4 overflow-x-auto rounded-2xl border border-slate-800 bg-[#050816] p-4 text-xs leading-6 text-slate-300">{widgetCode}</pre>
-                      <a href={widgetTestUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:border-slate-600">
-                        Open Test Page
-                      </a>
-                      <div className="mt-4 grid gap-3">
-                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm text-slate-300">1. Copy the install code.</div>
-                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm text-slate-300">2. Add it to your Shopify theme or WooCommerce footer script area.</div>
-                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm text-slate-300">3. Save and refresh your storefront.</div>
-                        <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm text-slate-300">4. If you want a quick check before installing on a store, open the test page and confirm the widget loads and replies.</div>
-                      </div>
-                    </SectionCard>
-                    <SectionCard title="Integration Status" description="These values decide whether the widget works end to end.">
-                      <div className="grid gap-4">
-                        <InfoRow label="Platform" value={formatLabel(store.platform)} />
-                        <InfoRow label="Store ID" value={store.storeId} />
-                        <InfoRow label="Workflow Status" value={formatLabel(store.workflowStatus || "not_started")} />
-                        <InfoRow label="Widget Status" value={formatLabel(store.widgetStatus || "not_installed")} />
-                        <InfoRow label="Webhook URL" value={webhookUrl || "Not configured yet"} />
-                      </div>
-                      {!webhookUrl ? (
-                        <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">
-                          Your workflow URL is not configured yet. The widget can load, but chat will not work until admin saves the store webhook.
-                        </div>
-                      ) : null}
-                    </SectionCard>
-                  </div>
-                ) : null}
-
                 {section === "support" ? (
                   <div className="grid gap-6 xl:grid-cols-[1fr_0.85fr]">
-                    <SectionCard title="Support" description="Use these references when contacting support.">
+                    <SectionCard title="Support" description="Use these references when contacting support. Installation and final setup details are sent manually after review.">
                       <div className="grid gap-4 md:grid-cols-2">
                         <InfoRow label="Support Email" value="agentcomrce@gmail.com" />
                         <InfoRow label="Dashboard Email" value={data?.user?.email || "Not set"} />
@@ -486,10 +421,13 @@ export default function ClientDashboard({ onLogout }) {
                     </SectionCard>
                     <SectionCard title="Operational Snapshot" description="Useful support context from the current account state.">
                       <div className="grid gap-4">
-                        <InfoRow label="Current Plan" value={`${formatLabel(plan)} · ${planLabels[plan]}`} />
+                        <InfoRow label="Current Plan" value={`${formatLabel(plan)} Ã‚Â· ${planLabels[plan]}`} />
                         <InfoRow label="Setup Stage" value={formatLabel(store.setupStatus || "new")} />
                         <InfoRow label="Widget Stage" value={formatLabel(store.widgetStatus || "not_installed")} />
                         <InfoRow label="Last Sync" value={store.lastSyncedAt ? new Date(store.lastSyncedAt).toLocaleString() : "Not available"} />
+                      </div>
+                      <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
+                        Installation details are sent manually after internal QA. Typical setup time is 1 to 2 days.
                       </div>
                     </SectionCard>
                   </div>
