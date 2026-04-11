@@ -114,6 +114,24 @@ function parseCsv(value) {
     .filter(Boolean);
 }
 
+function planCapabilityFor(plan) {
+  const capabilities = {
+    starter: {
+      title: "Starter",
+      detail: "Basic AI sales chat with a 5,000 message limit per cycle.",
+    },
+    pro: {
+      title: "Pro",
+      detail: "Higher message capacity with memory-enabled conversations and richer recommendations.",
+    },
+    enterprise: {
+      title: "Enterprise",
+      detail: "Priority setup, high-volume usage, memory, and the most advanced workflow logic.",
+    },
+  };
+  return capabilities[plan] || capabilities.starter;
+}
+
 export default function ClientDashboard({ onLogout }) {
   const [data, setData] = useState(null);
   const [form, setForm] = useState(null);
@@ -124,16 +142,32 @@ export default function ClientDashboard({ onLogout }) {
   const [section, setSection] = useState("overview");
 
   useEffect(() => {
-    apiGetDashboard()
-      .then((response) => {
+    let cancelled = false;
+
+    async function loadDashboard(syncForm = true) {
+      try {
+        const response = await apiGetDashboard();
+        if (cancelled) return;
         setData(response);
-        setForm(normalizeForm(response.store || {}));
+        if (syncForm) setForm(normalizeForm(response.store || {}));
         setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
+        if (cancelled) return;
         setError(err.message || "Failed to load dashboard.");
         setLoading(false);
-      });
+      }
+    }
+
+    loadDashboard(true);
+
+    const interval = window.setInterval(() => {
+      loadDashboard(false);
+    }, 15000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
   }, []);
 
   function handleLogout() {
@@ -213,6 +247,7 @@ export default function ClientDashboard({ onLogout }) {
   const workflowReady = ["ready", "live"].includes(store.workflowStatus);
   const widgetReady = ["ready", "live"].includes(store.widgetStatus);
   const setupLive = store.setupStatus === "live";
+  const capability = planCapabilityFor(plan);
 
   const metrics = [
     ["Plan", formatLabel(plan), planLabels[plan]],
@@ -317,6 +352,7 @@ export default function ClientDashboard({ onLogout }) {
                     <SectionCard title="Account summary" description="Current commercial state of the account.">
                       <div className="grid gap-4">
                         <InfoRow label="Plan" value={`${formatLabel(plan)} - ${planLabels[plan]}`} />
+                        <InfoRow label="Plan Features" value={capability.detail} />
                         <InfoRow label="Payment Status" value={formatLabel(store.paymentStatus || "pending")} />
                         <InfoRow label="Messages Used" value={`${msgCount.toLocaleString()} / ${msgLimit >= 999999 ? "Unlimited" : msgLimit.toLocaleString()}`} />
                         <InfoRow label="Last Activity" value={store.lastActiveAt ? new Date(store.lastActiveAt).toLocaleString() : "Not available"} />
@@ -450,6 +486,8 @@ export default function ClientDashboard({ onLogout }) {
                         <InfoRow label="Dashboard Email" value={data?.user?.email || "Not set"} />
                         <InfoRow label="Store Name" value={store.storeName} />
                         <InfoRow label="Store ID" value={store.storeId} />
+                        <InfoRow label="Current Plan" value={`${capability.title} - ${capability.detail}`} />
+                        <InfoRow label="Message Limit" value={msgLimit >= 999999 ? "Unlimited" : `${msgLimit.toLocaleString()} per cycle`} />
                       </div>
                       <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
                         <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Client Steps</div>

@@ -153,6 +153,41 @@ function workflowTemplateFor(store) {
   return map[key] || null;
 }
 
+function planCapabilityFor(plan) {
+  const capabilities = {
+    starter: "5,000 message limit with basic sales chat.",
+    pro: "13,000 message limit with memory and richer recommendations.",
+    enterprise: "High-volume usage, memory, and advanced workflow handling.",
+  };
+  return capabilities[plan] || capabilities.starter;
+}
+
+function installGuideTemplateFor(store) {
+  if (!store) return "";
+
+  const isWoo = store.platform === "woocommerce";
+  const storeName = store.storeName || "your store";
+  const storeId = store.storeId || "store_001";
+
+  return [
+    `AgentComerce install guide for ${storeName}`,
+    "",
+    isWoo ? "1. Open your WordPress admin panel." : "1. Open Shopify Admin.",
+    isWoo ? "2. Open the footer script or code snippet area used for custom code." : "2. Go to Online Store > Themes > Edit code.",
+    isWoo ? "3. Paste the AgentComerce widget snippet in the footer area." : "3. Open theme.liquid.",
+    isWoo ? "4. Save changes and refresh your storefront." : "4. Paste the AgentComerce widget snippet before the closing </body> tag.",
+    isWoo ? "" : "5. Save the file and refresh your storefront.",
+    "",
+    `Store ID: ${storeId}`,
+    "",
+    "After install:",
+    "1. Open the storefront.",
+    "2. Open the chat widget.",
+    "3. Send one test message.",
+    "4. Reply to this email if anything fails.",
+  ].filter(Boolean).join("\n");
+}
+
 function ChecklistItem({ done, label, detail }) {
   return (
     <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
@@ -228,8 +263,8 @@ export default function AdminDashboard() {
       setSelectedStore(detail.store);
       setForm(mapForm(detail.store));
       setAccountEmail(detail.store?.loginEmail || "");
-      setInstallGuideEmail(detail.store?.loginEmail || detail.store?.contactEmail || "");
-      setInstallGuideText(detail.store?.installGuide || "");
+      setInstallGuideEmail(detail.store?.contactEmail || detail.store?.loginEmail || "");
+      setInstallGuideText(detail.store?.installGuide || installGuideTemplateFor(detail.store));
       setAccountLookup(null);
     } catch (err) {
       setError(err.message || "Failed to load store.");
@@ -266,6 +301,30 @@ export default function AdminDashboard() {
     loadDashboard(filters, null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!selectedId) return undefined;
+
+    const interval = window.setInterval(async () => {
+      try {
+        const params = new URLSearchParams();
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value && value !== "all") params.set(key, value);
+        });
+        const [dashboard, detail] = await Promise.all([
+          apiGet(`/admin/dashboard${params.toString() ? `?${params.toString()}` : ""}`),
+          apiGet(`/admin/stores/${selectedId}`),
+        ]);
+        setSummary(dashboard.summary);
+        setStores(dashboard.stores);
+        setSelectedStore(detail.store);
+      } catch {
+        // keep current state if background refresh fails
+      }
+    }, 15000);
+
+    return () => window.clearInterval(interval);
+  }, [filters, selectedId]);
 
   async function saveStore() {
     if (!selectedId || !form) return;
@@ -401,6 +460,7 @@ export default function AdminDashboard() {
     ];
   }, [summary]);
   const workflowTemplate = selectedStore ? workflowTemplateFor(selectedStore) : null;
+  const planCapability = selectedStore ? planCapabilityFor(selectedStore.plan) : "";
   const adminChecklist = selectedStore
     ? [
         {
@@ -597,6 +657,10 @@ export default function AdminDashboard() {
                             <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Usage Left</div>
                             <div className="mt-2 text-sm font-semibold text-white">{number.format(selectedStore.usageLeft)}</div>
                           </div>
+                          <div className="sm:col-span-2">
+                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Plan Logic</div>
+                            <div className="mt-2 text-sm font-semibold text-white">{planCapability}</div>
+                          </div>
                         </div>
                       </div>
                     </section>
@@ -653,16 +717,11 @@ export default function AdminDashboard() {
                           <InputField label="Accent Color" value={form.accentColor} onChange={(value) => setForm((current) => ({ ...current, accentColor: value }))} placeholder="#7c3aed" />
                         </div>
                         <div className="mt-4">
-                          <InputField label="Webhook URL *" value={form.webhookUrl} onChange={(value) => setForm((current) => ({ ...current, webhookUrl: value }))} placeholder="https://n8n.example.com/webhook/..." />
-                        </div>
-                        <div className="mt-4">
                           <TextareaField label="Welcome Message" value={form.welcomeMessage} onChange={(value) => setForm((current) => ({ ...current, welcomeMessage: value }))} rows={3} />
                         </div>
-                        {!form.webhookUrl ? (
-                          <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">
-                            This store does not have a webhook URL yet. The widget can render, but chat routing will fail until you save the workflow webhook here.
-                          </div>
-                        ) : null}
+                        <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
+                          Usage totals refresh from live dashboard data. Starter is mainly message-limit based. Pro and Enterprise also rely on memory-enabled workflow logic.
+                        </div>
                       </SectionCard>
                     </div>
 
@@ -727,6 +786,15 @@ export default function AdminDashboard() {
                         </div>
                         <div className="mt-4 grid gap-4">
                           <InputField label="Install Guide Email" value={installGuideEmail} onChange={setInstallGuideEmail} placeholder="client@store.com" />
+                          <div className="flex flex-wrap gap-3">
+                            <button
+                              onClick={() => setInstallGuideText(installGuideTemplateFor(selectedStore))}
+                              type="button"
+                              className="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-white"
+                            >
+                              Use Default Template
+                            </button>
+                          </div>
                           <TextareaField label="Install Guide Details" value={installGuideText} onChange={setInstallGuideText} rows={8} placeholder="Write the final installation details you want saved on the dashboard and sent by email." />
                           <div className="flex flex-wrap gap-3">
                             <button onClick={sendInstallGuide} disabled={saving || !selectedId} className="rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
