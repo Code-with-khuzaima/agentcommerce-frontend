@@ -115,6 +115,60 @@ function SectionCard({ title, description, action, children }) {
   );
 }
 
+function workflowTemplateFor(store) {
+  if (!store) return null;
+  const key = `${store.plan || "starter"}:${store.platform || "shopify"}`;
+  const map = {
+    "starter:shopify": {
+      label: "Starter Shopify",
+      file: "D:\\Desktop\\agentcomerce_master\\starter\\shopify\\starter_shopify_backend_final.json",
+      path: "starter-chat",
+    },
+    "starter:woocommerce": {
+      label: "Starter WooCommerce",
+      file: "D:\\Desktop\\agentcomerce_master\\starter\\woocommerce\\starter_woocommerce_backend_final.json",
+      path: "starter-chat",
+    },
+    "pro:shopify": {
+      label: "Pro Shopify",
+      file: "D:\\Desktop\\pro_plan\\shopify\\pro_shopify_workflow.json",
+      path: "pro-chat",
+    },
+    "pro:woocommerce": {
+      label: "Pro WooCommerce",
+      file: "D:\\Desktop\\pro_plan\\woocommerce\\AgentComerce — Pro Plan — WooCommerce.json",
+      path: "pro-chat",
+    },
+    "enterprise:shopify": {
+      label: "Enterprise Shopify",
+      file: "D:\\Desktop\\enterprise_plan\\shopify\\enterprise_shopify_workflow.json",
+      path: "enterprise-chat",
+    },
+    "enterprise:woocommerce": {
+      label: "Enterprise WooCommerce",
+      file: "D:\\Desktop\\enterprise_plan\\woocommerce\\AgentComerce — Enterprise Plan — WooCommerce.json",
+      path: "enterprise-chat",
+    },
+  };
+  return map[key] || null;
+}
+
+function ChecklistItem({ done, label, detail }) {
+  return (
+    <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+      <div className="flex items-center gap-3">
+        <div className={cx("flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-black", done ? "bg-emerald-500 text-white" : "bg-slate-800 text-slate-300")}>
+          {done ? "OK" : "TODO"}
+        </div>
+        <div>
+          <div className="text-sm font-semibold text-white">{label}</div>
+          {detail ? <div className="mt-1 text-xs text-slate-400">{detail}</div> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function mapForm(store) {
   return {
     status: store.status,
@@ -346,6 +400,31 @@ export default function AdminDashboard() {
       ["Messages Used", number.format(summary.totalMessagesUsed), `${number.format(summary.totalUsageLeft)} remaining`],
     ];
   }, [summary]);
+  const workflowTemplate = selectedStore ? workflowTemplateFor(selectedStore) : null;
+  const adminChecklist = selectedStore
+    ? [
+        {
+          done: Boolean(selectedStore.credentialsPresent),
+          label: "Credentials saved",
+          detail: selectedStore.credentialsPresent ? "Encrypted credentials are present in backend storage." : "Credentials are missing for this store.",
+        },
+        {
+          done: Boolean(form?.webhookUrl),
+          label: "Webhook saved",
+          detail: form?.webhookUrl ? "Workflow routing is saved on the store record." : "Save the live n8n webhook URL before testing.",
+        },
+        {
+          done: ["ready", "live"].includes(selectedStore.workflowStatus),
+          label: "Workflow prepared",
+          detail: `Current workflow status: ${formatLabel(selectedStore.workflowStatus || "not_started")}`,
+        },
+        {
+          done: Boolean(selectedStore.installGuideSentAt),
+          label: "Install guide sent",
+          detail: selectedStore.installGuideSentAt ? `Last sent on ${formatDate(selectedStore.installGuideSentAt)}` : "Send the install guide after you complete QA.",
+        },
+      ]
+    : [];
 
   const navItems = [
     ["admin-overview", "Overview"],
@@ -522,6 +601,36 @@ export default function AdminDashboard() {
                       </div>
                     </section>
 
+                    <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+                      <SectionCard title="Workflow Mapping" description="Use this mapping to decide which n8n workflow file to import and which live webhook path this store should use.">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Recommended workflow</div>
+                            <div className="mt-2 text-sm font-semibold text-white">{workflowTemplate?.label || "Not available"}</div>
+                          </div>
+                          <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Webhook path</div>
+                            <div className="mt-2 text-sm font-semibold text-white">{workflowTemplate?.path || "Not available"}</div>
+                          </div>
+                          <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4 md:col-span-2">
+                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Import file</div>
+                            <div className="mt-2 break-all text-sm font-semibold text-white">{workflowTemplate?.file || "Not available"}</div>
+                          </div>
+                        </div>
+                        <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
+                          Import this workflow once in n8n for the matching plan and platform. After that, every store on the same plan and platform can use the same live webhook URL. Store separation happens by <span className="font-semibold text-white">store_id</span>, not by creating a new workflow every time.
+                        </div>
+                      </SectionCard>
+
+                      <SectionCard title="Admin Checklist" description="This is the minimum state that should be true before you send install details and mark the store live.">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          {adminChecklist.map((item) => (
+                            <ChecklistItem key={item.label} done={item.done} label={item.label} detail={item.detail} />
+                          ))}
+                        </div>
+                      </SectionCard>
+                    </div>
+
                     <div id="admin-settings" className="grid gap-6 xl:grid-cols-2 scroll-mt-24">
                       <SectionCard title="Operations" description="Control account state, payment, workflow stage, and priority.">
                         <div className="grid gap-4 sm:grid-cols-2">
@@ -605,6 +714,16 @@ export default function AdminDashboard() {
                         </div>
                         <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
                           Client installation is handled manually. After you test the workflow yourself, send the final instructions by email and let the client use the dashboard only for content and branding edits.
+                        </div>
+                        <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Operator Steps</div>
+                          <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-slate-300">
+                            <li>Import or publish the workflow file shown above in n8n.</li>
+                            <li>Copy the live webhook URL from n8n and save it here.</li>
+                            <li>Test the workflow yourself with the real store data.</li>
+                            <li>Send the install guide to the client after QA passes.</li>
+                            <li>Mark the store live only after the previous steps are complete.</li>
+                          </ol>
                         </div>
                         <div className="mt-4 grid gap-4">
                           <InputField label="Install Guide Email" value={installGuideEmail} onChange={setInstallGuideEmail} placeholder="client@store.com" />

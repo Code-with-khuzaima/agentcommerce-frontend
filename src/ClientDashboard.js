@@ -66,6 +66,22 @@ function InfoRow({ label, value }) {
   );
 }
 
+function ChecklistItem({ done, label, detail }) {
+  return (
+    <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
+      <div className="flex items-center gap-3">
+        <div className={cx("flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-black", done ? "bg-emerald-500 text-white" : "bg-slate-800 text-slate-300")}>
+          {done ? "OK" : "PENDING"}
+        </div>
+        <div>
+          <div className="text-sm font-semibold text-white">{label}</div>
+          {detail ? <div className="mt-1 text-xs text-slate-400">{detail}</div> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function toFaqList(text) {
   return String(text || "")
     .split(/\n+/)
@@ -75,7 +91,8 @@ function toFaqList(text) {
 
 function normalizeForm(store) {
   return {
-    storeName: store.storeName || "",    phoneNumber: store.phoneNumber || "",
+    storeName: store.storeName || "",
+    phoneNumber: store.phoneNumber || "",
     hasPhysicalStore: Boolean(store.hasPhysicalStore),
     storeAddress: store.storeAddress || "",
     agentName: store.agentName || "",
@@ -192,6 +209,10 @@ export default function ClientDashboard({ onLogout }) {
   const usageRemaining = msgLimit >= 999999 ? "Unlimited" : `${Math.max(msgLimit - msgCount, 0).toLocaleString()} remaining`;
   const planLabels = { starter: "$19/mo", pro: "$29/mo", enterprise: "$49/mo" };
   const storeAnswers = store.storeAnswers || {};
+  const installGuideSent = Boolean(store.installGuideSentAt);
+  const workflowReady = ["ready", "live"].includes(store.workflowStatus);
+  const widgetReady = ["ready", "live"].includes(store.widgetStatus);
+  const setupLive = store.setupStatus === "live";
 
   const metrics = [
     ["Plan", formatLabel(plan), planLabels[plan]],
@@ -221,7 +242,7 @@ export default function ClientDashboard({ onLogout }) {
                 <p className="mt-2 max-w-3xl text-sm text-slate-400">Manage your assistant branding and store content from one place. Installation is handled by our team after setup review.</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <StatusBadge tone="violet" label={`${formatLabel(plan)} ? ${planLabels[plan]}`} />
+                <StatusBadge tone="violet" label={`${formatLabel(plan)} - ${planLabels[plan]}`} />
                 <StatusBadge tone="blue" label={data?.user?.email || "No email"} />
                 <button onClick={saveClientSettings} disabled={saving || !form} className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
                   {saving ? "Saving..." : "Save Changes"}
@@ -295,10 +316,19 @@ export default function ClientDashboard({ onLogout }) {
 
                     <SectionCard title="Account summary" description="Current commercial state of the account.">
                       <div className="grid gap-4">
-                        <InfoRow label="Plan" value={`${formatLabel(plan)} Ã‚Â· ${planLabels[plan]}`} />
+                        <InfoRow label="Plan" value={`${formatLabel(plan)} - ${planLabels[plan]}`} />
                         <InfoRow label="Payment Status" value={formatLabel(store.paymentStatus || "pending")} />
                         <InfoRow label="Messages Used" value={`${msgCount.toLocaleString()} / ${msgLimit >= 999999 ? "Unlimited" : msgLimit.toLocaleString()}`} />
                         <InfoRow label="Last Activity" value={store.lastActiveAt ? new Date(store.lastActiveAt).toLocaleString() : "Not available"} />
+                      </div>
+                    </SectionCard>
+
+                    <SectionCard title="Client Checklist" description="This tells you what the team has already finished and what is still pending before the assistant is fully live.">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <ChecklistItem done={workflowReady} label="Workflow ready" detail={workflowReady ? "The automation workflow is assigned and ready." : "Our team is still preparing or testing the workflow."} />
+                        <ChecklistItem done={widgetReady} label="Widget ready" detail={widgetReady ? "The widget is marked ready for store installation." : "The widget is not marked ready yet."} />
+                        <ChecklistItem done={installGuideSent} label="Install guide sent" detail={installGuideSent ? `Sent on ${new Date(store.installGuideSentAt).toLocaleString()}` : "You will receive installation details by email after internal QA."} />
+                        <ChecklistItem done={setupLive} label="Store live" detail={setupLive ? "The store is marked live in our system." : "Setup is not marked live yet."} />
                       </div>
                     </SectionCard>
                   </div>
@@ -421,10 +451,20 @@ export default function ClientDashboard({ onLogout }) {
                         <InfoRow label="Store Name" value={store.storeName} />
                         <InfoRow label="Store ID" value={store.storeId} />
                       </div>
+                      <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                        <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Client Steps</div>
+                        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-slate-300">
+                          <li>Wait for the install guide email from our team.</li>
+                          <li>Install the widget using the exact steps sent in that guide.</li>
+                          <li>Refresh your store and send one test message.</li>
+                          <li>Edit branding, FAQs, delivery, and policies here when needed.</li>
+                          <li>Save changes in the dashboard so the next chat uses the new data.</li>
+                        </ol>
+                      </div>
                     </SectionCard>
                     <SectionCard title="Operational Snapshot" description="Useful support context from the current account state.">
                       <div className="grid gap-4">
-                        <InfoRow label="Current Plan" value={`${formatLabel(plan)} Ã‚Â· ${planLabels[plan]}`} />
+                        <InfoRow label="Current Plan" value={`${formatLabel(plan)} - ${planLabels[plan]}`} />
                         <InfoRow label="Setup Stage" value={formatLabel(store.setupStatus || "new")} />
                         <InfoRow label="Widget Stage" value={formatLabel(store.widgetStatus || "not_installed")} />
                         <InfoRow label="Last Sync" value={store.lastSyncedAt ? new Date(store.lastSyncedAt).toLocaleString() : "Not available"} />
