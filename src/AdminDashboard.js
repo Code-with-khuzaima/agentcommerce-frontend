@@ -162,32 +162,6 @@ function planCapabilityFor(plan) {
   return capabilities[plan] || capabilities.starter;
 }
 
-function installGuideTemplateFor(store) {
-  if (!store) return "";
-
-  const isWoo = store.platform === "woocommerce";
-  const storeName = store.storeName || "your store";
-  const storeId = store.storeId || "store_001";
-
-  return [
-    `AgentComerce install guide for ${storeName}`,
-    "",
-    isWoo ? "1. Open your WordPress admin panel." : "1. Open Shopify Admin.",
-    isWoo ? "2. Open the footer script or code snippet area used for custom code." : "2. Go to Online Store > Themes > Edit code.",
-    isWoo ? "3. Paste the AgentComerce widget snippet in the footer area." : "3. Open theme.liquid.",
-    isWoo ? "4. Save changes and refresh your storefront." : "4. Paste the AgentComerce widget snippet before the closing </body> tag.",
-    isWoo ? "" : "5. Save the file and refresh your storefront.",
-    "",
-    `Store ID: ${storeId}`,
-    "",
-    "After install:",
-    "1. Open the storefront.",
-    "2. Open the chat widget.",
-    "3. Send one test message.",
-    "4. Reply to this email if anything fails.",
-  ].filter(Boolean).join("\n");
-}
-
 function ChecklistItem({ done, label, detail }) {
   return (
     <div className="rounded-2xl border border-slate-800 bg-[#050816] p-4">
@@ -264,7 +238,7 @@ export default function AdminDashboard() {
       setForm(mapForm(detail.store));
       setAccountEmail(detail.store?.loginEmail || "");
       setInstallGuideEmail(detail.store?.contactEmail || detail.store?.loginEmail || "");
-      setInstallGuideText(detail.store?.installGuide || installGuideTemplateFor(detail.store));
+      setInstallGuideText(detail.store?.installGuide || detail.store?.defaultInstallGuide || "");
       setAccountLookup(null);
     } catch (err) {
       setError(err.message || "Failed to load store.");
@@ -426,10 +400,6 @@ export default function AdminDashboard() {
     if (!selectedId) return;
     if (!installGuideEmail.trim()) {
       setError("Enter the client email for the install guide.");
-      return;
-    }
-    if (installGuideText.trim().length < 10) {
-      setError("Install guide details are too short.");
       return;
     }
 
@@ -788,7 +758,7 @@ export default function AdminDashboard() {
                           <InputField label="Install Guide Email" value={installGuideEmail} onChange={setInstallGuideEmail} placeholder="client@store.com" />
                           <div className="flex flex-wrap gap-3">
                             <button
-                              onClick={() => setInstallGuideText(installGuideTemplateFor(selectedStore))}
+                              onClick={() => setInstallGuideText(selectedStore?.defaultInstallGuide || "")}
                               type="button"
                               className="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-white"
                             >
