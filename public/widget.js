@@ -60,6 +60,12 @@
     .acw-card-name { font-size: 13px; font-weight: 600; line-height: 1.45; min-height: 36px; }
     .acw-card-price { font-size: 13px; color: var(--acw-accent); font-weight: 700; margin-top: 4px; }
     .acw-card-stock { font-size: 11px; color: #047857; margin-top: 4px; }
+    .acw-card-detail { font-size: 11px; color: #64748b; margin-top: 4px; min-height: 16px; }
+    .acw-card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .acw-card-btn { border: 1px solid #dbe2ea; border-radius: 10px; padding: 8px 10px; font-size: 11px; font-weight: 700; text-align: center; text-decoration: none; cursor: pointer; }
+    .acw-card-view { background: white; color: #0f172a; }
+    .acw-card-cart { background: var(--acw-accent); border-color: var(--acw-accent); color: white; }
+    .acw-card-cart[disabled] { opacity: 0.55; cursor: not-allowed; }
     .acw-error { color: #b91c1c; font-size: 12px; margin: 0 0 12px; }
     @media (max-width: 640px) {
       #acw-button { right: 14px; bottom: 14px; width: 56px; height: 56px; }
@@ -161,16 +167,39 @@
     } catch (e) {}
   }
 
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function renderProducts(products) {
     if (!Array.isArray(products) || !products.length) return "";
     return `<div id="acw-products">${products.slice(0, 3).map(function (p) {
-      return '<a class="acw-card" href="' + (p.url || "#") + '" target="_blank" rel="noreferrer">' +
-        '<img src="' + (p.image || "") + '" alt="' + (p.name || "Product") + '" />' +
+      var img = escapeHtml(p.image || "");
+      var name = escapeHtml(p.name || "Product");
+      var price = escapeHtml(p.price || "");
+      var stock = escapeHtml(p.stock || "");
+      var detail = escapeHtml(p.detail || p.product_type || "");
+      var url = escapeHtml(p.url || "#");
+      var cartUrl = escapeHtml(p.add_to_cart_url || "");
+      return '<div class="acw-card">' +
+        '<a href="' + url + '" target="_blank" rel="noreferrer">' +
+        '<img src="' + img + '" alt="' + name + '" />' +
         '<div class="acw-card-body">' +
-        '<div class="acw-card-name">' + (p.name || "Product") + "</div>" +
-        '<div class="acw-card-price">$' + (p.price || "") + "</div>" +
-        '<div class="acw-card-stock">' + (p.stock || "") + "</div>" +
-        "</div></a>";
+        '<div class="acw-card-name">' + name + "</div>" +
+        '<div class="acw-card-price">' + price + "</div>" +
+        '<div class="acw-card-stock">' + stock + "</div>" +
+        '<div class="acw-card-detail">' + detail + "</div>" +
+        '</a>' +
+        '<div class="acw-card-actions">' +
+        '<a class="acw-card-btn acw-card-view" href="' + url + '" target="_blank" rel="noreferrer">View</a>' +
+        '<button class="acw-card-btn acw-card-cart" type="button" ' + (cartUrl ? 'data-cart-url="' + cartUrl + '"' : 'disabled') + '>' + (cartUrl ? 'Add to Cart' : 'Unavailable') + '</button>' +
+        '</div>' +
+        "</div></div>";
     }).join("")}</div>`;
   }
 
@@ -246,6 +275,28 @@
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+    }
+  });
+
+  msgs.addEventListener("click", async function (event) {
+    var button = event.target.closest(".acw-card-cart");
+    if (!button || button.disabled) return;
+    var cartUrl = button.getAttribute("data-cart-url");
+    if (!cartUrl) return;
+    button.disabled = true;
+    var original = button.textContent;
+    button.textContent = "Adding...";
+    try {
+      await fetch(cartUrl, {
+        method: "GET",
+        credentials: "include",
+      });
+      button.textContent = "Added";
+      addMessage("bot", "Product added to cart.");
+    } catch (e) {
+      button.disabled = false;
+      button.textContent = original || "Add to Cart";
+      addMessage("bot", "Could not add this product to cart automatically. Open the product page and add it there.");
     }
   });
 
