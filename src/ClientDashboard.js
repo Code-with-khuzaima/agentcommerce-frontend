@@ -195,6 +195,16 @@ function buildWidgetSnippet(store) {
   ].join("\n");
 }
 
+function installGuideMessage(store) {
+  if (store?.installGuide) return store.installGuide;
+  return [
+    "Use the widget snippet below for your store installation.",
+    "Paste it in the exact file and location shown beside the snippet.",
+    "After adding it to your store, refresh the storefront and send one test message.",
+    "If the widget does not appear, contact support with your store ID.",
+  ].join("\n");
+}
+
 export default function ClientDashboard({ onLogout }) {
   const [data, setData] = useState(null);
   const [form, setForm] = useState(null);
@@ -311,10 +321,11 @@ export default function ClientDashboard({ onLogout }) {
   const widgetReady = ["ready", "live"].includes(store.widgetStatus);
   const setupLive = store.setupStatus === "live";
   const liveConnected = setupLive || store.widgetStatus === "live" || store.workflowStatus === "live";
-  const showInstallGuide = Boolean(store.installGuide);
+  const showInstallGuide = Boolean(store.storeId);
   const capability = planCapabilityFor(plan);
   const installPlacement = installPlacementFor(store.platform);
   const widgetSnippet = buildWidgetSnippet(store);
+  const guideMessage = installGuideMessage(store);
 
   const metrics = [
     ["Plan", formatLabel(plan), planLabels[plan]],
@@ -412,11 +423,11 @@ export default function ClientDashboard({ onLogout }) {
                     {showInstallGuide ? (
                       <OverviewNotice
                         title="Install Guide"
-                        detail="This guide was sent from the admin dashboard and is shown here first so the client sees it immediately after opening the dashboard."
+                        detail="This is the install section for your store. Use this message and snippet directly from Overview."
                       >
                         <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
                           <div className="rounded-2xl border border-white/10 bg-[#050816] p-4">
-                            <div className="whitespace-pre-wrap text-sm leading-6 text-white">{store.installGuide}</div>
+                            <div className="whitespace-pre-wrap text-sm leading-6 text-white">{guideMessage}</div>
                             {store.installGuideSentAt ? <div className="mt-3 text-xs text-slate-300">Sent: {new Date(store.installGuideSentAt).toLocaleString()}</div> : null}
                           </div>
                           <div className="rounded-2xl border border-white/10 bg-[#050816] p-4">
@@ -620,13 +631,6 @@ export default function ClientDashboard({ onLogout }) {
                           ? "The store is live. Use support for account help and use the rest of the dashboard for ongoing updates."
                           : "Installation details are sent manually after internal QA. Typical setup time is 1 to 2 days."}
                       </div>
-                      {showInstallGuide ? (
-                        <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
-                          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Latest Install Guide</div>
-                          <div className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-300">{store.installGuide}</div>
-                          {store.installGuideSentAt ? <div className="mt-3 text-xs text-slate-500">Sent: {new Date(store.installGuideSentAt).toLocaleString()}</div> : null}
-                        </div>
-                      ) : null}
                     </SectionCard>
                   </div>
                 ) : null}
