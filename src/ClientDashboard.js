@@ -98,6 +98,14 @@ function OverviewNotice({ tone = "violet", title, detail, children }) {
   );
 }
 
+function ReadonlyCodeBlock({ code }) {
+  return (
+    <pre className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950 p-4 text-xs leading-6 text-slate-200">
+      <code>{code}</code>
+    </pre>
+  );
+}
+
 function toFaqList(text) {
   return String(text || "")
     .split(/\n+/)
@@ -146,6 +154,45 @@ function planCapabilityFor(plan) {
     },
   };
   return capabilities[plan] || capabilities.starter;
+}
+
+function installPlacementFor(platform) {
+  if (platform === "shopify") {
+    return {
+      title: "Snippet Placement",
+      file: "layout/theme.liquid",
+      location: "Paste the widget snippet just before the closing </body> tag.",
+    };
+  }
+
+  if (platform === "woocommerce") {
+    return {
+      title: "Snippet Placement",
+      file: "footer.php or a site-wide footer/header code injection area",
+      location: "Paste the widget snippet once so it loads on the storefront, ideally right before the closing </body> tag.",
+    };
+  }
+
+  return {
+    title: "Snippet Placement",
+    file: "Storefront global layout file",
+    location: "Paste the widget snippet once near the closing </body> tag.",
+  };
+}
+
+function widgetScriptUrl() {
+  if (typeof window === "undefined") return "/widget.js";
+  return `${window.location.origin}/widget.js`;
+}
+
+function buildWidgetSnippet(store) {
+  const storeId = store?.storeId || "store_id_here";
+  return [
+    "<script>",
+    `  window.AgentComerce = { store_id: ${JSON.stringify(storeId)} };`,
+    "</script>",
+    `<script src="${widgetScriptUrl()}" async data-agentcomerce-widget="true"></script>`,
+  ].join("\n");
 }
 
 export default function ClientDashboard({ onLogout }) {
@@ -264,8 +311,10 @@ export default function ClientDashboard({ onLogout }) {
   const widgetReady = ["ready", "live"].includes(store.widgetStatus);
   const setupLive = store.setupStatus === "live";
   const liveConnected = setupLive || store.widgetStatus === "live" || store.workflowStatus === "live";
-  const showInstallGuide = Boolean(store.installGuide) && !liveConnected;
+  const showInstallGuide = Boolean(store.installGuide);
   const capability = planCapabilityFor(plan);
+  const installPlacement = installPlacementFor(store.platform);
+  const widgetSnippet = buildWidgetSnippet(store);
 
   const metrics = [
     ["Plan", formatLabel(plan), planLabels[plan]],
@@ -365,9 +414,22 @@ export default function ClientDashboard({ onLogout }) {
                         title="Install Guide"
                         detail="This guide was sent from the admin dashboard and is shown here first so the client sees it immediately after opening the dashboard."
                       >
-                        <div className="rounded-2xl border border-white/10 bg-[#050816] p-4">
-                          <div className="whitespace-pre-wrap text-sm leading-6 text-white">{store.installGuide}</div>
-                          {store.installGuideSentAt ? <div className="mt-3 text-xs text-slate-300">Sent: {new Date(store.installGuideSentAt).toLocaleString()}</div> : null}
+                        <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+                          <div className="rounded-2xl border border-white/10 bg-[#050816] p-4">
+                            <div className="whitespace-pre-wrap text-sm leading-6 text-white">{store.installGuide}</div>
+                            {store.installGuideSentAt ? <div className="mt-3 text-xs text-slate-300">Sent: {new Date(store.installGuideSentAt).toLocaleString()}</div> : null}
+                          </div>
+                          <div className="rounded-2xl border border-white/10 bg-[#050816] p-4">
+                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-400">{installPlacement.title}</div>
+                            <div className="mt-3 text-sm font-semibold text-white">File / place</div>
+                            <div className="mt-1 text-sm leading-6 text-slate-200">{installPlacement.file}</div>
+                            <div className="mt-4 text-sm font-semibold text-white">Where to paste</div>
+                            <div className="mt-1 text-sm leading-6 text-slate-200">{installPlacement.location}</div>
+                          </div>
+                        </div>
+                        <div className="mt-4">
+                          <div className="mb-2 text-sm font-semibold text-white">Widget Snippet</div>
+                          <ReadonlyCodeBlock code={widgetSnippet} />
                         </div>
                       </OverviewNotice>
                     ) : null}
@@ -538,8 +600,8 @@ export default function ClientDashboard({ onLogout }) {
                       <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
                         <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Client Steps</div>
                         <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-slate-300">
-                          <li>Wait for the install guide email from our team.</li>
-                          <li>Install the widget using the exact steps sent in that guide.</li>
+                          <li>Open Overview and copy the widget snippet shown there.</li>
+                          <li>Paste it in the exact file/location shown for your platform.</li>
                           <li>Refresh your store and send one test message.</li>
                           <li>Edit branding, FAQs, delivery, and policies here when needed.</li>
                           <li>Save changes in the dashboard so the next chat uses the new data.</li>

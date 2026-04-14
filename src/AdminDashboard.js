@@ -115,6 +115,14 @@ function SectionCard({ title, description, action, children }) {
   );
 }
 
+function ReadonlyCodeBlock({ code }) {
+  return (
+    <pre className="overflow-x-auto rounded-2xl border border-slate-800 bg-[#050816] p-4 text-xs leading-6 text-slate-200">
+      <code>{code}</code>
+    </pre>
+  );
+}
+
 function workflowTemplateFor(store) {
   if (!store) return null;
   const key = `${store.plan || "starter"}:${store.platform || "shopify"}`;
@@ -160,6 +168,42 @@ function planCapabilityFor(plan) {
     enterprise: "High-volume usage, memory, and advanced workflow handling.",
   };
   return capabilities[plan] || capabilities.starter;
+}
+
+function installPlacementFor(platform) {
+  if (platform === "shopify") {
+    return {
+      file: "layout/theme.liquid",
+      location: "Paste the widget snippet just before the closing </body> tag.",
+    };
+  }
+
+  if (platform === "woocommerce") {
+    return {
+      file: "footer.php or a site-wide footer/header code injection area",
+      location: "Paste the widget snippet once so it loads on the storefront, ideally right before the closing </body> tag.",
+    };
+  }
+
+  return {
+    file: "Storefront global layout file",
+    location: "Paste the widget snippet once near the closing </body> tag.",
+  };
+}
+
+function widgetScriptUrl() {
+  if (typeof window === "undefined") return "/widget.js";
+  return `${window.location.origin}/widget.js`;
+}
+
+function buildWidgetSnippet(store) {
+  const storeId = store?.storeId || "store_id_here";
+  return [
+    "<script>",
+    `  window.AgentComerce = { store_id: ${JSON.stringify(storeId)} };`,
+    "</script>",
+    `<script src="${widgetScriptUrl()}" async data-agentcomerce-widget="true"></script>`,
+  ].join("\n");
 }
 
 function ChecklistItem({ done, label, detail }) {
@@ -431,6 +475,8 @@ export default function AdminDashboard() {
   }, [summary]);
   const workflowTemplate = selectedStore ? workflowTemplateFor(selectedStore) : null;
   const planCapability = selectedStore ? planCapabilityFor(selectedStore.plan) : "";
+  const installPlacement = selectedStore ? installPlacementFor(selectedStore.platform) : null;
+  const widgetSnippet = selectedStore ? buildWidgetSnippet(selectedStore) : "";
   const adminChecklist = selectedStore
     ? [
         {
@@ -745,11 +791,29 @@ export default function AdminDashboard() {
                           Client installation is handled manually. After you test the workflow yourself, send the final instructions by email and let the client use the dashboard only for content and branding edits.
                         </div>
                         <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
+                          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Client Snippet Method</div>
+                          <div className="mt-3 grid gap-4 lg:grid-cols-2">
+                            <div>
+                              <div className="text-sm font-semibold text-white">File / place</div>
+                              <div className="mt-1 text-sm leading-6 text-slate-300">{installPlacement?.file || "Not available"}</div>
+                              <div className="mt-4 text-sm font-semibold text-white">Where to paste</div>
+                              <div className="mt-1 text-sm leading-6 text-slate-300">{installPlacement?.location || "Not available"}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm font-semibold text-white">Generated widget snippet</div>
+                              <div className="mt-2">
+                                <ReadonlyCodeBlock code={widgetSnippet} />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
                           <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Operator Steps</div>
                           <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-slate-300">
                             <li>Import or publish the workflow file shown above in n8n.</li>
                             <li>Copy the live webhook URL from n8n and save it here.</li>
                             <li>Test the workflow yourself with the real store data.</li>
+                            <li>Use the generated snippet method shown above for the client handoff.</li>
                             <li>Send the install guide to the client after QA passes.</li>
                             <li>Mark the store live only after the previous steps are complete.</li>
                           </ol>
