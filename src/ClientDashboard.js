@@ -82,6 +82,22 @@ function ChecklistItem({ done, label, detail }) {
   );
 }
 
+function OverviewNotice({ tone = "violet", title, detail, children }) {
+  const tones = {
+    violet: "border-violet-500/30 bg-violet-500/10 text-violet-100",
+    emerald: "border-emerald-500/30 bg-emerald-500/10 text-emerald-100",
+    amber: "border-amber-500/30 bg-amber-500/10 text-amber-100",
+  };
+
+  return (
+    <section className={cx("rounded-[28px] border p-5", tones[tone])}>
+      <div className="text-[11px] font-semibold uppercase tracking-[0.24em]">{title}</div>
+      {detail ? <div className="mt-2 text-sm leading-6">{detail}</div> : null}
+      {children ? <div className="mt-4">{children}</div> : null}
+    </section>
+  );
+}
+
 function toFaqList(text) {
   return String(text || "")
     .split(/\n+/)
@@ -247,6 +263,8 @@ export default function ClientDashboard({ onLogout }) {
   const workflowReady = ["ready", "live"].includes(store.workflowStatus);
   const widgetReady = ["ready", "live"].includes(store.widgetStatus);
   const setupLive = store.setupStatus === "live";
+  const liveConnected = setupLive || store.widgetStatus === "live" || store.workflowStatus === "live";
+  const showInstallGuide = Boolean(store.installGuide) && !liveConnected;
   const capability = planCapabilityFor(plan);
 
   const metrics = [
@@ -289,9 +307,15 @@ export default function ClientDashboard({ onLogout }) {
             </div>
             {error ? <div className="mt-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">{error}</div> : null}
             {success ? <div className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">{success}</div> : null}
-            <div className="mt-4 rounded-2xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 text-sm text-violet-100">
-              You receive your install guide in 1 to 2 days by email after internal setup review.
-            </div>
+            {!liveConnected ? (
+              <div className="mt-4 rounded-2xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 text-sm text-violet-100">
+                Installation is still in progress. Review the Overview section for the latest handoff status and install instructions.
+              </div>
+            ) : (
+              <div className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+                Your store is live. Use this dashboard for ongoing content, branding, and support updates.
+              </div>
+            )}
           </header>
 
           <div className="px-5 py-5 sm:px-8">
@@ -335,7 +359,28 @@ export default function ClientDashboard({ onLogout }) {
 
               <main className="space-y-6">
                 {section === "overview" ? (
-                  <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+                  <div className="space-y-6">
+                    {showInstallGuide ? (
+                      <OverviewNotice
+                        title="Install Guide"
+                        detail="This guide was sent from the admin dashboard and is shown here first so the client sees it immediately after opening the dashboard."
+                      >
+                        <div className="rounded-2xl border border-white/10 bg-[#050816] p-4">
+                          <div className="whitespace-pre-wrap text-sm leading-6 text-white">{store.installGuide}</div>
+                          {store.installGuideSentAt ? <div className="mt-3 text-xs text-slate-300">Sent: {new Date(store.installGuideSentAt).toLocaleString()}</div> : null}
+                        </div>
+                      </OverviewNotice>
+                    ) : null}
+
+                    {!showInstallGuide && !liveConnected ? (
+                      <OverviewNotice
+                        tone="amber"
+                        title="Install Status"
+                        detail={installGuideSent ? "The install guide was sent by email. If you do not see it, contact support." : "The install guide has not been sent yet. Our team still needs to finish internal QA before handoff."}
+                      />
+                    ) : null}
+
+                    <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
                     <SectionCard title="Store snapshot" description="Current status of your account, setup, and storefront configuration.">
                       <div className="grid gap-4 md:grid-cols-2">
                         <InfoRow label="Store Name" value={store.storeName} />
@@ -367,6 +412,7 @@ export default function ClientDashboard({ onLogout }) {
                         <ChecklistItem done={setupLive} label="Store live" detail={setupLive ? "The store is marked live in our system." : "Setup is not marked live yet."} />
                       </div>
                     </SectionCard>
+                    </div>
                   </div>
                 ) : null}
 
@@ -508,9 +554,11 @@ export default function ClientDashboard({ onLogout }) {
                         <InfoRow label="Last Sync" value={store.lastSyncedAt ? new Date(store.lastSyncedAt).toLocaleString() : "Not available"} />
                       </div>
                       <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4 text-sm leading-6 text-slate-300">
-                        Installation details are sent manually after internal QA. Typical setup time is 1 to 2 days.
+                        {liveConnected
+                          ? "The store is live. Use support for account help and use the rest of the dashboard for ongoing updates."
+                          : "Installation details are sent manually after internal QA. Typical setup time is 1 to 2 days."}
                       </div>
-                      {store.installGuide ? (
+                      {showInstallGuide ? (
                         <div className="mt-4 rounded-2xl border border-slate-800 bg-[#050816] p-4">
                           <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Latest Install Guide</div>
                           <div className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-300">{store.installGuide}</div>
