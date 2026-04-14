@@ -1,0 +1,124 @@
+WORDPRESS REAL STORE TEST PLAN
+
+Purpose
+Use this checklist when testing AgentComerce on a real WooCommerce / WordPress store.
+Do not skip the credential checks or the storefront widget checks.
+
+Before You Start
+1. Make a full backup of the WordPress site and database.
+2. Confirm WooCommerce is active and working.
+3. Confirm permalinks are not set to Plain.
+4. Have one admin user available for WordPress.
+5. Have one product in stock and visible on the storefront.
+6. Have one test order available if order-status chat is part of the workflow.
+7. Confirm the frontend is pointing to the correct backend API environment.
+
+Part 1: Generate WooCommerce API Credentials
+1. Log in to WordPress admin.
+2. Open WooCommerce > Settings > Advanced > REST API.
+3. Click Add key.
+4. Description: AgentComerce
+5. User: pick an admin-level user you control
+6. Permissions: Read/Write
+7. Click Generate API key.
+8. Copy the Consumer Key.
+9. Copy the Consumer Secret.
+10. Save both in a secure place.
+
+Part 2: Submit Store in AgentComerce
+1. Open the onboarding flow.
+2. Select the right plan.
+3. Enter the exact live store URL.
+4. Select WooCommerce.
+5. Paste the Consumer Key and Consumer Secret.
+6. Wait for credential validation to succeed.
+7. Complete store name, contact email, phone, categories, delivery methods, return policy, and store questions.
+8. Add a real dashboard login email and password.
+9. Submit the store.
+10. Confirm you receive a store ID after submission.
+
+Part 3: Admin Dashboard Checks
+1. Log in to the admin dashboard.
+2. Open the new store record.
+3. Verify store URL, platform, contact email, login email, plan, and notes are correct.
+4. Verify workflow status, widget status, and setup status are not falsely marked live.
+5. Save one small field change and confirm it persists.
+6. If client access is needed, verify account lookup works.
+7. Generate a temporary password only if needed.
+
+Part 4: Client Dashboard Checks
+1. Log in with the client dashboard account.
+2. Confirm the dashboard loads without redirect loops.
+3. Change welcome message, agent name, accent color, and one FAQ or note.
+4. Save changes.
+5. Refresh the page.
+6. Confirm the saved values are still there.
+
+Part 5: Widget Pre-Test
+1. Open the widget test page before touching the real storefront.
+2. Use the real store ID.
+3. Enter the correct backend API base shown by your deployment.
+4. Confirm the widget loads.
+5. Confirm the welcome text and branding match dashboard settings.
+6. Send at least 3 test messages:
+   - product question
+   - shipping question
+   - return policy question
+7. Confirm the assistant responds with store-specific answers.
+8. Confirm message usage increases in dashboard/admin.
+
+Part 6: Install on Real WordPress Store
+1. Copy the widget snippet from the dashboard/admin install section.
+2. In WordPress, place it in the global footer.
+3. Best options:
+   - footer.php in the active theme
+   - a site-wide code injection plugin
+   - a theme settings area that outputs code before </body>
+4. Add the snippet once only.
+5. Save changes.
+6. Open the storefront in an incognito window.
+7. Confirm the widget bubble appears.
+
+Part 7: Real Storefront Tests
+1. Open home page and confirm widget loads.
+2. Open a category page and confirm widget still loads.
+3. Open a product page and confirm widget still loads.
+4. Refresh the page and confirm only one widget instance appears.
+5. Start a chat and ask:
+   - "Do you have this in stock?"
+   - "How long is delivery?"
+   - "What is your return policy?"
+   - "Do you offer cash on delivery?"
+6. If product recommendations are enabled, ask for a product suggestion.
+7. If order lookup is enabled, ask about a known test order.
+8. Confirm replies are relevant to your store and not generic nonsense.
+
+Part 8: Failure Checks
+1. Enter an invalid store ID on the widget test page and confirm the widget does not fake success.
+2. Temporarily break the webhook URL and confirm chat errors are visible.
+3. Log out of client dashboard and confirm protected pages redirect to login.
+4. Try wrong dashboard credentials and confirm login fails cleanly.
+
+Part 9: Mobile Checks
+1. Test on a real phone if possible.
+2. Open the store homepage.
+3. Open the widget.
+4. Send 2 to 3 test messages.
+5. Confirm the widget is usable, scrollable, and not cut off.
+
+Go / No-Go Rule
+Go live only if all of these are true:
+- credentials validate successfully
+- onboarding saves correctly
+- admin and client dashboards load correctly
+- widget loads on the real storefront
+- chat replies work on real pages
+- usage tracking updates
+- no duplicate widget loads
+
+Stop immediately if any of these happen:
+- wrong backend environment
+- credential validation fails
+- widget does not appear on storefront
+- messages do not reach the backend
+- answers are clearly wrong for store policy or products

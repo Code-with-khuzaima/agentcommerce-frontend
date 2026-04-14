@@ -1,10 +1,15 @@
 (function () {
   "use strict";
 
+  if (window.__AgentComerceWidgetLoaded) return;
+  window.__AgentComerceWidgetLoaded = true;
+
+  var currentScript = document.currentScript || document.querySelector('script[data-agentcomerce-widget][src*="widget.js"]');
   var config = window.AgentComerce || {};
+  var scriptApiBase = currentScript && currentScript.getAttribute("data-api-base");
   var storeId = config.store_id || "store_001";
   var webhook = config.webhook_url || "";
-  var apiBase = config.api_base || "https://agentcommerce-backend-production-e1d9.up.railway.app/api";
+  var apiBase = config.api_base || scriptApiBase || "";
   var agentName = config.agent_name || "AI Assistant";
   var accent = config.accent_color || "#7c3aed";
   var welcome = config.welcome_message || "Welcome! How can I help you today?";
@@ -27,7 +32,17 @@
     messages = JSON.parse(localStorage.getItem(msgKey) || "[]");
   } catch (e) {}
 
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   var style = document.createElement("style");
+  style.id = "acw-style";
   style.textContent = `
     #acw-root, #acw-root * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
     #acw-root { --acw-accent: ${accent}; }
@@ -77,10 +92,10 @@
   var root = document.createElement("div");
   root.id = "acw-root";
   root.innerHTML = `
-    <button id="acw-button" aria-label="Open chat">💬</button>
+    <button id="acw-button" aria-label="Open chat">&#128172;</button>
     <div id="acw-panel">
       <div id="acw-head">
-        <div id="acw-title">${agentName}</div>
+        <div id="acw-title"></div>
         <div id="acw-sub">Shopping assistant</div>
       </div>
       <div id="acw-body">
@@ -113,7 +128,7 @@
       </div>
       <div id="acw-foot" style="display:${lead ? "flex" : "none"}">
         <input id="acw-input" placeholder="Ask me anything about this store..." />
-        <button id="acw-send">➤</button>
+        <button id="acw-send" aria-label="Send message">&#10148;</button>
       </div>
     </div>
   `;
@@ -131,6 +146,8 @@
   var send = document.getElementById("acw-send");
   var saveLead = document.getElementById("acw-save-lead");
   var leadError = document.getElementById("acw-lead-error");
+
+  if (titleNode) titleNode.textContent = agentName;
 
   function persistMessages() {
     try { localStorage.setItem(msgKey, JSON.stringify(messages.slice(-30))); } catch (e) {}
@@ -167,15 +184,6 @@
     } catch (e) {}
   }
 
-  function escapeHtml(value) {
-    return String(value || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
-
   function renderProducts(products) {
     if (!Array.isArray(products) || !products.length) return "";
     return `<div id="acw-products">${products.slice(0, 3).map(function (p) {
@@ -197,20 +205,24 @@
         '</a>' +
         '<div class="acw-card-actions">' +
         '<a class="acw-card-btn acw-card-view" href="' + url + '" target="_blank" rel="noreferrer">View</a>' +
-        '<button class="acw-card-btn acw-card-cart" type="button" ' + (cartUrl ? 'data-cart-url="' + cartUrl + '"' : 'disabled') + '>' + (cartUrl ? 'Add to Cart' : 'Unavailable') + '</button>' +
-        '</div>' +
+        '<button class="acw-card-btn acw-card-cart" type="button" ' + (cartUrl ? 'data-cart-url="' + cartUrl + '"' : "disabled") + ">" + (cartUrl ? "Add to Cart" : "Unavailable") + "</button>" +
+        "</div>" +
         "</div></div>";
     }).join("")}</div>`;
+  }
+
+  function renderMessage(role, text, products) {
+    var item = document.createElement("div");
+    item.className = "acw-msg " + (role === "user" ? "acw-user" : "acw-bot");
+    item.innerHTML = escapeHtml(String(text || "")).replace(/\n/g, "<br>") + renderProducts(products);
+    msgs.appendChild(item);
+    msgs.scrollTop = msgs.scrollHeight;
   }
 
   function addMessage(role, text, products) {
     messages.push({ role: role, text: text, products: products || [] });
     persistMessages();
-    var item = document.createElement("div");
-    item.className = "acw-msg " + (role === "user" ? "acw-user" : "acw-bot");
-    item.innerHTML = String(text || "").replace(/\n/g, "<br>") + renderProducts(products);
-    msgs.appendChild(item);
-    msgs.scrollTop = msgs.scrollHeight;
+    renderMessage(role, text, products);
   }
 
   function hydrateChat() {
@@ -219,14 +231,22 @@
       addMessage("bot", welcome);
       return;
     }
-    messages.forEach(function (m) { addMessage(m.role, m.text, m.products); });
+    messages.forEach(function (message) {
+      renderMessage(message.role, message.text, message.products);
+    });
   }
 
   async function sendMessage() {
     var value = (input.value || "").trim();
-    if (!value || !webhook) return;
+    if (!value) return;
+    if (!webhook) {
+      addMessage("bot", "The assistant is not configured yet. Please contact the store team.");
+      return;
+    }
+
     input.value = "";
     addMessage("user", value);
+
     try {
       var res = await fetch(webhook, {
         method: "POST",
@@ -279,23 +299,23 @@
   });
 
   msgs.addEventListener("click", async function (event) {
-    var button = event.target.closest(".acw-card-cart");
-    if (!button || button.disabled) return;
-    var cartUrl = button.getAttribute("data-cart-url");
+    var cartButton = event.target.closest(".acw-card-cart");
+    if (!cartButton || cartButton.disabled) return;
+    var cartUrl = cartButton.getAttribute("data-cart-url");
     if (!cartUrl) return;
-    button.disabled = true;
-    var original = button.textContent;
-    button.textContent = "Adding...";
+    cartButton.disabled = true;
+    var original = cartButton.textContent;
+    cartButton.textContent = "Adding...";
     try {
       await fetch(cartUrl, {
         method: "GET",
         credentials: "include",
       });
-      button.textContent = "Added";
+      cartButton.textContent = "Added";
       addMessage("bot", "Product added to cart.");
     } catch (e) {
-      button.disabled = false;
-      button.textContent = original || "Add to Cart";
+      cartButton.disabled = false;
+      cartButton.textContent = original || "Add to Cart";
       addMessage("bot", "Could not add this product to cart automatically. Open the product page and add it there.");
     }
   });

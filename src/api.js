@@ -1,7 +1,22 @@
-const API_BASE = process.env.REACT_APP_API_URL ||
-  (window.location.hostname === "localhost"
-    ? "http://localhost:4000/api"
-    : "https://agentcommerce-backend-production-e1d9.up.railway.app/api");
+export function resolveApiBase(location = (typeof window !== "undefined" ? window.location : null), envApiBase = process.env.REACT_APP_API_URL) {
+  if (envApiBase) {
+    return envApiBase;
+  }
+
+  if (location) {
+    const { hostname, origin } = location;
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return "http://localhost:4000/api";
+    }
+
+    // Do not silently route preview or alternate domains to production.
+    return `${origin}/api`;
+  }
+
+  return "http://localhost:4000/api";
+}
+
+const API_BASE = resolveApiBase();
 
 async function parseJsonSafe(res) {
   const text = await res.text();
@@ -18,14 +33,19 @@ function getAdminAuthHeaders() {
 }
 
 async function request(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...getAdminAuthHeaders(),
-      ...(options.headers || {}),
-    },
-    ...options,
-  });
+  let res;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAdminAuthHeaders(),
+        ...(options.headers || {}),
+      },
+      ...options,
+    });
+  } catch (error) {
+    throw new Error(`Network error while contacting ${API_BASE}. Check REACT_APP_API_URL or backend availability.`);
+  }
 
   const data = await parseJsonSafe(res);
 

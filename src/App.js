@@ -4,6 +4,7 @@ import AdminLoginPage from "./AdminLoginPage";
 import ClientDashboard from "./ClientDashboard";
 import LoginPage from "./LoginPage";
 import SalesPopup from "./SalesPopup";
+import { sendTemplateEmail } from "./email";
 import { apiPost } from "./api";
 
 const cx = (...args) => args.filter(Boolean).join(" ");
@@ -700,7 +701,7 @@ function Step2({ data, setData, onNext, onBack }) {
       }
     }
 
-    // Try backend validation — if backend unreachable, skip and proceed
+    // Credential validation must fail closed before a store can move forward.
     try {
       await apiPost("/validate-credentials", {
         platform: data.platform,
@@ -713,30 +714,22 @@ function Step2({ data, setData, onNext, onBack }) {
       setApiStatus("success");
       setTimeout(() => onNext(), 1200);
     } catch (err) {
-      // If backend is down/unreachable — do format check only and proceed
-      const isNetworkError = err?.message?.includes("fetch") || err?.message?.includes("network") || err?.message?.includes("Failed to fetch");
-      if (isNetworkError) {
-        nextQueuedRef.current = true;
-        setApiStatus("success"); // format looked ok, backend just unreachable
-        setTimeout(() => onNext(), 1200);
-      } else {
-        setApiStatus("error");
-      }
+      setApiStatus("error");
     } finally {
       setValidating(false);
     }
   };
   const shopifyInstructions = [
-    <>Go to <strong>dev.shopify.com</strong> → click <strong>Apps</strong> → <strong>Create app</strong> → choose <strong>Dev Dashboard</strong>.</>,
-    <>Name it <strong>"AgentComerce AI"</strong> → click <strong>Create app</strong>.</>,
-    <>Go to <strong>Configuration</strong> tab → under Admin API scopes enable: <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_products</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_orders</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_inventory</code> → click <strong>Save</strong>.</>,
-    <>Go to <strong>Distribution</strong> tab → click <strong>Select store</strong> → choose your store → click <strong>Install</strong>.</>,
-    <>Go to <strong>Settings</strong> or <strong>API credentials</strong> → copy your <strong>Client ID</strong> and either your <strong>Client Secret</strong> (<code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">shpss_</code>) or your <strong>Admin API access token</strong> (<code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">shpat_</code>) → paste them below.</>,
+    <>Go to <strong>dev.shopify.com</strong> - click <strong>Apps</strong> - <strong>Create app</strong> - choose <strong>Dev Dashboard</strong>.</>,
+    <>Name it <strong>"AgentComerce AI"</strong> - click <strong>Create app</strong>.</>,
+    <>Go to <strong>Configuration</strong> tab - under Admin API scopes enable: <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_products</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_orders</code> <code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">read_inventory</code> - click <strong>Save</strong>.</>,
+    <>Go to <strong>Distribution</strong> tab - click <strong>Select store</strong> - choose your store - click <strong>Install</strong>.</>,
+    <>Go to <strong>Settings</strong> or <strong>API credentials</strong> - copy your <strong>Client ID</strong> and either your <strong>Client Secret</strong> (<code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">shpss_</code>) or your <strong>Admin API access token</strong> (<code className="text-violet-300 bg-violet-500/15 px-1 rounded text-xs">shpat_</code>) - paste them below.</>,
   ];
   const wooInstructions = [
-    <>Go to <strong>WooCommerce → Settings → Advanced → REST API</strong>.</>,
+    <>Go to <strong>WooCommerce - Settings - Advanced - REST API</strong>.</>,
     <>Click <strong>Add key</strong>, set description to "AgentComerce", select <strong>Read/Write</strong>.</>,
-    <>Click <strong>Generate API key</strong> → copy the Consumer Key and Consumer Secret below.</>,
+    <>Click <strong>Generate API key</strong> - copy the Consumer Key and Consumer Secret below.</>,
     <>Make sure permalinks are set to "Post name" in WordPress settings.</>,
   ];
   return (
@@ -1222,21 +1215,21 @@ function LandingPage({ onStart, onLogin }) {
   ];
 
   const faqs = [
-    { q: "How long does the setup take?", a: "Our team typically completes the full integration within 1–2 business days. Once you submit your store details and credentials, we handle everything — no technical work required from your side." },
+    { q: "How long does the setup take?", a: "Our team typically completes the full integration within 1-2 business days. Once you submit your store details and credentials, we handle everything with no technical work required from your side." },
     { q: "Does it work with my Shopify or WooCommerce store?", a: "Yes! AgentComerce is purpose-built for both Shopify and WooCommerce stores. We connect via your store's official REST API to access live products, orders, prices, and stock in real time." },
-    { q: "Can the AI show product images and prices?", a: "Yes! On Pro and Enterprise plans, the AI shows live product image cards inside the chat — with price, stock status, sale badge, and an Add to Cart button. Customers can browse and buy without leaving the chat." },
+    { q: "Can the AI show product images and prices?", a: "Yes! On Pro and Enterprise plans, the AI shows live product image cards inside the chat with price, stock status, sale badge, and an Add to Cart button. Customers can browse and buy without leaving the chat." },
     { q: "Does it track customer orders?", a: "Yes. Customers can type their order number and the AI instantly fetches the real order status, payment, fulfillment, and tracking number from your store." },
     { q: "Is my API data safe and secure?", a: "Absolutely. All your store credentials are encrypted using AES-256 encryption. We use HTTPS for all communications and your credentials are never exposed in our frontend code." },
-    { q: "What happens after I submit?", a: "You'll receive a confirmation email immediately. Our team then configures your AI agent with your products and FAQs, and emails you when it's live — usually within 1–2 business days." },
+    { q: "What happens after I submit?", a: "You'll receive a confirmation email immediately. Our team then configures your AI agent with your products and FAQs, and emails you when it's live, usually within 1-2 business days." },
     { q: "Can I customize what the AI says?", a: "Yes! You provide your FAQs, return policy, delivery info, and brand voice during onboarding. The AI is trained specifically for your store and can be updated anytime by emailing us." },
     { q: "What if I want to cancel?", a: "No contracts, no hassle. Cancel your subscription anytime. We also offer a 14-day money-back guarantee if you're not satisfied with the service." },
-    { q: "How does pricing work?", a: "Simple flat monthly fee — Starter $19/mo (5,000 messages), Pro $29/mo (13,000 messages), Enterprise $49/mo (unlimited). No hidden costs, no setup fees. Cancel anytime." },
+    { q: "How does pricing work?", a: "Simple flat monthly fee: Starter $19/mo (5,000 messages), Pro $29/mo (13,000 messages), Enterprise $49/mo (unlimited). No hidden costs and no setup fees. Cancel anytime." },
     { q: "What languages does the AI support?", a: "The AI automatically detects the customer's language and replies in the same language. Works with Urdu, English, Arabic, and most other languages out of the box." },
   ];
 
   const handleContactSubmit = () => {
     if (!contactForm.name || !contactForm.email || !contactForm.message) return;
-    window.emailjs.send(
+    sendTemplateEmail(
       EMAILJS_SERVICE_ID,
       EMAILJS_CONTACT_TEMPLATE_ID,
       {
@@ -1265,7 +1258,7 @@ function LandingPage({ onStart, onLogin }) {
     if (!/\S+@\S+\.\S+/.test(email)) return alert("Enter a valid email address.");
 
     setBookDemoSending(true);
-    window.emailjs.send(
+    sendTemplateEmail(
       EMAILJS_SERVICE_ID,
       EMAILJS_CONTACT_TEMPLATE_ID,
       {
@@ -2223,7 +2216,7 @@ export default function App() {
     return (
       <div>
         <div className="flex items-center justify-between px-6 py-3 bg-slate-950 border-b border-white/6">
-          <span className="text-xs text-slate-500 font-mono">admin panel ? agentcomerce</span>
+          <span className="text-xs text-slate-500 font-mono">admin panel | agentcomerce</span>
           <button onClick={handleAdminLogout} className="text-xs text-slate-500 hover:text-red-400 transition-colors">Logout admin</button>
         </div>
         <AdminDashboard />
@@ -2278,6 +2271,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 

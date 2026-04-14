@@ -1,6 +1,7 @@
 // LoginPage.js
 import React, { useState } from "react";
 import { apiLogin } from "./api";
+import { sendTemplateEmail } from "./email";
 
 const EMAILJS_SERVICE_ID = "service_26d0u9m";
 const EMAILJS_PUBLIC_KEY = "Nvak4g2MT8AuvKpb6";
@@ -88,7 +89,7 @@ export default function LoginPage({ onLogin, onBack }) {
     setForgotNotice("");
 
     try {
-      await window.emailjs.send(
+      await sendTemplateEmail(
         EMAILJS_SERVICE_ID,
         EMAILJS_FORGOT_TEMPLATE_ID,
         {

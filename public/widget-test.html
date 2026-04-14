@@ -154,6 +154,10 @@
               <input id="storeId" type="text" value="store_002" placeholder="store_002" />
               <button id="loadWidget" class="primary" type="button">Load Widget</button>
             </div>
+            <label class="label" for="apiBase" style="margin-top:14px;">API Base</label>
+            <div class="row">
+              <input id="apiBase" type="text" placeholder="https://your-backend.example.com/api" />
+            </div>
             <div id="status" class="status">Ready. Load the widget for a store and test the live chat flow.</div>
           </div>
 
@@ -191,11 +195,14 @@
   <script>
     (function () {
       const storeInput = document.getElementById('storeId');
+      const apiBaseInput = document.getElementById('apiBase');
       const loadButton = document.getElementById('loadWidget');
       const status = document.getElementById('status');
       const params = new URLSearchParams(window.location.search);
       const queryStore = params.get('store_id');
+      const queryApiBase = params.get('api_base');
       if (queryStore) storeInput.value = queryStore;
+      apiBaseInput.value = queryApiBase || new URL('/api', window.location.origin).toString();
 
       function setStatus(message, isError) {
         status.textContent = message;
@@ -207,33 +214,45 @@
       function removeExistingWidget() {
         document.querySelectorAll('script[data-agentcomerce-widget]').forEach((node) => node.remove());
         const existing = document.getElementById('agentcommerce-config-script');
+        const existingRoot = document.getElementById('acw-root');
+        const existingStyle = document.getElementById('acw-style');
         if (existing) existing.remove();
+        if (existingRoot) existingRoot.remove();
+        if (existingStyle) existingStyle.remove();
         delete window.AgentComerce;
+        delete window.__AgentComerceWidgetLoaded;
       }
 
       function loadWidget() {
         const storeId = storeInput.value.trim();
+        const apiBase = apiBaseInput.value.trim();
         if (!storeId) {
           setStatus('Enter a store ID first.', true);
           return;
         }
+        if (!apiBase) {
+          setStatus('Enter an API base first.', true);
+          return;
+        }
 
         removeExistingWidget();
-        window.AgentComerce = { store_id: storeId };
+        window.AgentComerce = { store_id: storeId, api_base: apiBase };
 
         const configScript = document.createElement('script');
         configScript.id = 'agentcommerce-config-script';
-        configScript.text = 'window.AgentComerce = ' + JSON.stringify({ store_id: storeId }) + ';';
+        configScript.text = 'window.AgentComerce = ' + JSON.stringify({ store_id: storeId, api_base: apiBase }) + ';';
         document.body.appendChild(configScript);
 
         const script = document.createElement('script');
         script.src = '/widget.js';
         script.async = true;
         script.dataset.agentcomerceWidget = 'true';
+        script.dataset.apiBase = apiBase;
         script.onload = function () {
           setStatus('Widget loaded for ' + storeId + '. Open the chat bubble and test live messages.');
           const nextUrl = new URL(window.location.href);
           nextUrl.searchParams.set('store_id', storeId);
+          nextUrl.searchParams.set('api_base', apiBase);
           window.history.replaceState({}, '', nextUrl.toString());
         };
         script.onerror = function () {

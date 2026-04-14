@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiGetDashboard, apiUpdateDashboard } from "./api";
+import { API_BASE, apiGetDashboard, apiUpdateDashboard } from "./api";
 
 const cx = (...values) => values.filter(Boolean).join(" ");
 
@@ -187,11 +187,12 @@ function widgetScriptUrl() {
 
 function buildWidgetSnippet(store) {
   const storeId = store?.storeId || "store_id_here";
+  const apiBase = API_BASE;
   return [
     "<script>",
-    `  window.AgentComerce = { store_id: ${JSON.stringify(storeId)} };`,
+    `  window.AgentComerce = { store_id: ${JSON.stringify(storeId)}, api_base: ${JSON.stringify(apiBase)} };`,
     "</script>",
-    `<script src="${widgetScriptUrl()}" async data-agentcomerce-widget="true"></script>`,
+    `<script src="${widgetScriptUrl()}" async data-agentcomerce-widget="true" data-api-base="${apiBase}"></script>`,
   ].join("\n");
 }
 
