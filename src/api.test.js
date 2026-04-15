@@ -63,4 +63,34 @@ describe("apiLogin", () => {
 
     await expect(apiLogin("demo@example.com", "bad-pass")).rejects.toThrow("Invalid email or password");
   });
+
+  test("attaches status metadata for empty non-401 failures", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      text: async () => "",
+    });
+
+    try {
+      await apiLogin("demo@example.com", "bad-pass");
+      throw new Error("Expected apiLogin to fail");
+    } catch (error) {
+      expect(error.message).toBe("Request failed (404)");
+      expect(error.status).toBe(404);
+      expect(error.path).toBe("/auth/login");
+    }
+  });
+
+  test("attaches network metadata when fetch throws", async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error("Failed to fetch"));
+
+    try {
+      await apiLogin("demo@example.com", "bad-pass");
+      throw new Error("Expected apiLogin to fail");
+    } catch (error) {
+      expect(error.message).toContain("Network error while contacting");
+      expect(error.code).toBe("NETWORK_ERROR");
+      expect(error.path).toBe("/auth/login");
+    }
+  });
 });

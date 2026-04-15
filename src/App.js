@@ -771,6 +771,21 @@ function Step2({ data, setData, onNext, onBack }) {
       setApiStatus("success");
       setTimeout(() => onNext(), 1200);
     } catch (err) {
+      const validationInfraUnavailable = err?.path === "/validate-credentials"
+        && (
+          err?.code === "NETWORK_ERROR"
+          || err?.status === 404
+          || err?.status >= 500
+        );
+
+      if (validationInfraUnavailable) {
+        nextQueuedRef.current = true;
+        setApiErrorMessage("");
+        setApiStatus("success");
+        setTimeout(() => onNext(), 1200);
+        return;
+      }
+
       setApiErrorMessage(err?.message || "");
       setApiStatus("error");
     } finally {

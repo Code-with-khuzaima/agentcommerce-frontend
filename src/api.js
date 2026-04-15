@@ -68,7 +68,11 @@ async function request(path, options = {}) {
       ...options,
     });
   } catch (error) {
-    throw new Error(`Network error while contacting ${API_BASE}. Check REACT_APP_API_URL or backend availability.`);
+    const networkError = new Error(`Network error while contacting ${API_BASE}. Check REACT_APP_API_URL or backend availability.`);
+    networkError.code = "NETWORK_ERROR";
+    networkError.path = path;
+    networkError.apiBase = API_BASE;
+    throw networkError;
   }
 
   const data = await parseJsonSafe(res);
@@ -81,9 +85,13 @@ async function request(path, options = {}) {
       ? firstError.msg
       : field
         ? `Invalid value for ${field}`
-        : (backendMessage || (res.status === 401 ? "Invalid email or password" : "Request failed"));
+        : (backendMessage || (res.status === 401 ? "Invalid email or password" : `Request failed (${res.status})`));
 
-    throw new Error(message);
+    const requestError = new Error(message);
+    requestError.status = res.status;
+    requestError.path = path;
+    requestError.apiBase = API_BASE;
+    throw requestError;
   }
 
   return data;
