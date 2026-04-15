@@ -1119,6 +1119,7 @@ function Step4({ data, setData, onBack }) {
       };
 
       const response = await apiPost("/submit", payload);
+      localStorage.removeItem("ac_pending_manual_submission");
       setSubmitted({ storeId: response.storeId, loginEmail: response.loginEmail || data.loginEmail });
     } catch (e) {
       const submitInfraUnavailable = e?.path === "/submit"
@@ -1145,6 +1146,11 @@ function Step4({ data, setData, onBack }) {
             EMAILJS_PUBLIC_KEY
           );
 
+          localStorage.setItem("ac_pending_manual_submission", JSON.stringify({
+            loginEmail: data.loginEmail,
+            storeName: data.storeName || "",
+            submittedAt: new Date().toISOString(),
+          }));
           setSubmitted({
             storeId: "Pending manual confirmation",
             loginEmail: data.loginEmail,

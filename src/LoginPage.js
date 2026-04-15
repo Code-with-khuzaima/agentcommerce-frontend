@@ -1,5 +1,5 @@
 // LoginPage.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { apiLogin } from "./api";
 import { sendTemplateEmail } from "./email";
 
@@ -46,6 +46,16 @@ export default function LoginPage({ onLogin, onBack }) {
   const [notice, setNotice] = useState("");
   const [forgotError, setForgotError] = useState("");
   const [forgotNotice, setForgotNotice] = useState("");
+  const [pendingManualSubmission, setPendingManualSubmission] = useState(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("ac_pending_manual_submission");
+      setPendingManualSubmission(raw ? JSON.parse(raw) : null);
+    } catch {
+      setPendingManualSubmission(null);
+    }
+  }, []);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -67,6 +77,21 @@ export default function LoginPage({ onLogin, onBack }) {
       // Call onLogin callback
       if (onLogin) onLogin(res.user);
     } catch (err) {
+      const isBackendRouteProblem = err?.path === "/auth/login"
+        && (err?.code === "NETWORK_ERROR" || err?.status === 404 || err?.status === 405 || err?.status >= 500);
+      const pendingForThisEmail = pendingManualSubmission?.loginEmail
+        && pendingManualSubmission.loginEmail.toLowerCase() === email.trim().toLowerCase();
+
+      if (isBackendRouteProblem && pendingForThisEmail) {
+        setError("Your store submission was sent through the manual backup path, so your dashboard account is not active yet. Wait for manual confirmation or contact agentcomrce@gmail.com.");
+        return;
+      }
+
+      if (isBackendRouteProblem) {
+        setError("Dashboard login server is unavailable right now. This is a backend deployment issue, not a password issue.");
+        return;
+      }
+
       setError(err.message || "Invalid email or password");
     } finally {
       setLoading(false);
@@ -148,6 +173,13 @@ export default function LoginPage({ onLogin, onBack }) {
             <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm mb-5">
               <Icon path={icons.info} size={14} className="shrink-0" />
               {notice}
+            </div>
+          )}
+
+          {pendingManualSubmission && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-sm mb-5">
+              <Icon path={icons.info} size={14} className="shrink-0" />
+              A recent submission for {pendingManualSubmission.loginEmail} is still waiting for manual confirmation because the main server was unavailable.
             </div>
           )}
 
