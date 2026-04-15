@@ -27,6 +27,30 @@ async function parseJsonSafe(res) {
   }
 }
 
+function extractErrorMessage(data) {
+  if (!data || typeof data !== "object") {
+    return "";
+  }
+
+  if (typeof data.message === "string" && data.message.trim()) {
+    return data.message.trim();
+  }
+
+  if (typeof data.error === "string" && data.error.trim()) {
+    return data.error.trim();
+  }
+
+  if (data.error && typeof data.error === "object" && typeof data.error.message === "string" && data.error.message.trim()) {
+    return data.error.message.trim();
+  }
+
+  if (typeof data.detail === "string" && data.detail.trim()) {
+    return data.detail.trim();
+  }
+
+  return "";
+}
+
 function getAdminAuthHeaders() {
   const token = localStorage.getItem("ac_admin_token");
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -52,11 +76,12 @@ async function request(path, options = {}) {
   if (!res.ok) {
     const firstError = Array.isArray(data.errors) && data.errors.length ? data.errors[0] : null;
     const field = firstError?.path || firstError?.param;
+    const backendMessage = extractErrorMessage(data);
     const message = firstError?.msg && firstError.msg !== "Invalid value"
       ? firstError.msg
       : field
         ? `Invalid value for ${field}`
-        : (data.message || "Request failed");
+        : (backendMessage || (res.status === 401 ? "Invalid email or password" : "Request failed"));
 
     throw new Error(message);
   }
@@ -130,4 +155,4 @@ export function apiUpdateDashboard(body) {
   });
 }
 
-export { API_BASE };
+export { API_BASE, extractErrorMessage };
