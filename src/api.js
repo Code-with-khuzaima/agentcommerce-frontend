@@ -17,6 +17,7 @@ export function resolveApiBase(location = (typeof window !== "undefined" ? windo
 }
 
 const API_BASE = resolveApiBase();
+const REQUEST_TIMEOUT_MS = Number(process.env.REACT_APP_API_TIMEOUT_MS || 15000);
 
 async function parseJsonSafe(res) {
   const text = await res.text();
@@ -58,6 +59,11 @@ function getAdminAuthHeaders() {
 
 async function request(path, options = {}) {
   let res;
+  const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+  const timeoutId = controller
+    ? setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+    : null;
+
   try {
     res = await fetch(`${API_BASE}${path}`, {
       headers: {
@@ -65,14 +71,22 @@ async function request(path, options = {}) {
         ...getAdminAuthHeaders(),
         ...(options.headers || {}),
       },
+      signal: controller?.signal,
       ...options,
     });
   } catch (error) {
-    const networkError = new Error(`Network error while contacting ${API_BASE}. Check REACT_APP_API_URL or backend availability.`);
-    networkError.code = "NETWORK_ERROR";
+    const timedOut = error?.name === "AbortError";
+    const networkError = new Error(
+      timedOut
+        ? `Request timed out after ${Math.round(REQUEST_TIMEOUT_MS / 1000)}s while contacting ${API_BASE}.`
+        : `Network error while contacting ${API_BASE}. Check REACT_APP_API_URL or backend availability.`
+    );
+    networkError.code = timedOut ? "TIMEOUT_ERROR" : "NETWORK_ERROR";
     networkError.path = path;
     networkError.apiBase = API_BASE;
     throw networkError;
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
   }
 
   const data = await parseJsonSafe(res);
