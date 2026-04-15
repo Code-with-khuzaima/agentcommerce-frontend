@@ -775,6 +775,7 @@ function Step2({ data, setData, onNext, onBack }) {
         && (
           err?.code === "NETWORK_ERROR"
           || err?.status === 404
+          || err?.status === 405
           || err?.status >= 500
         );
 
@@ -1044,12 +1045,13 @@ function Step4({ data, setData, onBack }) {
 
     setSubmitting(true);
     setError(null);
+    let fullDetails = "";
 
     try {
       const answers = data.storeAnswers || {};
       const yn = (v) => (v === "yes" ? "Yes" : v === "no" ? "No" : "-");
       const isShopify = data.platform === "shopify";
-      const fullDetails = [
+      fullDetails = [
         "NEW STORE SUBMISSION - AGENTCOMERCE",
         "",
         "PLAN",
@@ -1119,6 +1121,42 @@ function Step4({ data, setData, onBack }) {
       const response = await apiPost("/submit", payload);
       setSubmitted({ storeId: response.storeId, loginEmail: response.loginEmail || data.loginEmail });
     } catch (e) {
+      const submitInfraUnavailable = e?.path === "/submit"
+        && (
+          e?.code === "NETWORK_ERROR"
+          || e?.status === 404
+          || e?.status === 405
+          || e?.status >= 500
+        );
+
+      if (submitInfraUnavailable) {
+        try {
+          await sendTemplateEmail(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_CONTACT_TEMPLATE_ID,
+            {
+              title: `Store Submission - ${data.storeName || "New Store"}`,
+              subject: `Store Submission - ${data.storeName || "New Store"}`,
+              from_name: data.storeName || "AgentComerce Store Submission",
+              from_email: data.storeContactEmail || data.loginEmail || "agentcomrce@gmail.com",
+              reply_to: data.storeContactEmail || data.loginEmail || "agentcomrce@gmail.com",
+              message: fullDetails,
+            },
+            EMAILJS_PUBLIC_KEY
+          );
+
+          setSubmitted({
+            storeId: "Pending manual confirmation",
+            loginEmail: data.loginEmail,
+            manualFallback: true,
+          });
+          return;
+        } catch {
+          setError("Submission server is unavailable right now, and the backup email handoff also failed. Please try again in a few minutes or email agentcomrce@gmail.com.");
+          return;
+        }
+      }
+
       setError(e?.message || "Failed to submit. Please try again.");
     } finally {
       setSubmitting(false);
@@ -1134,7 +1172,9 @@ function Step4({ data, setData, onBack }) {
         <div>
           <h2 className="text-3xl font-bold text-white mb-3">Submission Received</h2>
           <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">
-            Your store is saved. Admin review happens first. Once approved, the customer dashboard login will use the email and password you set here.
+            {submitted.manualFallback
+              ? "Your submission was forwarded through our backup channel because the main server is unavailable. We will review it manually and follow up by email."
+              : "Your store is saved. Admin review happens first. Once approved, the customer dashboard login will use the email and password you set here."}
           </p>
         </div>
         <div className="w-full max-w-sm p-4 rounded-xl bg-emerald-500/8 border border-emerald-500/20 text-left space-y-2">
