@@ -267,6 +267,52 @@ const DELIVERY_OPTIONS = ["Standard Shipping", "Express Shipping", "Same-Day Del
 const CATEGORY_OPTIONS = ["Clothing & Apparel", "Electronics", "Home & Garden", "Beauty & Health", "Sports & Outdoors", "Food & Beverage", "Toys & Games", "Books & Media", "Jewelry & Accessories", "Other"];
 const PHONE_VALIDATION_REGEX = /^[+\d][\d\s().-]{6,}$/;
 const STORE_URL_REGEX = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[^\s]*)?$/i;
+
+function normalizePathname(pathname) {
+  const cleaned = String(pathname || "").replace(/\/+/g, "/");
+  if (!cleaned || cleaned === "/") return "";
+  return cleaned.replace(/\/$/, "");
+}
+
+function normalizeWooStorePath(pathname) {
+  const cleaned = normalizePathname(pathname);
+  if (!cleaned) return "";
+
+  const segments = cleaned.split("/").filter(Boolean);
+  if (!segments.length) return "";
+
+  const adminIndex = segments.findIndex((segment) => /^(wp-admin|wp-login\.php)$/i.test(segment));
+  if (adminIndex >= 0) {
+    return adminIndex === 0 ? "" : `/${segments.slice(0, adminIndex).join("/")}`;
+  }
+
+  const apiIndex = segments.findIndex((segment) => /^(wp-json|wc-api)$/i.test(segment));
+  if (apiIndex >= 0) {
+    return apiIndex === 0 ? "" : `/${segments.slice(0, apiIndex).join("/")}`;
+  }
+
+  return cleaned;
+}
+
+export function normalizeStoreUrl(rawUrl, platform = "") {
+  const trimmed = (rawUrl || "").trim();
+  if (!trimmed) return "";
+
+  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+
+  try {
+    const parsed = new URL(withProtocol);
+    const hostname = parsed.hostname.toLowerCase();
+    if (platform === "shopify") {
+      return `https://${hostname}`;
+    }
+
+    const pathname = normalizeWooStorePath(parsed.pathname);
+    return `${parsed.protocol}//${hostname}${pathname}`;
+  } catch {
+    return trimmed;
+  }
+}
 const EMAILJS_SERVICE_ID = "service_26d0u9m";
 const EMAILJS_PUBLIC_KEY = "Nvak4g2MT8AuvKpb6";
 const EMAILJS_CONTACT_TEMPLATE_ID = "template_3s3hffj";
@@ -614,9 +660,13 @@ function Step1({ data, setData, onNext, onBack }) {
   const [errors, setErrors] = useState({});
   const validate = () => {
     const e = {};
-    if (!data.storeUrl) e.storeUrl = "Store URL is required";
-    else if (!/^https?:\/\/.+\..+/.test(data.storeUrl)) e.storeUrl = "Please enter a valid URL";
+    const normalizedStoreUrl = normalizeStoreUrl(data.storeUrl, data.platform);
+    if (!normalizedStoreUrl) e.storeUrl = "Store URL is required";
+    else if (!/^https?:\/\/.+\..+/.test(normalizedStoreUrl)) e.storeUrl = "Please enter a valid URL";
     if (!data.platform) e.platform = "Please select your platform";
+    if (!e.storeUrl && normalizedStoreUrl !== data.storeUrl) {
+      setData(d => ({ ...d, storeUrl: normalizedStoreUrl }));
+    }
     setErrors(e); return Object.keys(e).length === 0;
   };
   return (
@@ -655,6 +705,7 @@ function Step2({ data, setData, onNext, onBack }) {
   const [errors, setErrors] = useState({});
   const [validating, setValidating] = useState(false);
   const [apiStatus, setApiStatus] = useState(null);
+  const [apiErrorMessage, setApiErrorMessage] = useState("");
   const nextQueuedRef = useRef(false);
   const isShopify = data.platform === "shopify";
   const validate = () => {
@@ -671,7 +722,11 @@ function Step2({ data, setData, onNext, onBack }) {
   const handleValidate = async () => {
     if (validating || nextQueuedRef.current) return;
     if (!validate()) return;
-    setValidating(true); setApiStatus(null);
+    const normalizedStoreUrl = normalizeStoreUrl(data.storeUrl, data.platform);
+    if (normalizedStoreUrl !== data.storeUrl) {
+      setData(d => ({ ...d, storeUrl: normalizedStoreUrl }));
+    }
+    setValidating(true); setApiStatus(null); setApiErrorMessage("");
 
     // Developer bypass
     const field1 = isShopify ? data.apiKey : data.consumerKey;
@@ -693,8 +748,10 @@ function Step2({ data, setData, onNext, onBack }) {
         return;
       }
     } else {
-      const keyOk = data.consumerKey?.trim().length > 10;
-      if (!keyOk) {
+      const consumerKeyOk = /^ck_/i.test((data.consumerKey || "").trim()) && data.consumerKey?.trim().length > 12;
+      const consumerSecretOk = /^cs_/i.test((data.consumerSecret || "").trim()) && data.consumerSecret?.trim().length > 12;
+      if (!consumerKeyOk || !consumerSecretOk) {
+        setApiErrorMessage("Use the WooCommerce Consumer Key (`ck_`) and Consumer Secret (`cs_`) from WooCommerce > Settings > Advanced > REST API.");
         setApiStatus("error");
         setValidating(false);
         return;
@@ -705,7 +762,7 @@ function Step2({ data, setData, onNext, onBack }) {
     try {
       await apiPost("/validate-credentials", {
         platform: data.platform,
-        storeUrl: data.storeUrl,
+        storeUrl: normalizedStoreUrl,
         ...(isShopify
           ? { apiKey: data.apiKey, accessToken: data.accessToken }
           : { consumerKey: data.consumerKey, consumerSecret: data.consumerSecret })
@@ -714,6 +771,7 @@ function Step2({ data, setData, onNext, onBack }) {
       setApiStatus("success");
       setTimeout(() => onNext(), 1200);
     } catch (err) {
+      setApiErrorMessage(err?.message || "");
       setApiStatus("error");
     } finally {
       setValidating(false);
@@ -775,7 +833,7 @@ function Step2({ data, setData, onNext, onBack }) {
         </>)}
       </div>
       {apiStatus === "success" && <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-sm"><Icon path={icons.check} size={16} /> Credentials validated successfully!</div>}
-      {apiStatus === "error" && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> Could not verify credentials. Use your Client ID with either the Shopify Client Secret (`shpss_`) or the Admin API access token (`shpat_`). Also make sure the app is installed on the exact store URL you entered.</div>}
+      {apiStatus === "error" && <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-sm"><Icon path={icons.info} size={16} /> {apiErrorMessage || (isShopify ? "Could not verify credentials. Use your Client ID with either the Shopify Client Secret (`shpss_`) or the Admin API access token (`shpat_`). Also make sure the app is installed on the exact store URL you entered." : "Could not verify credentials. Use the WooCommerce Consumer Key (`ck_`) and Consumer Secret (`cs_`), and enter the exact WordPress store URL instead of a `wp-admin` or API endpoint.")}</div>}
 
       <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-800/50 border border-white/5">
         <Icon path={icons.shield} size={16} className="text-violet-400 flex-shrink-0 mt-0.5" />

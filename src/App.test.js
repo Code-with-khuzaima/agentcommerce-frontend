@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import App from "./App";
+import App, { normalizeStoreUrl } from "./App";
 
 jest.mock("./AdminDashboard", () => () => <div>Admin Dashboard Mock</div>);
 jest.mock("./AdminLoginPage", () => () => <div>Admin Login Mock</div>);
@@ -55,5 +55,23 @@ describe("App routing shell", () => {
       adminToken: "admin_token_123",
     });
     expect(screen.getByText("Admin Dashboard Mock")).toBeInTheDocument();
+  });
+});
+
+describe("normalizeStoreUrl", () => {
+  test("normalizes Shopify admin URLs to the canonical shop domain", () => {
+    expect(normalizeStoreUrl("https://Example-Store.myshopify.com/admin/settings", "shopify")).toBe("https://example-store.myshopify.com");
+  });
+
+  test("adds https when the user enters only the hostname", () => {
+    expect(normalizeStoreUrl("example-store.myshopify.com", "shopify")).toBe("https://example-store.myshopify.com");
+  });
+
+  test("keeps WooCommerce subdirectory installs while stripping wp-admin", () => {
+    expect(normalizeStoreUrl("https://example.com/shop/wp-admin/admin.php?page=wc-settings", "woocommerce")).toBe("https://example.com/shop");
+  });
+
+  test("strips WooCommerce API endpoints down to the site base", () => {
+    expect(normalizeStoreUrl("https://example.com/store/wp-json/wc/v3/products", "woocommerce")).toBe("https://example.com/store");
   });
 });
