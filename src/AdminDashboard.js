@@ -108,12 +108,12 @@ function workflowTemplateFor(store) {
   if (!store) return null;
   const key = `${store.plan || "starter"}:${store.platform || "shopify"}`;
   const map = {
-    "starter:shopify": ["Starter Shopify", "starter-chat"],
-    "starter:woocommerce": ["Starter WooCommerce", "starter-chat"],
-    "pro:shopify": ["Pro Shopify", "pro-chat"],
-    "pro:woocommerce": ["Pro WooCommerce", "pro-chat"],
-    "enterprise:shopify": ["Enterprise Shopify", "enterprise-chat"],
-    "enterprise:woocommerce": ["Enterprise WooCommerce", "enterprise-chat"],
+    "starter:shopify": ["Starter Shopify", "starter-shopify-chat"],
+    "starter:woocommerce": ["Starter WooCommerce", "starter-woocommerce-chat"],
+    "pro:shopify": ["Pro Shopify", "pro-shopify-chat"],
+    "pro:woocommerce": ["Pro WooCommerce", "pro-woocommerce-chat"],
+    "enterprise:shopify": ["Enterprise Shopify", "enterprise-shopify-chat"],
+    "enterprise:woocommerce": ["Enterprise WooCommerce", "enterprise-woocommerce-chat"],
   };
   const item = map[key];
   return item ? { label: item[0], path: item[1] } : null;
