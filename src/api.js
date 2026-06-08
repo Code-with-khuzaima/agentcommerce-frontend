@@ -9,6 +9,16 @@ export function resolveApiBase(location = (typeof window !== "undefined" ? windo
       return "http://localhost:4000/api";
     }
 
+    const productionHosts = new Set([
+      "agentcommerce-frontend.vercel.app",
+      "agentcommerce-frontend-code-with-khuzaimas-projects.vercel.app",
+      "agentcommerce-frontend-git-master-code-with-khuzaimas-projects.vercel.app",
+    ]);
+
+    if (productionHosts.has(hostname)) {
+      return "https://agentcommerce-backend-production.up.railway.app/api";
+    }
+
     // Do not silently route preview or alternate domains to production.
     return `${origin}/api`;
   }

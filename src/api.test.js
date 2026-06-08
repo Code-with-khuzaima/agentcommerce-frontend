@@ -11,6 +11,11 @@ describe("resolveApiBase", () => {
       .toBe("http://localhost:4000/api");
   });
 
+  test("uses Railway backend for production Vercel domain", () => {
+    expect(resolveApiBase({ hostname: "agentcommerce-frontend.vercel.app", origin: "https://agentcommerce-frontend.vercel.app" }, ""))
+      .toBe("https://agentcommerce-backend-production.up.railway.app/api");
+  });
+
   test("uses same-origin api path for non-local hosts when env is unset", () => {
     expect(resolveApiBase({ hostname: "preview.example.com", origin: "https://preview.example.com" }, ""))
       .toBe("https://preview.example.com/api");

@@ -129,32 +129,32 @@ function workflowTemplateFor(store) {
   const map = {
     "starter:shopify": {
       label: "Starter Shopify",
-      file: "D:\\Desktop\\agentcomerce_master\\starter\\shopify\\starter_shopify_backend_final.json",
+      file: "E:\\Desktop\\agentcomerce_master\\starter\\shopify\\starter_shopify_fixed.json",
       path: "starter-chat",
     },
     "starter:woocommerce": {
       label: "Starter WooCommerce",
-      file: "D:\\Desktop\\agentcomerce_master\\starter\\woocommerce\\starter_woocommerce_backend_final.json",
+      file: "E:\\Desktop\\agentcomerce_master\\starter\\woocommerce\\starter_woocommerce_fixed.json",
       path: "starter-chat",
     },
     "pro:shopify": {
       label: "Pro Shopify",
-      file: "D:\\Desktop\\pro_plan\\shopify\\pro_shopify_workflow.json",
+      file: "E:\\Desktop\\pro_plan\\shopify\\pro_shopify_fixed.json",
       path: "pro-chat",
     },
     "pro:woocommerce": {
       label: "Pro WooCommerce",
-      file: "D:\\Desktop\\pro_plan\\woocommerce\\AgentComerce — Pro Plan — WooCommerce.json",
+      file: "E:\\Desktop\\pro_plan\\woocommerce\\AgentComerce___Pro_Plan___WooCommerce_fixed (3).json",
       path: "pro-chat",
     },
     "enterprise:shopify": {
       label: "Enterprise Shopify",
-      file: "D:\\Desktop\\enterprise_plan\\shopify\\enterprise_shopify_workflow.json",
+      file: "E:\\Desktop\\enterprise_plan\\shopify\\enterprise_shopify_fixed.json",
       path: "enterprise-chat",
     },
     "enterprise:woocommerce": {
       label: "Enterprise WooCommerce",
-      file: "D:\\Desktop\\enterprise_plan\\woocommerce\\AgentComerce — Enterprise Plan — WooCommerce.json",
+      file: "E:\\Desktop\\enterprise_plan\\woocommerce\\enterprise_woocommerce_fixed.json",
       path: "enterprise-chat",
     },
   };
