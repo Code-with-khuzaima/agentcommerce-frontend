@@ -7,13 +7,15 @@
   var currentScript = document.currentScript || document.querySelector('script[data-agentcomerce-widget][src*="widget.js"]');
   var config = window.AgentComerce || {};
   var scriptApiBase = currentScript && currentScript.getAttribute("data-api-base");
+  var scriptSrc = currentScript && currentScript.src;
+  var assetBase = scriptSrc ? new URL(".", scriptSrc).href : window.location.origin + "/";
   var storeId = config.store_id || "store_001";
   var webhook = config.webhook_url || "";
   var apiBase = config.api_base || scriptApiBase || "";
-  var agentName = config.agent_name || "AI Assistant";
-  var accent = config.accent_color || "#7c3aed";
+  var agentName = config.agent_name || "AgentComerce Assistant";
+  var accent = config.accent_color || "#0f766e";
+  var logoUrl = config.logo_url || new URL("logo192.png", assetBase).href;
   var welcome = config.welcome_message || "Welcome! How can I help you today?";
-  var storageKey = "ac_widget_lead_" + storeId;
   var sessionKey = "ac_widget_session_" + storeId;
   var msgKey = "ac_widget_msgs_" + storeId;
 
@@ -25,10 +27,8 @@
     sessionId = "guest_" + Math.random().toString(36).slice(2, 10);
   }
 
-  var lead = null;
   var messages = [];
   try {
-    lead = JSON.parse(localStorage.getItem(storageKey) || "null");
     messages = JSON.parse(localStorage.getItem(msgKey) || "[]");
   } catch (e) {}
 
@@ -46,45 +46,46 @@
   style.textContent = `
     #acw-root, #acw-root * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
     #acw-root { --acw-accent: ${accent}; }
-    #acw-button { position: fixed; right: 20px; bottom: 20px; width: 60px; height: 60px; border-radius: 18px; border: none; background: var(--acw-accent); color: white; cursor: pointer; box-shadow: 0 12px 32px rgba(0,0,0,0.24); z-index: 99998; }
-    #acw-panel { position: fixed; right: 20px; bottom: 92px; width: min(380px, calc(100vw - 24px)); height: min(640px, calc(100vh - 120px)); background: #0f172a; color: white; border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 48px rgba(0,0,0,0.35); display: none; flex-direction: column; z-index: 99999; }
+    #acw-button { position: fixed; right: 20px; bottom: 20px; width: 62px; height: 62px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.28); background: #ffffff; color: white; cursor: pointer; box-shadow: 0 16px 36px rgba(15,23,42,0.24); z-index: 99998; padding: 7px; }
+    #acw-button img { width: 100%; height: 100%; display: block; border-radius: 14px; }
+    #acw-panel { position: fixed; right: 20px; bottom: 94px; width: min(400px, calc(100vw - 24px)); height: min(660px, calc(100vh - 120px)); background: #ffffff; color: #101828; border: 1px solid rgba(15,23,42,0.12); border-radius: 22px; overflow: hidden; box-shadow: 0 24px 60px rgba(15,23,42,0.22); display: none; flex-direction: column; z-index: 99999; }
     #acw-panel.open { display: flex; }
-    #acw-head { padding: 18px 18px 14px; background: linear-gradient(135deg, #111827 0%, #1f2937 100%); border-bottom: 1px solid rgba(255,255,255,0.08); }
+    #acw-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; background: #111827; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    #acw-logo { width: 40px; height: 40px; border-radius: 12px; background: white; padding: 4px; flex: 0 0 auto; }
+    #acw-logo img { width: 100%; height: 100%; display: block; border-radius: 9px; }
     #acw-title { font-size: 16px; font-weight: 700; }
     #acw-sub { font-size: 12px; color: rgba(255,255,255,0.68); margin-top: 4px; }
-    #acw-body { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #f8fafc; color: #111827; }
-    #acw-lead, #acw-chat { flex: 1; padding: 16px; overflow: auto; }
-    #acw-lead h3 { font-size: 18px; margin: 0 0 8px; color: #111827; }
-    #acw-lead p { font-size: 13px; line-height: 1.6; color: #475569; margin: 0 0 14px; }
-    #acw-lead label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin: 0 0 6px; }
-    #acw-lead input, #acw-lead select, #acw-input { width: 100%; border-radius: 12px; border: 1px solid #dbe2ea; background: white; padding: 12px 14px; font-size: 14px; outline: none; }
-    #acw-lead .acw-field { margin-bottom: 12px; }
-    #acw-note { border-radius: 14px; background: #eef2ff; color: #4338ca; padding: 12px; font-size: 12px; line-height: 1.6; margin-bottom: 14px; }
+    #acw-body { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #f3f6fa; color: #111827; }
+    #acw-chat { flex: 1; padding: 16px; overflow: auto; }
+    #acw-input { width: 100%; min-width: 0; border-radius: 14px; border: 1px solid #d6dde7; background: #ffffff; color: #111827; padding: 12px 14px; font-size: 14px; outline: none; }
     #acw-msgs { display: flex; flex-direction: column; gap: 12px; }
-    .acw-msg { max-width: 86%; padding: 12px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; box-shadow: 0 2px 8px rgba(15,23,42,0.08); }
-    .acw-bot { align-self: flex-start; background: white; color: #111827; border-bottom-left-radius: 4px; }
+    .acw-msg { max-width: 88%; padding: 12px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; box-shadow: 0 2px 8px rgba(15,23,42,0.08); }
+    .acw-msg.acw-has-products { max-width: 100%; width: 100%; }
+    .acw-bot { align-self: flex-start; background: #ffffff; color: #111827; border: 1px solid #e4eaf2; border-bottom-left-radius: 4px; }
     .acw-user { align-self: flex-end; background: var(--acw-accent); color: white; border-bottom-right-radius: 4px; }
-    #acw-foot { padding: 12px; border-top: 1px solid #e2e8f0; background: white; display: flex; gap: 10px; }
-    #acw-send, #acw-save-lead { border: none; border-radius: 14px; background: var(--acw-accent); color: white; font-weight: 700; cursor: pointer; }
-    #acw-send { width: 52px; }
-    #acw-save-lead { width: 100%; padding: 12px 14px; }
-    #acw-products { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
-    .acw-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; color: #111827; text-decoration: none; }
-    .acw-card img { width: 100%; height: 120px; object-fit: cover; background: #e2e8f0; }
-    .acw-card-body { padding: 10px; }
-    .acw-card-name { font-size: 13px; font-weight: 600; line-height: 1.45; min-height: 36px; }
-    .acw-card-price { font-size: 13px; color: var(--acw-accent); font-weight: 700; margin-top: 4px; }
-    .acw-card-stock { font-size: 11px; color: #047857; margin-top: 4px; }
+    #acw-foot { padding: 12px; border-top: 1px solid #e2e8f0; background: #ffffff; display: flex; gap: 10px; }
+    #acw-send { width: 48px; flex: 0 0 48px; border: none; border-radius: 14px; background: var(--acw-accent); color: white; font-weight: 800; cursor: pointer; }
+    #acw-products { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+    .acw-card { background: #ffffff; border: 1px solid #dde5ef; border-radius: 14px; overflow: hidden; color: #111827; text-decoration: none; min-width: 0; }
+    .acw-card a { color: inherit; text-decoration: none; display: block; min-width: 0; }
+    .acw-card img { width: 100%; aspect-ratio: 4 / 3; height: auto; object-fit: cover; background: #e2e8f0; display: block; }
+    .acw-card-body { padding: 10px; min-width: 0; }
+    .acw-card-name { font-size: 13px; font-weight: 700; line-height: 1.35; min-height: 35px; overflow-wrap: anywhere; }
+    .acw-card-price { font-size: 13px; color: var(--acw-accent); font-weight: 800; margin-top: 5px; }
+    .acw-card-stock { font-size: 11px; color: #067647; margin-top: 4px; }
     .acw-card-detail { font-size: 11px; color: #64748b; margin-top: 4px; min-height: 16px; }
-    .acw-card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-    .acw-card-btn { border: 1px solid #dbe2ea; border-radius: 10px; padding: 8px 10px; font-size: 11px; font-weight: 700; text-align: center; text-decoration: none; cursor: pointer; }
+    .acw-card-actions { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 10px; }
+    .acw-card-btn { border: 1px solid #dbe2ea; border-radius: 10px; padding: 9px 8px; font-size: 11px; font-weight: 800; text-align: center; text-decoration: none; cursor: pointer; width: 100%; }
     .acw-card-view { background: white; color: #0f172a; }
     .acw-card-cart { background: var(--acw-accent); border-color: var(--acw-accent); color: white; }
     .acw-card-cart[disabled] { opacity: 0.55; cursor: not-allowed; }
-    .acw-error { color: #b91c1c; font-size: 12px; margin: 0 0 12px; }
     @media (max-width: 640px) {
       #acw-button { right: 14px; bottom: 14px; width: 56px; height: 56px; }
-      #acw-panel { right: 12px; left: 12px; bottom: 82px; width: auto; height: min(72vh, 640px); }
+      #acw-panel { right: 10px; left: 10px; bottom: 80px; width: auto; height: min(78vh, 640px); border-radius: 18px; }
+      #acw-head { padding: 14px; }
+      #acw-chat { padding: 12px; }
+      .acw-msg { max-width: 92%; }
+      #acw-products { grid-template-columns: 1fr; }
     }
   `;
   document.head.appendChild(style);
@@ -92,41 +93,21 @@
   var root = document.createElement("div");
   root.id = "acw-root";
   root.innerHTML = `
-    <button id="acw-button" aria-label="Open chat">&#128172;</button>
+    <button id="acw-button" aria-label="Open chat"><img id="acw-button-logo" src="${escapeHtml(logoUrl)}" alt="" /></button>
     <div id="acw-panel">
       <div id="acw-head">
-        <div id="acw-title"></div>
-        <div id="acw-sub">Shopping assistant</div>
+        <div id="acw-logo"><img id="acw-head-logo" src="${escapeHtml(logoUrl)}" alt="" /></div>
+        <div>
+          <div id="acw-title"></div>
+          <div id="acw-sub">Shopping assistant</div>
+        </div>
       </div>
       <div id="acw-body">
-        <div id="acw-lead" style="display:${lead ? "none" : "block"}">
-          <h3>Before we start</h3>
-          <div id="acw-note">
-            We use this information to personalize responses, save your conversation, and optionally pass qualified leads to the store team. If you want leads, the store can follow up with interested shoppers.
-          </div>
-          <div class="acw-field">
-            <label for="acw-name">Name</label>
-            <input id="acw-name" type="text" placeholder="Your name" />
-          </div>
-          <div class="acw-field">
-            <label for="acw-email">Email</label>
-            <input id="acw-email" type="email" placeholder="you@example.com" />
-          </div>
-          <div class="acw-field">
-            <label for="acw-leads">Do you want to receive leads?</label>
-            <select id="acw-leads">
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
-          <p id="acw-lead-error" class="acw-error" style="display:none"></p>
-          <button id="acw-save-lead">Continue to Chat</button>
-        </div>
-        <div id="acw-chat" style="display:${lead ? "block" : "none"}">
+        <div id="acw-chat">
           <div id="acw-msgs"></div>
         </div>
       </div>
-      <div id="acw-foot" style="display:${lead ? "flex" : "none"}">
+      <div id="acw-foot">
         <input id="acw-input" placeholder="Ask me anything about this store..." />
         <button id="acw-send" aria-label="Send message">&#10148;</button>
       </div>
@@ -138,14 +119,11 @@
   var panel = document.getElementById("acw-panel");
   var rootNode = document.getElementById("acw-root");
   var titleNode = document.getElementById("acw-title");
-  var leadWrap = document.getElementById("acw-lead");
-  var chatWrap = document.getElementById("acw-chat");
-  var foot = document.getElementById("acw-foot");
+  var buttonLogo = document.getElementById("acw-button-logo");
+  var headLogo = document.getElementById("acw-head-logo");
   var msgs = document.getElementById("acw-msgs");
   var input = document.getElementById("acw-input");
   var send = document.getElementById("acw-send");
-  var saveLead = document.getElementById("acw-save-lead");
-  var leadError = document.getElementById("acw-lead-error");
 
   if (titleNode) titleNode.textContent = agentName;
 
@@ -157,10 +135,13 @@
     if (!next) return;
     agentName = next.agentName || agentName;
     accent = next.accentColor || accent;
+    logoUrl = next.logoUrl || logoUrl;
     welcome = next.welcomeMessage || welcome;
     webhook = next.webhookUrl || webhook;
     if (rootNode) rootNode.style.setProperty("--acw-accent", accent);
     if (titleNode) titleNode.textContent = agentName;
+    if (buttonLogo) buttonLogo.src = logoUrl;
+    if (headLogo) headLogo.src = logoUrl;
   }
 
   async function loadLiveConfig() {
@@ -202,7 +183,9 @@
         '<div class="acw-card-price">' + price + "</div>" +
         '<div class="acw-card-stock">' + stock + "</div>" +
         '<div class="acw-card-detail">' + detail + "</div>" +
+        '</div>' +
         '</a>' +
+        '<div class="acw-card-body">' +
         '<div class="acw-card-actions">' +
         '<a class="acw-card-btn acw-card-view" href="' + url + '" target="_blank" rel="noreferrer">View</a>' +
         '<button class="acw-card-btn acw-card-cart" type="button" ' + (cartUrl ? 'data-cart-url="' + cartUrl + '"' : "disabled") + ">" + (cartUrl ? "Add to Cart" : "Unavailable") + "</button>" +
@@ -214,6 +197,7 @@
   function renderMessage(role, text, products) {
     var item = document.createElement("div");
     item.className = "acw-msg " + (role === "user" ? "acw-user" : "acw-bot");
+    if (Array.isArray(products) && products.length) item.className += " acw-has-products";
     item.innerHTML = escapeHtml(String(text || "")).replace(/\n/g, "<br>") + renderProducts(products);
     msgs.appendChild(item);
     msgs.scrollTop = msgs.scrollHeight;
@@ -255,9 +239,6 @@
           store_id: storeId,
           user_id: sessionId,
           message: value,
-          lead_name: lead && lead.name,
-          lead_email: lead && lead.email,
-          wants_leads: lead && lead.wantsLeads,
         }),
       });
       var data = await res.json();
@@ -270,24 +251,7 @@
 
   button.addEventListener("click", function () {
     panel.classList.toggle("open");
-    if (panel.classList.contains("open") && lead) hydrateChat();
-  });
-
-  saveLead.addEventListener("click", function () {
-    var name = document.getElementById("acw-name").value.trim();
-    var email = document.getElementById("acw-email").value.trim();
-    var wantsLeads = document.getElementById("acw-leads").value;
-    if (!name || !email) {
-      leadError.style.display = "block";
-      leadError.textContent = "Name and email are required before chat.";
-      return;
-    }
-    lead = { name: name, email: email, wantsLeads: wantsLeads };
-    try { localStorage.setItem(storageKey, JSON.stringify(lead)); } catch (e) {}
-    leadWrap.style.display = "none";
-    chatWrap.style.display = "block";
-    foot.style.display = "flex";
-    hydrateChat();
+    if (panel.classList.contains("open")) hydrateChat();
   });
 
   send.addEventListener("click", sendMessage);
@@ -320,5 +284,5 @@
     }
   });
 
-  loadLiveConfig();
+  loadLiveConfig().then(hydrateChat).catch(hydrateChat);
 })();
