@@ -14,6 +14,7 @@
   var apiBase = config.api_base || scriptApiBase || "";
   var agentName = config.agent_name || "AgentComerce Assistant";
   var accent = config.accent_color || "#0f766e";
+  var secondary = config.secondary_color || "#111827";
   var logoUrl = config.logo_url || new URL("logo192.png", assetBase).href;
   var welcome = config.welcome_message || "Welcome! How can I help you today?";
   var sessionKey = "ac_widget_session_" + storeId;
@@ -45,12 +46,12 @@
   style.id = "acw-style";
   style.textContent = `
     #acw-root, #acw-root * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
-    #acw-root { --acw-accent: ${accent}; }
-    #acw-button { position: fixed; right: 20px; bottom: 20px; width: 62px; height: 62px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.28); background: #ffffff; color: white; cursor: pointer; box-shadow: 0 16px 36px rgba(15,23,42,0.24); z-index: 99998; padding: 7px; }
+    #acw-root { --acw-accent: ${accent}; --acw-secondary: ${secondary}; }
+    #acw-button { position: fixed; right: 20px; bottom: 20px; width: 62px; height: 62px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.28); background: var(--acw-secondary); color: white; cursor: pointer; box-shadow: 0 16px 36px rgba(15,23,42,0.24); z-index: 99998; padding: 7px; }
     #acw-button img { width: 100%; height: 100%; display: block; border-radius: 14px; }
     #acw-panel { position: fixed; right: 20px; bottom: 94px; width: min(400px, calc(100vw - 24px)); height: min(660px, calc(100vh - 120px)); background: #ffffff; color: #101828; border: 1px solid rgba(15,23,42,0.12); border-radius: 22px; overflow: hidden; box-shadow: 0 24px 60px rgba(15,23,42,0.22); display: none; flex-direction: column; z-index: 99999; }
     #acw-panel.open { display: flex; }
-    #acw-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; background: #111827; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    #acw-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; background: var(--acw-secondary); border-bottom: 1px solid rgba(255,255,255,0.08); }
     #acw-logo { width: 40px; height: 40px; border-radius: 12px; background: white; padding: 4px; flex: 0 0 auto; }
     #acw-logo img { width: 100%; height: 100%; display: block; border-radius: 9px; }
     #acw-title { font-size: 16px; font-weight: 700; }
@@ -135,10 +136,12 @@
     if (!next) return;
     agentName = next.agentName || agentName;
     accent = next.accentColor || accent;
+    secondary = next.secondaryColor || secondary;
     logoUrl = next.logoUrl || logoUrl;
     welcome = next.welcomeMessage || welcome;
     webhook = next.webhookUrl || webhook;
     if (rootNode) rootNode.style.setProperty("--acw-accent", accent);
+    if (rootNode) rootNode.style.setProperty("--acw-secondary", secondary);
     if (titleNode) titleNode.textContent = agentName;
     if (buttonLogo) buttonLogo.src = logoUrl;
     if (headLogo) headLogo.src = logoUrl;

@@ -69,6 +69,19 @@ function InputField({ label, value, onChange, placeholder = "", type = "text" })
   );
 }
 
+function ColorField({ label, value, onChange }) {
+  const current = value || "#0f766e";
+  const swatchValue = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(current) ? current : "#0f766e";
+  return (
+    <Field label={label}>
+      <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-800 bg-slate-950 px-3 py-2">
+        <input type="color" value={swatchValue} onChange={(event) => onChange(event.target.value)} className="h-10 w-12 flex-none cursor-pointer rounded-xl border-0 bg-transparent p-0" />
+        <input type="text" value={current} onChange={(event) => onChange(event.target.value)} className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-white outline-none" />
+      </div>
+    </Field>
+  );
+}
+
 function TextareaField({ label, value, onChange, placeholder = "", rows = 4 }) {
   return (
     <Field label={label}>
@@ -132,6 +145,8 @@ function mapForm(store) {
     msgLimit: store.msgLimit || 5000,
     paymentAmount: store.paymentAmount || 0,
     webhookUrl: store.webhookUrl || "",
+    accentColor: store.accentColor || "#0f766e",
+    secondaryColor: store.secondaryColor || "#111827",
     internalNotes: store.internalNotes || "",
   };
 }
@@ -348,6 +363,27 @@ export default function AdminDashboard() {
                     <InfoStat label="Created" value={formatDate(selectedStore.createdAt)} />
                   </div>
                   <div className="mt-4 break-words text-sm text-slate-400 [overflow-wrap:anywhere]">{selectedStore.storeUrl}</div>
+                </Panel>
+
+                <Panel title="Chat Widget Colors">
+                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <ColorField label="Color 1 - Buttons And User Chat" value={form.accentColor} onChange={(value) => setForm((current) => ({ ...current, accentColor: value }))} />
+                      <ColorField label="Color 2 - Header And Launcher" value={form.secondaryColor} onChange={(value) => setForm((current) => ({ ...current, secondaryColor: value }))} />
+                    </div>
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+                      <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
+                        <div className="px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: form.secondaryColor || "#111827" }}>Chat Header</div>
+                        <div className="space-y-3 bg-slate-100 p-3">
+                          <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-white p-3 text-xs font-semibold text-slate-800">Assistant reply</div>
+                          <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md p-3 text-xs font-semibold text-white" style={{ backgroundColor: form.accentColor || "#0f766e" }}>User message</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <button onClick={saveStore} disabled={saving} className="rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">{saving ? "Saving..." : "Save Colors"}</button>
+                  </div>
                 </Panel>
 
                 <Panel title="Status">
