@@ -116,6 +116,20 @@
       color: #d1fae5;
       font-size: 14px;
     }
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .check-row input {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
     .muted-note {
       font-size: 13px;
       color: #9fb0cf;
@@ -158,6 +172,10 @@
             <div class="row">
               <input id="apiBase" type="text" placeholder="https://your-backend.example.com/api" />
             </div>
+            <label class="check-row" for="mockMode">
+              <input id="mockMode" type="checkbox" />
+              Use mock chat reply for UI preview
+            </label>
             <div id="status" class="status">Ready. Load the widget for a store and test the live chat flow.</div>
           </div>
 
@@ -196,13 +214,17 @@
     (function () {
       const storeInput = document.getElementById('storeId');
       const apiBaseInput = document.getElementById('apiBase');
+      const mockModeInput = document.getElementById('mockMode');
       const loadButton = document.getElementById('loadWidget');
       const status = document.getElementById('status');
       const params = new URLSearchParams(window.location.search);
       const queryStore = params.get('store_id');
       const queryApiBase = params.get('api_base');
+      const queryMock = params.get('mock');
+      const originalFetch = window.fetch.bind(window);
       if (queryStore) storeInput.value = queryStore;
       apiBaseInput.value = queryApiBase || new URL('/api', window.location.origin).toString();
+      mockModeInput.checked = queryMock === '1';
 
       function setStatus(message, isError) {
         status.textContent = message;
@@ -221,6 +243,60 @@
         if (existingStyle) existingStyle.remove();
         delete window.AgentComerce;
         delete window.__AgentComerceWidgetLoaded;
+        window.fetch = originalFetch;
+      }
+
+      function installMockFetch(storeId) {
+        const mockWebhook = 'https://agentcommerce.local/mock-webhook';
+        window.fetch = async function (input, init) {
+          const url = typeof input === 'string' ? input : input && input.url;
+          if (url && url.includes('/widget-config/')) {
+            return new Response(JSON.stringify({
+              success: true,
+              config: {
+                storeId,
+                agentName: 'AgentComerce Assistant',
+                accentColor: '#0f766e',
+                welcomeMessage: 'Hi, I can help you find products, compare options, and answer store questions.',
+                webhookUrl: mockWebhook,
+              },
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          }
+          if (url === mockWebhook) {
+            let message = 'your message';
+            try {
+              const body = JSON.parse((init && init.body) || '{}');
+              message = body.message || message;
+            } catch (error) {}
+            return new Response(JSON.stringify({
+              reply: 'Here is how the live assistant reply will look for: "' + message + '". These product cards are mock preview data.',
+              products: [
+                {
+                  name: 'Premium Wireless Headphones',
+                  price: 'Rs. 12,500',
+                  stock: 'In Stock',
+                  detail: 'Noise cancellation, 30-hour battery',
+                  image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80',
+                  url: '#',
+                  add_to_cart_url: '',
+                },
+                {
+                  name: 'Smart Fitness Watch',
+                  price: 'Rs. 8,900',
+                  stock: 'In Stock',
+                  detail: 'Heart rate, sleep, workout tracking',
+                  image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80',
+                  url: '#',
+                  add_to_cart_url: '',
+                },
+              ],
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          }
+          if (url && url.includes('/widget-usage')) {
+            return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          }
+          return originalFetch(input, init);
+        };
       }
 
       function loadWidget() {
@@ -236,6 +312,7 @@
         }
 
         removeExistingWidget();
+        if (mockModeInput.checked) installMockFetch(storeId);
         window.AgentComerce = { store_id: storeId, api_base: apiBase };
 
         const configScript = document.createElement('script');
@@ -249,10 +326,12 @@
         script.dataset.agentcomerceWidget = 'true';
         script.dataset.apiBase = apiBase;
         script.onload = function () {
-          setStatus('Widget loaded for ' + storeId + '. Open the chat bubble and test live messages.');
+          setStatus('Widget loaded for ' + storeId + '. Open the chat bubble and test ' + (mockModeInput.checked ? 'the mock UI preview.' : 'live messages.'));
           const nextUrl = new URL(window.location.href);
           nextUrl.searchParams.set('store_id', storeId);
           nextUrl.searchParams.set('api_base', apiBase);
+          if (mockModeInput.checked) nextUrl.searchParams.set('mock', '1');
+          else nextUrl.searchParams.delete('mock');
           window.history.replaceState({}, '', nextUrl.toString());
         };
         script.onerror = function () {
