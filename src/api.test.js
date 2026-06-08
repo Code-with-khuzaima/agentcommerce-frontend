@@ -16,6 +16,11 @@ describe("resolveApiBase", () => {
       .toBe("https://agentcommerce-backend-production.up.railway.app/api");
   });
 
+  test("ignores stale env value on production Vercel domain", () => {
+    expect(resolveApiBase({ hostname: "agentcommerce-frontend.vercel.app", origin: "https://agentcommerce-frontend.vercel.app" }, "https://agentcommerce-backend-production-e1d9.up.railway.app/api"))
+      .toBe("https://agentcommerce-backend-production.up.railway.app/api");
+  });
+
   test("uses same-origin api path for non-local hosts when env is unset", () => {
     expect(resolveApiBase({ hostname: "preview.example.com", origin: "https://preview.example.com" }, ""))
       .toBe("https://preview.example.com/api");

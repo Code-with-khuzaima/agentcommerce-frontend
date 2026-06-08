@@ -1,14 +1,6 @@
 export function resolveApiBase(location = (typeof window !== "undefined" ? window.location : null), envApiBase = process.env.REACT_APP_API_URL) {
-  if (envApiBase) {
-    return envApiBase;
-  }
-
   if (location) {
     const { hostname, origin } = location;
-    if (hostname === "localhost" || hostname === "127.0.0.1") {
-      return "http://localhost:4000/api";
-    }
-
     const productionHosts = new Set([
       "agentcommerce-frontend.vercel.app",
       "agentcommerce-frontend-code-with-khuzaimas-projects.vercel.app",
@@ -19,8 +11,20 @@ export function resolveApiBase(location = (typeof window !== "undefined" ? windo
       return "https://agentcommerce-backend-production.up.railway.app/api";
     }
 
+    if (envApiBase) {
+      return envApiBase;
+    }
+
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return "http://localhost:4000/api";
+    }
+
     // Do not silently route preview or alternate domains to production.
     return `${origin}/api`;
+  }
+
+  if (envApiBase) {
+    return envApiBase;
   }
 
   return "http://localhost:4000/api";
